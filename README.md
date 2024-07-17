@@ -1,1 +1,1 @@
-Eternal is an old dead hacked client for minecraft, im just trying to recreate this on roblox
+Eternal, old dead minecraft hacked client that i tried to recreate on roblox
