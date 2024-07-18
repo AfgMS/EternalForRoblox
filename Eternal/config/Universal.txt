@@ -24,7 +24,7 @@ local Gravity = Tabs.Misc:CreateToggle({
 		end
 	end
 })
-local CustomSpeed = Speed:CreateSlider({
+local CustomGravity = Gravity:CreateSlider({
 	Name = "Gravity",
 	Min = 0,
 	Max = 192.6,
@@ -116,7 +116,6 @@ local LongJump = Tabs.Player:CreateToggle({
 	Name = "LongJump",
 	Keybind = "F",
 	Default = false,
-	IsDisabled = LongJumpSettings.Disabled,
 	Callback = function(callback)
 		if callback then
 			LongJumpSettings.GravityGlide = true
@@ -154,11 +153,8 @@ local LongJumpFix = LongJump:CreateMiniToggle({
 local MobileSupport = Tabs.Misc:CreateToggle({
 	Name = "MobileSupport",
 	Keybind = nil,
-	Callback = function(enabled)
-		if enabled then
-			Library.MobileButtons = true
-		else
-			Library.MobileButtons = true
-		end
+	Default = false,
+	Callback = function(callback)
+		Library.MobileButtons = not Library.MobileButtons 
 	end
 })
