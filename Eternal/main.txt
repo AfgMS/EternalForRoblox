@@ -6,13 +6,21 @@ local Library = "https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/E
 local Universal = "https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/config/Universal.txt"
 
 local function GetGithub(url, path)
-	local success, response = pcall(function() return HttpService:GetAsync(url) end)
+	local success, response = pcall(function()
+		return HttpService:GetAsync(url)
+	end)
 
 	if success then
-		if not isfile(path) or readfile(path) ~= response then
+		local fileContent
+		if isfile(path) then
+			fileContent = readfile(path)
+		end
+
+		if fileContent ~= response then
 			writefile(path, response)
+			print("Updated:", path)
 		else
-			return true
+			print("Up to date!")
 		end
 	else
 		writefile(LogsFolder .. "/update_error.txt", "Unable to update Eternal, if you think that this is a bug. Please report at discord.gg/VuamOWAasa")
