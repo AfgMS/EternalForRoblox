@@ -2,28 +2,16 @@ local HttpService = game:GetService("HttpService")
 local MainFolder = "Eternal"
 local ConfigFolder = MainFolder .. "/config"
 local LogsFolder = MainFolder .. "/logs"
-local Library = "https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/library.txt"
-local Universal = "https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/config/Universal.txt"
+local LibraryURL = "https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/library.txt"
+local UniversalURL = "https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/config/Universal.txt"
 
 local function GetGithub(url, path)
-	local success, response = pcall(function()
-		return HttpService:GetAsync(url)
-	end)
-
-	if success then
-		local fileContent
-		if isfile(path) then
-			fileContent = readfile(path)
-		end
-
-		if fileContent ~= response then
-			writefile(path, response)
-			print("Updated:", path)
-		else
-			print("Up to date!")
-		end
+	local content = game:HttpGet(url)
+	if content then
+		writefile(path, content)
+		print("Updated " .. path)
 	else
-		writefile(LogsFolder .. "/update_error.txt", "Unable to update Eternal, if you think that this is a bug. Please report at discord.gg/VuamOWAasa")
+		writefile(LogsFolder .. "/update_error.txt", "Unable to update Eternal. Dm nothm_ on discord for support")
 	end
 end
 
@@ -32,11 +20,11 @@ if not isfolder(ConfigFolder) then makefolder(ConfigFolder) end
 if not isfolder(LogsFolder) then makefolder(LogsFolder) end
 
 if isfolder(MainFolder) and isfolder(ConfigFolder) and isfolder(LogsFolder) then
-	GetGithub(Library, MainFolder .. "/Library.lua")
-
+	GetGithub(UniversalURL, MainFolder .. "/library.txt")
+	
 	if game.PlaceId == 6872274481 or game.PlaceId == 8560631822 or game.PlaceId == 8444591321 then
 		writefile(LogsFolder .. "/error_" .. game.PlaceId .. ".txt", "This game is not supported by Eternal")
 	else
-		loadstring(game:HttpGet(Universal))()
+		--
 	end
 end
