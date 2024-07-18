@@ -24,7 +24,14 @@ local Gravity = Tabs.Misc:CreateToggle({
 		end
 	end
 })
-
+local CustomSpeed = Speed:CreateSlider({
+	Name = "Gravity",
+	Min = 0,
+	Max = 192.6,
+	Callback = function(value)
+		GravitySettings.NewGravity = value
+	end
+})
 --Speed
 local SpeedSettings = {
 	OldSpeed = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed,
@@ -143,18 +150,8 @@ local LongJumpFix = LongJump:CreateMiniToggle({
 		end
 	end
 })
-
---[[
-
-local Main = Library:CreateCore()
-local Tab1 = Main:CreateTab("Main")
-local Tab2 = Main:CreateTab("Misc")
-local Tab3 = Main:CreateTab("Main")
-local Tab4 = Main:CreateTab("Misc")
-local Tab5 = Main:CreateTab("Main")
-local Tab6 = Main:CreateTab("Misc")
-
-local MobileSupport = Tab1:CreateToggle({
+--MobileSupport
+local MobileSupport = Tabs.Misc:CreateToggle({
 	Name = "MobileSupport",
 	Keybind = nil,
 	Callback = function(enabled)
@@ -165,52 +162,3 @@ local MobileSupport = Tab1:CreateToggle({
 		end
 	end
 })
-local Rainbow = Tab2:CreateToggle({
-	Name = "Rainbow",
-	Keybind = nil,
-	Callback = function(enabled)
-		if enabled then
-			Library.RaindbowGui = false
-		else
-			Library.RaindbowGui = true
-		end
-	end
-})
-
-local ToggleTest = Tab1:CreateToggle({
-	Name = "ToggleTest",
-	Keybind = nil,
-	Callback = function(enabled)
-		if enabled then
-			print("Enabled")
-		else
-			print("Disabled")
-		end
-	end
-})
-local DropdownTest = ToggleTest:CreateDropdown({
-	Name = "DropDownTest",
-	List = {"Henlo", "Santi", "Asep"},
-	Callback = function(selected)
-		print(selected)
-	end
-})
-local SliderTest = ToggleTest:CreateSlider({
-	Name = "SliderTest",
-	Min = 0,
-	Max = 500,
-	Callback = function(value)
-		game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = value
-	end
-})
-local MiniToggleTest = ToggleTest:CreateMiniToggle({
-	Name = "MiniToggleTest",
-	Callback = function(enabled)
-		if enabled then
-			print("MiniEnabled")
-		else
-			print("MiniDisabled")
-		end	
-	end
-})
---]]
