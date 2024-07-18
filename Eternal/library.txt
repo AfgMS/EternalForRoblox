@@ -152,7 +152,7 @@ function Library:CreateCore()
 	Logo.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	Logo.BorderSizePixel = 0
 	Logo.Position = UDim2.new(0.00932994019, 0, 0.0187969916, 0)
-	Logo.Size = UDim2.new(0, 220, 0, 23)
+	Logo.Size = UDim2.new(0, 220, 0, 28)
 	
 	local Top = Instance.new("Frame")
 	Top.Parent = Logo
