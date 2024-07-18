@@ -152,7 +152,6 @@ function Library:CreateCore()
 	Logo.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	Logo.BorderSizePixel = 0
 	Logo.Position = UDim2.new(0.00932994019, 0, 0.0187969916, 0)
-	Logo.Size = UDim2.new(0, 220, 0, 28)
 	
 	local Top = Instance.new("Frame")
 	Top.Parent = Logo
@@ -176,6 +175,10 @@ function Library:CreateCore()
 	Title.TextSize = 14.000
 	Title.TextWrapped = true
 	Title.TextXAlignment = Enum.TextXAlignment.Left
+	
+	local NewSize = game:GetService("TextService"):GetTextSize(Title.Text, Title.TextSize, Title.Font, Vector2.new(math.huge, math.huge))
+	Logo.Size = UDim2.new(0, NewSize.X + 12, 0, 23)
+	
 	
 	local ArraylistHolder = Instance.new("Frame")
 	ArraylistHolder.Name = "ArraylistHolder"
