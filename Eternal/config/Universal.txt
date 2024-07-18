@@ -1,1 +1,216 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/library.txt"))()
+local Main = Library:CreateCore()
 
+local Tabs = {
+	Combat = Main:CreateTab("Combat"),
+	Player = Main:CreateTab("Player"),
+	Misc = Main:CreateTab("Misc")
+}
+--Gravity
+local GravitySettings = {
+	OldGravity = game.Workspace.Gravity,
+	NewGravity = 15
+}
+
+local Gravity = Tabs.Misc:CreateToggle({
+	Name = "Gravity",
+	Keybind = nil,
+	Default = true,
+	Callback = function(callback)
+		if callback then
+			game.Workspace.Gravity = GravitySettings.NewGravity
+		else
+			game.Workspace.Gravity = GravitySettings.OldGravity
+		end
+	end
+})
+
+--Speed
+local SpeedSettings = {
+	OldSpeed = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed,
+	NewSpeed = 23,
+	ChoosedMode = nil,
+	HumanoidSlow = false,
+	HumanoidOnly = false,
+}
+
+local function HumanoidSlow()
+	while SpeedSettings.HumanoidSlow do
+		wait(0.8)
+		game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = SpeedSettings.NewSpeed + 32
+		wait(0.2)
+		game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = SpeedSettings.OldSpeed - 8
+	end
+end
+local function HumanoidOnly()
+	while SpeedSettings.HumanoidOnly do
+		wait()
+		game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = SpeedSettings.NewSpeed
+	end
+end
+local Speed = Tabs.Player:CreateToggle({
+	Name = "Speed",
+	Keybind = nil,
+	Default = false,
+	Callback = function(callback)
+		if callback then
+			if SpeedSettings.ChoosedMode == "HumanoidSlow" then
+				SpeedSettings.HumanoidSlow = true
+				HumanoidSlow()
+			elseif SpeedSettings.ChoosedMode == "HumanoidWalk" then
+				SpeedSettings.HumanoidOnly = true
+				HumanoidOnly()
+			end
+		else
+			SpeedSettings.HumanoidSlow = false
+			SpeedSettings.HumanoidOnly = false
+			wait(0.8)
+			game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = SpeedSettings.OldSpeed
+		end
+	end
+})
+local SpeedMode = Speed:CreateDropdown({
+	Name = "Mode",
+	List = {"HumanoidSlow", "HumanoidWalk"},
+	Default = "HumanoidWalk",
+	Callback = function(selected)
+		SpeedSettings.ChoosedMode = selected
+	end
+})
+local FixSpeed = Speed:CreateMiniToggle({
+	Name = "Fix",
+	Default = false,
+	Callback = function(callback)
+		if callback then
+			game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = SpeedSettings.OldSpeed
+		end
+	end
+})
+local CustomSpeed = Speed:CreateSlider({
+	Name = "Spped",
+	Min = 0,
+	Max = 100,
+	Callback = function(value)
+		SpeedSettings.NewSpeed = value
+	end
+})
+--LongJump
+local CurrentCamera = game.Workspace.CurrentCamera
+local LongJumpSettings = {
+	AutoJump = true,
+	Boost = 150,
+	BoostTime = 3,
+	GravityGlide = false,
+	GravityGlideCustom = 5,
+	GravityGlideTime = 2
+}
+
+local LongJump = Tabs.Player:CreateToggle({
+	Name = "LongJump",
+	Keybind = "F",
+	Default = false,
+	IsDisabled = LongJumpSettings.Disabled,
+	Callback = function(callback)
+		if callback then
+			LongJumpSettings.GravityGlide = true
+			if LongJumpSettings.GravityGlide then
+				game.Workspace.Gravity = LongJumpSettings.GravityGlideCustom
+			end
+			if LongJumpSettings.AutoJump then
+				game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
+			end
+			game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").Velocity = CurrentCamera.CFrame.LookVector * LongJumpSettings.Boost
+			wait(LongJumpSettings.GravityGlideTime)
+			game.Workspace.Gravity = GravitySettings.OldGravity
+			LongJumpSettings.GravityGlide = false
+		end
+	end
+})
+local CustomBoost = LongJump:CreateSlider({
+	Name = "Boost",
+	Min = 100,
+	Max = 1000,
+	Callback = function(value)
+		LongJumpSettings.Boost = value
+	end
+})
+local LongJumpFix = LongJump:CreateMiniToggle({
+	Name = "Fix",
+	Default = false,
+	Callback = function(callback)
+		if callback then
+			game.Workspace.Gravity = GravitySettings.OldGravity
+		end
+	end
+})
+
+--[[
+
+local Main = Library:CreateCore()
+local Tab1 = Main:CreateTab("Main")
+local Tab2 = Main:CreateTab("Misc")
+local Tab3 = Main:CreateTab("Main")
+local Tab4 = Main:CreateTab("Misc")
+local Tab5 = Main:CreateTab("Main")
+local Tab6 = Main:CreateTab("Misc")
+
+local MobileSupport = Tab1:CreateToggle({
+	Name = "MobileSupport",
+	Keybind = nil,
+	Callback = function(enabled)
+		if enabled then
+			Library.MobileButtons = true
+		else
+			Library.MobileButtons = true
+		end
+	end
+})
+local Rainbow = Tab2:CreateToggle({
+	Name = "Rainbow",
+	Keybind = nil,
+	Callback = function(enabled)
+		if enabled then
+			Library.RaindbowGui = false
+		else
+			Library.RaindbowGui = true
+		end
+	end
+})
+
+local ToggleTest = Tab1:CreateToggle({
+	Name = "ToggleTest",
+	Keybind = nil,
+	Callback = function(enabled)
+		if enabled then
+			print("Enabled")
+		else
+			print("Disabled")
+		end
+	end
+})
+local DropdownTest = ToggleTest:CreateDropdown({
+	Name = "DropDownTest",
+	List = {"Henlo", "Santi", "Asep"},
+	Callback = function(selected)
+		print(selected)
+	end
+})
+local SliderTest = ToggleTest:CreateSlider({
+	Name = "SliderTest",
+	Min = 0,
+	Max = 500,
+	Callback = function(value)
+		game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = value
+	end
+})
+local MiniToggleTest = ToggleTest:CreateMiniToggle({
+	Name = "MiniToggleTest",
+	Callback = function(enabled)
+		if enabled then
+			print("MiniEnabled")
+		else
+			print("MiniDisabled")
+		end	
+	end
+})
+--]]
