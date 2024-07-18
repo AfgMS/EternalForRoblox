@@ -25,6 +25,6 @@ if isfolder(MainFolder) and isfolder(ConfigFolder) and isfolder(LogsFolder) then
 	if game.PlaceId == 6872274481 or game.PlaceId == 8560631822 or game.PlaceId == 8444591321 then
 		writefile(LogsFolder .. "/error_" .. game.PlaceId .. ".txt", "This game is not supported by Eternal")
 	else
-		--
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/config/Universal.txt"))()
 	end
 end
