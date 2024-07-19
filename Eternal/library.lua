@@ -313,17 +313,9 @@ function Library:CreateCore()
 			ToggleButton = {
 				Name = ToggleButton.Name,
 				Keybind = ToggleButton.Keybind or "Insert",
-				Enabled = ToggleButton.Enabled or false,
+				Enabled = ToggleButton.Enabled,
 				Callback = ToggleButton.Callback or function() end
 			}
-
-			if not Settings.ToggleButton[ToggleButton.Name] then
-				Settings.ToggleButton[ToggleButton.Name] = {
-					Enabled = ToggleButton.Enabled
-				}
-			else
-				ToggleButton.Enabled = Settings.ToggleButton[ToggleButton.Name].Enabled
-			end
 			
 			local ToggleButtonHolder = Instance.new("TextButton")
 			ToggleButtonHolder.Parent = ToggleHolders
@@ -434,11 +426,9 @@ function Library:CreateCore()
 				if ToggleButton.Enabled then
 					TweenEffect(ToggleCheckmark, {BackgroundColor3 = Color3.fromRGB(0, 175, 0)})
 					InsertArray(ToggleButton.Name)
-					Settings.ToggleButton[ToggleButton.Name].Enabled = ToggleButton.Enabled
 				else
 					TweenEffect(ToggleCheckmark, {BackgroundColor3 = Color3.fromRGB(175, 0, 0)})
 					RemoveArray(ToggleButton.Name)
-					Settings.ToggleButton[ToggleButton.Name].Enabled = ToggleButton.Enabled
 				end
 			end
 			
@@ -463,10 +453,8 @@ function Library:CreateCore()
 				local function OnClickedButtonz()
 					if ToggleButton.Enabled then
 						TweenEffect(MobileButtonz, {BackgroundColor3 = Color3.fromRGB(0, 175, 0)})
-						Settings.ToggleButton[ToggleButton.Name].Enabled = ToggleButton.Enabled
 					else
 						TweenEffect(MobileButtonz, {BackgroundColor3 = Color3.fromRGB(175, 0, 0)})
-						Settings.ToggleButton[ToggleButton.Name].Enabled = ToggleButton.Enabled
 					end
 				end
 
