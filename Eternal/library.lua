@@ -112,7 +112,7 @@ function Library:CreateCore()
 	else
 		Eternal.Parent = CoreGui
 	end
-	
+
 	local MainFrame = Instance.new("Frame")
 	MainFrame.Parent = Eternal
 	MainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -121,7 +121,7 @@ function Library:CreateCore()
 	MainFrame.BorderSizePixel = 0
 	MainFrame.Size = UDim2.new(1, 0, 1, 0)
 	MainFrame.Visible = false
-	
+
 	local MobileButtonsHolder = Instance.new("Frame")
 	MobileButtonsHolder.Parent = Eternal
 	MobileButtonsHolder.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -130,7 +130,7 @@ function Library:CreateCore()
 	MobileButtonsHolder.BorderSizePixel = 0
 	MobileButtonsHolder.Size = UDim2.new(1, 0, 1, 0)
 	MobileButtonsHolder.Visible = true
-	
+
 	local TrashCans = Instance.new("ImageLabel")
 	TrashCans.Name = "TrashCans"
 	TrashCans.Parent = MobileButtonsHolder
@@ -143,18 +143,18 @@ function Library:CreateCore()
 	TrashCans.Size = UDim2.new(0, 80, 0, 80)
 	TrashCans.Image = "rbxassetid://8463436236"
 	TrashCans.Visible = false
-	
+
 	local UIListLayout = Instance.new("UIListLayout")
 	UIListLayout.Parent = MainFrame
 	UIListLayout.FillDirection = Enum.FillDirection.Horizontal
 	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	UIListLayout.Padding = UDim.new(0, 5)
-	
+
 	local UIPadding = Instance.new("UIPadding")
 	UIPadding.Parent = MainFrame
 	UIPadding.PaddingLeft = UDim.new(0, 20)
 	UIPadding.PaddingTop = UDim.new(0, 35)
-	
+
 	local OpenButton = Instance.new("TextButton")
 	OpenButton.Parent = Eternal
 	OpenButton.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -170,7 +170,7 @@ function Library:CreateCore()
 	OpenButton.TextScaled = true
 	OpenButton.TextSize = 14.000
 	OpenButton.TextWrapped = true
-	
+
 	local Hud = Instance.new("Frame")
 	Hud.Parent = Eternal
 	Hud.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -179,7 +179,7 @@ function Library:CreateCore()
 	Hud.BorderSizePixel = 0
 	Hud.Size = UDim2.new(1, 0, 1, 0)
 	Hud.ZIndex = -1
-	
+
 	local Logo = Instance.new("Frame")
 	Logo.Parent = Hud
 	Logo.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
@@ -187,14 +187,14 @@ function Library:CreateCore()
 	Logo.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	Logo.BorderSizePixel = 0
 	Logo.Position = UDim2.new(0.00932994019, 0, 0.0187969916, 0)
-	
+
 	local Top = Instance.new("Frame")
 	Top.Parent = Logo
 	Top.BackgroundColor3 = Library.GuiColor
 	Top.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	Top.BorderSizePixel = 0
 	Top.Size = UDim2.new(1, 0, 0, 2)
-	
+
 	local Title = Instance.new("TextLabel")
 	Title.Name = "Title"
 	Title.Parent = Logo
@@ -210,11 +210,11 @@ function Library:CreateCore()
 	Title.TextSize = 14.000
 	Title.TextWrapped = true
 	Title.TextXAlignment = Enum.TextXAlignment.Left
-	
+
 	local NewSize = game:GetService("TextService"):GetTextSize(Title.Text, Title.TextSize, Title.Font, Vector2.new(math.huge, math.huge))
 	Logo.Size = UDim2.new(0, NewSize.X + 12, 0, 23)
-	
-	
+
+
 	local ArraylistHolder = Instance.new("Frame")
 	ArraylistHolder.Name = "ArraylistHolder"
 	ArraylistHolder.Parent = Hud
@@ -224,12 +224,12 @@ function Library:CreateCore()
 	ArraylistHolder.BorderSizePixel = 0
 	ArraylistHolder.Position = UDim2.new(0.799537122, 0, 0.0243661068, 0)
 	ArraylistHolder.Size = UDim2.new(0.168943331, 0, 0.975633919, 0)
-	
+
 	local UIListLayout_4 = Instance.new("UIListLayout")
 	UIListLayout_4.Parent = ArraylistHolder
 	UIListLayout_4.SortOrder = Enum.SortOrder.LayoutOrder
 	UIListLayout_4.HorizontalAlignment = Enum.HorizontalAlignment.Center
-	
+
 	local function InsertArray(name)
 		local ArrayList = Instance.new("TextLabel")
 		ArrayList.Name = name
@@ -248,7 +248,7 @@ function Library:CreateCore()
 		ArrayList.LayoutOrder = -#name
 		ArrayList.TextXAlignment = Enum.TextXAlignment.Right
 	end
-	
+
 	local function RemoveArray(name)
 		for i,v in pairs(ArraylistHolder:GetChildren()) do
 			if v:IsA("TextLabel") and v.Name == name then
@@ -256,19 +256,19 @@ function Library:CreateCore()
 			end
 		end
 	end
-	
+
 	OpenButton.MouseButton1Click:Connect(function()
 		MainFrame.Visible = not MainFrame.Visible
 		TrashCans.Visible = not TrashCans.Visible
 	end)
-	
+
 	UserInputService.InputBegan:Connect(function(Input, isTyping)
 		if Input.KeyCode == Enum.KeyCode.RightShift and not isTyping then
 			MainFrame.Visible = not MainFrame.Visible
 			TrashCans.Visible = not TrashCans.Visible
 		end
 	end)
-	
+
 	function Core:CreateTab(TabName)
 		local Tab = {SizeY = 0}
 		local TabMain = Instance.new("Frame")
@@ -308,15 +308,23 @@ function Library:CreateCore()
 
 		local UIListLayout_2 = Instance.new("UIListLayout")
 		UIListLayout_2.Parent = ToggleHolders
-		
+
 		function Tab:CreateToggle(ToggleButton)
 			ToggleButton = {
 				Name = ToggleButton.Name,
 				Keybind = ToggleButton.Keybind or "Insert",
-				Enabled = ToggleButton.Enabled,
+				Enabled = ToggleButton.Enabled or false,
 				Callback = ToggleButton.Callback or function() end
 			}
-			
+
+			if not Settings.ToggleButton[ToggleButton.Name] then
+				Settings.ToggleButton[ToggleButton.Name] = {
+					Enabled = ToggleButton.Enabled
+				}
+			else
+				ToggleButton.Enabled = Settings.ToggleButton[ToggleButton.Name].Enabled
+			end
+
 			local ToggleButtonHolder = Instance.new("TextButton")
 			ToggleButtonHolder.Parent = ToggleHolders
 			ToggleButtonHolder.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
@@ -330,7 +338,7 @@ function Library:CreateCore()
 			ToggleButtonHolder.Text = ""
 			ToggleButtonHolder.TextColor3 = Color3.fromRGB(0, 0, 0)
 			ToggleButtonHolder.TextSize = 14.000
-			
+
 			local OpenMenu = Instance.new("TextButton")
 			OpenMenu.Parent = ToggleButtonHolder
 			OpenMenu.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -345,7 +353,7 @@ function Library:CreateCore()
 			OpenMenu.TextScaled = true
 			OpenMenu.TextSize = 14.000
 			OpenMenu.TextWrapped = true
-			
+
 			local ToggleCheckmark = Instance.new("Frame")
 			ToggleCheckmark.Parent = ToggleButtonHolder
 			ToggleCheckmark.BackgroundColor3 = Color3.fromRGB(175, 0, 0)
@@ -353,11 +361,11 @@ function Library:CreateCore()
 			ToggleCheckmark.BorderSizePixel = 0
 			ToggleCheckmark.Position = UDim2.new(0.0508474559, 0, 0.254365265, 0)
 			ToggleCheckmark.Size = UDim2.new(0, 10, 0, 10)
-			
+
 			local UICorner_2 = Instance.new("UICorner")
 			UICorner_2.CornerRadius = UDim.new(0, 3)
 			UICorner_2.Parent = ToggleCheckmark
-			
+
 			local ToggleName = Instance.new("TextLabel")
 			ToggleName.Parent = ToggleButtonHolder
 			ToggleName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -371,7 +379,7 @@ function Library:CreateCore()
 			ToggleName.TextColor3 = Color3.fromRGB(255, 255, 255)
 			ToggleName.TextSize = 13.000
 			ToggleName.TextXAlignment = Enum.TextXAlignment.Left
-			
+
 			local ToggleButtonMenu = Instance.new("Frame")
 			ToggleButtonMenu.Name = "" .. ToggleButton.Name .. "Menu"
 			ToggleButtonMenu.Parent = ToggleHolders
@@ -382,7 +390,7 @@ function Library:CreateCore()
 			ToggleButtonMenu.Position = UDim2.new(0, 0, 0.497959971, 0)
 			ToggleButtonMenu.Size = UDim2.new(1, 0, 1.19949615, 0)
 			ToggleButtonMenu.Visible = false
-			
+
 			local ScrollingFrame = Instance.new("ScrollingFrame")
 			ScrollingFrame.Parent = ToggleButtonMenu
 			ScrollingFrame.Active = true
@@ -394,11 +402,11 @@ function Library:CreateCore()
 			ScrollingFrame.CanvasPosition = Vector2.new(0, 80.6783905)
 			ScrollingFrame.ScrollBarThickness = 4
 			ScrollingFrame.VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Left
-			
+
 			local UIListLayout_3 = Instance.new("UIListLayout")
 			UIListLayout_3.Parent = ScrollingFrame
 			UIListLayout_3.SortOrder = Enum.SortOrder.LayoutOrder
-			
+
 			local KeyBind = Instance.new("TextBox")
 			KeyBind.Parent = ToggleButtonMenu
 			KeyBind.BackgroundColor3 = Color3.fromRGB(28, 28, 28)
@@ -421,17 +429,19 @@ function Library:CreateCore()
 					end       
 				end
 			end)
-			
+
 			local function OnClicked()
 				if ToggleButton.Enabled then
 					TweenEffect(ToggleCheckmark, {BackgroundColor3 = Color3.fromRGB(0, 175, 0)})
 					InsertArray(ToggleButton.Name)
+					Settings.ToggleButton[ToggleButton.Name].Enabled = ToggleButton.Enabled
 				else
 					TweenEffect(ToggleCheckmark, {BackgroundColor3 = Color3.fromRGB(175, 0, 0)})
 					RemoveArray(ToggleButton.Name)
+					Settings.ToggleButton[ToggleButton.Name].Enabled = ToggleButton.Enabled
 				end
 			end
-			
+
 			local function CreateButtons(name)	
 				local MobileButtonz = Instance.new("TextButton")
 				MobileButtonz.AnchorPoint = Vector2.new(0, 5)
@@ -453,8 +463,10 @@ function Library:CreateCore()
 				local function OnClickedButtonz()
 					if ToggleButton.Enabled then
 						TweenEffect(MobileButtonz, {BackgroundColor3 = Color3.fromRGB(0, 175, 0)})
+						Settings.ToggleButton[ToggleButton.Name].Enabled = ToggleButton.Enabled
 					else
 						TweenEffect(MobileButtonz, {BackgroundColor3 = Color3.fromRGB(175, 0, 0)})
+						Settings.ToggleButton[ToggleButton.Name].Enabled = ToggleButton.Enabled
 					end
 				end
 
@@ -485,20 +497,20 @@ function Library:CreateCore()
 					end
 				end
 			end
-			
+
 			ToggleButtonHolder.MouseButton1Click:Connect(function()
 				ToggleButton.Enabled = not ToggleButton.Enabled
 				OnClicked()
-				
+
 				if ToggleButton.Callback then
 					ToggleButton.Callback(ToggleButton.Enabled)
 				end
 			end)
-			
+
 			ToggleButtonHolder.MouseButton2Click:Connect(function()
 				ToggleButtonMenu.Visible = not ToggleButtonMenu.Visible
 			end)
-			
+
 			local HoldTime = 5
 			local Holding = false
 			ToggleButtonHolder.MouseButton1Down:Connect(function()
@@ -510,15 +522,15 @@ function Library:CreateCore()
 					end
 				end
 			end)
-			
+
 			ToggleButtonHolder.MouseButton1Up:Connect(function()
 				Holding = false
 			end)
-			
+
 			OpenMenu.MouseButton1Click:Connect(function()
 				ToggleButtonMenu.Visible = not ToggleButtonMenu.Visible
 			end)
-			
+
 			if ToggleButton.Keybind then
 				UserInputService.InputBegan:Connect(function(Input, isTyping)
 					if Input.KeyCode == Enum.KeyCode[ToggleButton.Keybind] and not isTyping then
@@ -531,7 +543,7 @@ function Library:CreateCore()
 					end
 				end)
 			end
-			
+
 			if ToggleButton.Enabled then
 				ToggleButton.Enabled = true
 				OnClicked()
@@ -540,7 +552,7 @@ function Library:CreateCore()
 					ToggleButton.Callback(ToggleButton.Enabled)
 				end
 			end
-			
+
 			function ToggleButton:CreateMiniToggle(MiniToggle)
 				MiniToggle = {
 					Name = MiniToggle.Name,
@@ -548,7 +560,7 @@ function Library:CreateCore()
 					Callback = MiniToggle.Callback() or function()
 					end
 				}
-				
+
 				local MiniTogglez = Instance.new("TextButton")
 				MiniTogglez.Name = MiniToggle.Name
 				MiniTogglez.Parent = ScrollingFrame
@@ -562,7 +574,7 @@ function Library:CreateCore()
 				MiniTogglez.Text = ""
 				MiniTogglez.TextColor3 = Color3.fromRGB(0, 0, 0)
 				MiniTogglez.TextSize = 14.000
-				
+
 				local MiniToggleName = Instance.new("TextLabel")
 				MiniToggleName.Parent = MiniTogglez
 				MiniToggleName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -576,7 +588,7 @@ function Library:CreateCore()
 				MiniToggleName.TextColor3 = Color3.fromRGB(255, 255, 255)
 				MiniToggleName.TextSize = 13.000
 				MiniToggleName.TextXAlignment = Enum.TextXAlignment.Left
-				
+
 				local MiniToggleCheckmark = Instance.new("Frame")
 				MiniToggleCheckmark.Parent = MiniTogglez
 				MiniToggleCheckmark.BackgroundColor3 = Color3.fromRGB(175, 0, 0)
@@ -584,11 +596,11 @@ function Library:CreateCore()
 				MiniToggleCheckmark.BorderSizePixel = 0
 				MiniToggleCheckmark.Position = UDim2.new(0.075000003, 0, 0.254000008, 0)
 				MiniToggleCheckmark.Size = UDim2.new(0, 10, 0, 10)
-				
+
 				local UICorneraa = Instance.new("UICorner")
 				UICorneraa.CornerRadius = UDim.new(0, 3)
 				UICorneraa.Parent = MiniToggleCheckmark
-				
+
 				local function OnClickezd()
 					if MiniToggle.Enabled then
 						TweenEffect(MiniToggleCheckmark, {BackgroundColor3 = Color3.fromRGB(0, 175, 0)})
@@ -596,7 +608,7 @@ function Library:CreateCore()
 						TweenEffect(MiniToggleCheckmark, {BackgroundColor3 = Color3.fromRGB(175, 0, 0)})
 					end
 				end
-				
+
 				MiniTogglez.MouseButton1Click:Connect(function()
 					MiniToggle.Enabled = not MiniToggle.Enabled
 					OnClickezd()
@@ -605,7 +617,7 @@ function Library:CreateCore()
 						MiniToggle.Callback(MiniToggle.Enabled)
 					end
 				end)
-				
+
 				if MiniToggle.Enabled then
 					MiniToggle.Enabled = true
 					OnClickezd()
@@ -616,7 +628,7 @@ function Library:CreateCore()
 				end
 				return MiniToggle
 			end
-			
+
 			function ToggleButton:CreateSlider(Slider)
 				Slider = {
 					Name = Slider.Name,
@@ -625,10 +637,10 @@ function Library:CreateCore()
 					Callback = Slider.Callback or function() 
 					end
 				}
-				
+
 				local Value
 				local Dragged = false
-				
+
 				local Sliderz = Instance.new("Frame")
 				Sliderz.Name = Slider.Name
 				Sliderz.Parent = ScrollingFrame
@@ -637,7 +649,7 @@ function Library:CreateCore()
 				Sliderz.BorderColor3 = Color3.fromRGB(0, 0, 0)
 				Sliderz.BorderSizePixel = 0
 				Sliderz.Size = UDim2.new(1, 0, 0, 25)
-				
+
 				local SliderName = Instance.new("TextLabel")
 				SliderName.Parent = Sliderz
 				SliderName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -651,7 +663,7 @@ function Library:CreateCore()
 				SliderName.TextColor3 = Color3.fromRGB(255, 255, 255)
 				SliderName.TextSize = 13.000
 				SliderName.TextXAlignment = Enum.TextXAlignment.Left
-				
+
 				local SliderBack = Instance.new("Frame")
 				SliderBack.Parent = Sliderz
 				SliderBack.BackgroundColor3 = Color3.fromRGB(105, 85, 85)
@@ -659,14 +671,14 @@ function Library:CreateCore()
 				SliderBack.BorderSizePixel = 0
 				SliderBack.Position = UDim2.new(0.0850000009, 0, 0.800000012, 0)
 				SliderBack.Size = UDim2.new(0, 100, 0, 2)
-				
+
 				local SliderFront = Instance.new("Frame")
 				SliderFront.Parent = SliderBack
 				SliderFront.BackgroundColor3 = Color3.fromRGB(89, 143, 77)
 				SliderFront.BorderColor3 = Color3.fromRGB(0, 0, 0)
 				SliderFront.BorderSizePixel = 0
 				SliderFront.Size = UDim2.new(0, 50, 0, 2)
-				
+
 				local SliderTriggerer = Instance.new("TextButton")
 				SliderTriggerer.Parent = SliderFront
 				SliderTriggerer.BackgroundColor3 = Color3.fromRGB(88, 117, 153)
@@ -678,7 +690,7 @@ function Library:CreateCore()
 				SliderTriggerer.Text = ""
 				SliderTriggerer.TextColor3 = Color3.fromRGB(0, 0, 0)
 				SliderTriggerer.TextSize = 14.000
-				
+
 				local function OnDragged(input)
 					local InputPos = input.Position
 					Value = math.clamp((InputPos.X - SliderBack.AbsolutePosition.X) / SliderBack.AbsoluteSize.X, 0, 1)
@@ -705,7 +717,7 @@ function Library:CreateCore()
 				end)
 				return Slider
 			end
-			
+
 			function ToggleButton:CreateDropdown(Dropdowns)
 				Dropdowns = {
 					Name = Dropdowns.Name,
