@@ -29,11 +29,8 @@ if isfolder(MainFolder) and isfolder(ConfigFolder) and isfolder(LogsFolder) then
 	local LoadedSettings = LoadSettings(FileMain)
 	if LoadedSettings then
 		Settings = LoadedSettings
-		AutoSave = true
-	else
-		SaveSettings(FileMain, Settings)
-		AutoSave = true
 	end
+	AutoSave = true
 
 	spawn(function()
 		while AutoSave do
@@ -316,13 +313,13 @@ function Library:CreateCore()
 			ToggleButton = {
 				Name = ToggleButton.Name,
 				Keybind = ToggleButton.Keybind or "Insert",
-				Enabled = ToggleButton.Enabled,
-				Callback = ToggleButton.Callback or function()
-				end
+				Enabled = ToggleButton.Enabled or false,
+				Callback = ToggleButton.Callback or function() end
 			}
+
 			if not Settings.ToggleButton[ToggleButton.Name] then
 				Settings.ToggleButton[ToggleButton.Name] = {
-					Enabled = ToggleButton.Enabled,
+					Enabled = ToggleButton.Enabled
 				}
 			else
 				ToggleButton.Enabled = Settings.ToggleButton[ToggleButton.Name].Enabled
@@ -437,9 +434,11 @@ function Library:CreateCore()
 				if ToggleButton.Enabled then
 					TweenEffect(ToggleCheckmark, {BackgroundColor3 = Color3.fromRGB(0, 175, 0)})
 					InsertArray(ToggleButton.Name)
+					Settings.ToggleButton[ToggleButton.Name].Enabled = ToggleButton.Enabled
 				else
 					TweenEffect(ToggleCheckmark, {BackgroundColor3 = Color3.fromRGB(175, 0, 0)})
 					RemoveArray(ToggleButton.Name)
+					Settings.ToggleButton[ToggleButton.Name].Enabled = ToggleButton.Enabled
 				end
 			end
 			
@@ -464,8 +463,10 @@ function Library:CreateCore()
 				local function OnClickedButtonz()
 					if ToggleButton.Enabled then
 						TweenEffect(MobileButtonz, {BackgroundColor3 = Color3.fromRGB(0, 175, 0)})
+						Settings.ToggleButton[ToggleButton.Name].Enabled = ToggleButton.Enabled
 					else
 						TweenEffect(MobileButtonz, {BackgroundColor3 = Color3.fromRGB(175, 0, 0)})
+						Settings.ToggleButton[ToggleButton.Name].Enabled = ToggleButton.Enabled
 					end
 				end
 
