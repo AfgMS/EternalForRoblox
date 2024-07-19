@@ -7,12 +7,21 @@ local Tabs = {
 
 local Toggle1 = Tabs.MainTab:CreateToggle({
 	Name = "Toggle1",
-	Enabled = true,
 	Callback = function(callback)
 		if callback then
 			print("Activated")
 		else
 			print("Deactivated")
+		end
+	end
+})
+local MiniToggle1 = Toggle1:CreateMiniToggle({
+	Name = "MiniToggle1",
+	Callback = function(callback)
+		if callback then
+			print("MiniE")
+		else
+			print("MiniD")
 		end
 	end
 })
@@ -27,15 +36,23 @@ local Toggle2 = Tabs.MainTab:CreateToggle({
 		end
 	end
 })
-
-local Toggle3 = Tabs.MainTab:CreateToggle({
-	Name = "Toggle3",
-	Enabled = true,
+local Selected
+local Dropdown1 = Toggle2:CreateDropdown({
+	Name = "RandomThingy",
+	List = {"Dungong", "Henlo", "Santu"},
+	Default = "Santu",
 	Callback = function(callback)
 		if callback then
-			print("Pencing")
+			Selected = callback
+			if Selected == "Dungong" then
+				print("hendroriujhajija")
+			elseif Selected == "Henlo" then
+				print("Santuywgah")
+			elseif Selected == "Santu" then
+				print("Dungongiajka")
+			end
 		else
-			print("Fembror")
+			print("Broken")
 		end
 	end
 })
