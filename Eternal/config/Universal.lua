@@ -1,5 +1,4 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/library.txt"))()
-local Library = require(game.ReplicatedStorage.Roblox.New.Eternal.Eternal)
 local Main = Library:CreateCore()
 
 local Tabs = {
