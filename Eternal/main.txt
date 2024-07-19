@@ -20,7 +20,7 @@ if not isfolder(ConfigFolder) then makefolder(ConfigFolder) end
 if not isfolder(LogsFolder) then makefolder(LogsFolder) end
 
 if isfolder(MainFolder) and isfolder(ConfigFolder) and isfolder(LogsFolder) then
-	GetGithub(UniversalURL, MainFolder .. "/library.txt")
+	GetGithub(LibraryURL, MainFolder .. "/library.txt")
 	
 	if game.PlaceId == 6872274481 or game.PlaceId == 8560631822 or game.PlaceId == 8444591321 then
 		writefile(LogsFolder .. "/error_" .. game.PlaceId .. ".txt", "This game is not supported by Eternal")
