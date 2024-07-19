@@ -21,10 +21,14 @@ if not isfolder(LogsFolder) then makefolder(LogsFolder) end
 
 if isfolder(MainFolder) and isfolder(ConfigFolder) and isfolder(LogsFolder) then
 	GetGithub(LibraryURL, MainFolder .. "/library.txt")
-	
+
 	if game.PlaceId == 6872274481 or game.PlaceId == 8560631822 or game.PlaceId == 8444591321 then
 		writefile(LogsFolder .. "/error_" .. game.PlaceId .. ".txt", "This game is not supported by Eternal")
 	else
+		if not isfile(ConfigFolder .. "/" .. game.PlaceId .. ".json") then
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/config/Universal.lua"))()
+		else
+			HttpService:JSONDecode(readfile(ConfigFolder .. "/" .. game.PlaceId .. ".json"))
+		end
 	end
 end
