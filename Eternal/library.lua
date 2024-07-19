@@ -316,7 +316,7 @@ function Library:CreateCore()
 		function Tab:CreateToggle(ToggleButton)
 			ToggleButton = {
 				Name = ToggleButton.Name,
-				Keybind = ToggleButton.Keybind or "Insert",
+				Keybind = ToggleButton.Keybind or "Insert" or Settings.Keybind,
 				IsEnabled = ToggleButton.IsEnabled,
 				Default = ToggleButton.Default or Settings.Default,
 				Callback = ToggleButton.Callback or function()
