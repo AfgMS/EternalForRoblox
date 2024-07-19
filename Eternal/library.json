@@ -4,6 +4,45 @@ local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local MainFolder = "Eternal"
+local ConfigFolder = MainFolder .. "/config"
+local LogsFolder = MainFolder .. "/logs"
+local AutoSave = false
+local Settings = {
+	Keybind = "Insert",
+	Default = false,
+}
+
+function LoadSettings(path)
+	if isfile(path) then
+		return HttpService:JSONDecode(readfile(path))
+	else
+		return nil
+	end
+end
+
+function SaveSettings(path, settings)
+	writefile(path, HttpService:JSONEncode(settings))
+end
+
+if isfolder(MainFolder) and isfolder(ConfigFolder) and isfolder(LogsFolder) then
+	local FileMain = ConfigFolder .. "/" .. game.PlaceId .. ".json"
+	local LoadSettings = LoadSettings(FileMain)
+	if LoadSettings then
+		Settings = LoadSettings
+		AutoSave = true
+	else
+		SaveSettings(FileMain, Settings)
+		AutoSave = true
+	end
+	
+	spawn(function()
+		while AutoSave do
+			wait(3)
+			SaveSettings(FileMain, Settings)
+		end
+	end)
+end
 
 function Draggable(object)
 	local gui = object
@@ -279,7 +318,7 @@ function Library:CreateCore()
 				Name = ToggleButton.Name,
 				Keybind = ToggleButton.Keybind or "Insert",
 				IsEnabled = ToggleButton.IsEnabled,
-				Default = ToggleButton.Default,
+				Default = ToggleButton.Default or Settings.Default,
 				Callback = ToggleButton.Callback or function()
 				end
 			}
@@ -590,6 +629,7 @@ function Library:CreateCore()
 					Name = Slider.Name,
 					Min = Slider.Min,
 					Max = Slider.Max,
+					Default = Slider.Default or Settings.Default,
 					Callback = Slider.Callback or function() 
 					end
 				}
@@ -671,6 +711,11 @@ function Library:CreateCore()
 						Dragged = false
 					end
 				end)
+				
+				if Slider.Default then
+					Slider.Callback(Slider.Default)
+				end
+				
 				return Slider
 			end
 			
@@ -678,6 +723,7 @@ function Library:CreateCore()
 				Dropdowns = {
 					Name = Dropdowns.Name,
 					List = Dropdowns.List,
+					Default = Dropdowns.Default or Settings.Default,
 					Callback = Dropdowns.Callback or function() 
 					end
 				}
@@ -718,7 +764,7 @@ function Library:CreateCore()
 				SelectedText.Position = UDim2.new(0.35, 0, 0.159, 0)
 				SelectedText.Size = UDim2.new(0, 68, 0, 15)
 				SelectedText.Font = Enum.Font.SourceSans
-				SelectedText.Text = "None"
+				SelectedText.Text = Dropdowns.Default
 				SelectedText.TextColor3 = Color3.fromRGB(255, 255, 255)
 				SelectedText.TextSize = 13.000
 				SelectedText.TextXAlignment = Enum.TextXAlignment.Left
@@ -729,6 +775,11 @@ function Library:CreateCore()
 					Dropdowns.Callback(Dropdowns.List[currentIndex])
 					currentIndex = currentIndex % #Dropdowns.List + 1
 				end)
+				
+				if Dropdowns.Default then
+					Dropdowns.Callback(Dropdowns.Default)
+				end
+				
 				return Dropdowns
 			end
 			return ToggleButton
