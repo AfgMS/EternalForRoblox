@@ -2,7 +2,7 @@ local HttpService = game:GetService("HttpService")
 local MainFolder = "Eternal"
 local ConfigFolder = MainFolder .. "/config"
 local LogsFolder = MainFolder .. "/logs"
-local LibraryURL = "https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/library.txt"
+local LibraryURL = "https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/library.json"
 local UniversalURL = "https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/config/Universal.txt"
 
 local function GetGithub(url, path)
