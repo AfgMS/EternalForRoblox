@@ -215,7 +215,7 @@ function Library:CreateCore()
 	Title.TextXAlignment = Enum.TextXAlignment.Left
 
 	local NewSize = game:GetService("TextService"):GetTextSize(Title.Text, Title.TextSize, Title.Font, Vector2.new(math.huge, math.huge))
-	Logo.Size = UDim2.new(0, NewSize.X + 12, 0, 23)
+	Logo.Size = UDim2.new(0, NewSize.X + 12, 0, 21)
 
 
 	local ArraylistHolder = Instance.new("Frame")
@@ -795,7 +795,8 @@ function Library:CreateCore()
 					SelectedText.Text = Dropdowns.List[CurrentDropdown]
 					Dropdowns.Callback(Dropdowns.List[CurrentDropdown])
 					CurrentDropdown = CurrentDropdown % #Dropdowns.List + 1
-					Settings.ToggleButton.Dropdown[Dropdowns.Name].Default = Dropdowns.Default
+					Settings.ToggleButton.Dropdown[Dropdowns.Name].Default = Dropdowns.List[CurrentDropdown]
+					Dropdowns.Default = Dropdowns.List[CurrentDropdown]
 				end)
 				
 				if Dropdowns.Default then
