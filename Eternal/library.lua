@@ -10,7 +10,7 @@ local LogsFolder = MainFolder .. "/logs"
 local AutoSave = false
 local Settings = {
 	ToggleButton = {
-		MiniToggle = {},
+		MiniToggle = {}
 	}
 }
 
@@ -430,7 +430,7 @@ function Library:CreateCore()
 						KeyBind.Text = Input.KeyCode.Name
 						KeyBind.PlaceholderText = Input.KeyCode.Name
 						KeyBind:ReleaseFocus() 
-						Settings.ToggleButton[ToggleButton.Name].Keybind = Input.KeyCode.Name
+						Settings.ToggleButton[ToggleButton.Name].Keybind = ToggleButton.Keybind
 					end       
 				end
 			end)
