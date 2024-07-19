@@ -9,7 +9,6 @@ local function GetGithub(url, path)
 	local content = game:HttpGet(url)
 	if content then
 		writefile(path, content)
-		print("Updated " .. path)
 	else
 		writefile(LogsFolder .. "/update_error.txt", "Unable to update Eternal. Dm nothm_ on discord for support")
 	end
@@ -25,6 +24,6 @@ if isfolder(MainFolder) and isfolder(ConfigFolder) and isfolder(LogsFolder) then
 	if game.PlaceId == 6872274481 or game.PlaceId == 8560631822 or game.PlaceId == 8444591321 then
 		writefile(LogsFolder .. "/error_" .. game.PlaceId .. ".txt", "This game is not supported by Eternal")
 	else
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/config/Universal.lua"))()
+		loadstring(game:HttpGet(UniversalURL))()
 	end
 end
