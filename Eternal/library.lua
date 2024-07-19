@@ -11,7 +11,6 @@ local AutoSave = false
 local Settings = {
 	ToggleButton = {
 		MiniToggle = {},
-		Dropdown = {}
 	}
 }
 
@@ -322,9 +321,11 @@ function Library:CreateCore()
 
 			if not Settings.ToggleButton[ToggleButton.Name] then
 				Settings.ToggleButton[ToggleButton.Name] = {
+					Keybind = ToggleButton.Keybind,
 					Enabled = ToggleButton.Enabled
 				}
 			else
+				ToggleButton.Keybind = Settings.ToggleButton[ToggleButton.Name].Keybind
 				ToggleButton.Enabled = Settings.ToggleButton[ToggleButton.Name].Enabled
 			end
 
@@ -429,6 +430,7 @@ function Library:CreateCore()
 						KeyBind.Text = Input.KeyCode.Name
 						KeyBind.PlaceholderText = Input.KeyCode.Name
 						KeyBind:ReleaseFocus() 
+						Settings.ToggleButton[ToggleButton.Name].Keybind = Input.KeyCode.Name
 					end       
 				end
 			end)
@@ -736,18 +738,9 @@ function Library:CreateCore()
 				Dropdowns = {
 					Name = Dropdowns.Name,
 					List = Dropdowns.List,
-					Default = Dropdowns.Default,
 					Callback = Dropdowns.Callback or function() 
 					end
 				}
-				
-				if not Settings.ToggleButton.Dropdown[Dropdowns.Name] then
-					Settings.ToggleButton.Dropdown[Dropdowns.Name] = {
-						Default = Dropdowns.Default
-					}
-				else
-					Dropdowns.Default = Settings.ToggleButton.Dropdown[Dropdowns.Name].Default
-				end
 				
 				local Dropdown = Instance.new("TextButton")
 				Dropdown.Name = Dropdowns.Name
@@ -795,13 +788,7 @@ function Library:CreateCore()
 					SelectedText.Text = Dropdowns.List[CurrentDropdown]
 					Dropdowns.Callback(Dropdowns.List[CurrentDropdown])
 					CurrentDropdown = CurrentDropdown % #Dropdowns.List + 1
-					Settings.ToggleButton.Dropdown[Dropdowns.Name].Default = Dropdowns.List[CurrentDropdown]
-					Dropdowns.Default = Dropdowns.List[CurrentDropdown]
 				end)
-				
-				if Dropdowns.Default then
-					Dropdowns.Callback(Dropdowns.Default)
-				end
 				
 				return Dropdowns
 			end
