@@ -40,7 +40,6 @@ local Selected
 local Dropdown1 = Toggle2:CreateDropdown({
 	Name = "RandomThingy",
 	List = {"Dungong", "Henlo", "Santu"},
-	Default = "Santu",
 	Callback = function(callback)
 		if callback then
 			Selected = callback
@@ -51,8 +50,6 @@ local Dropdown1 = Toggle2:CreateDropdown({
 			elseif Selected == "Santu" then
 				print("Dungongiajka")
 			end
-		else
-			print("Broken")
 		end
 	end
 })
