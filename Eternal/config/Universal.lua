@@ -7,6 +7,7 @@ local Tabs = {
 
 local Toggle1 = Tabs.MainTab:CreateToggle({
 	Name = "Toggle1",
+	Enabled = true,
 	Callback = function(callback)
 		if callback then
 			print("Activated")
@@ -18,7 +19,6 @@ local Toggle1 = Tabs.MainTab:CreateToggle({
 
 local Toggle2 = Tabs.MainTab:CreateToggle({
 	Name = "Toggle2",
-	Default = false,
 	Callback = function(callback)
 		if callback then
 			print("Enabled")
@@ -30,7 +30,7 @@ local Toggle2 = Tabs.MainTab:CreateToggle({
 
 local Toggle3 = Tabs.MainTab:CreateToggle({
 	Name = "Toggle3",
-	Default = false,
+	Enabled = true,
 	Callback = function(callback)
 		if callback then
 			print("Pencing")
