@@ -9,7 +9,10 @@ local ConfigFolder = MainFolder .. "/config"
 local LogsFolder = MainFolder .. "/logs"
 local AutoSave = false
 local Settings = {
-	ToggleButton = {}
+	ToggleButton = {
+		MiniToggle = {},
+		Dropdown = {}
+	}
 }
 
 function LoadSettings(path)
@@ -561,6 +564,14 @@ function Library:CreateCore()
 					end
 				}
 
+				if not Settings.ToggleButton.MiniToggle[MiniToggle.Name] then
+					Settings.ToggleButton.MiniToggle[MiniToggle.Name] = {
+						Enabled = MiniToggle.Enabled
+					}
+				else
+					MiniToggle.Enabled = Settings.ToggleButton.MiniToggle[MiniToggle.Name].Enabled
+				end
+				
 				local MiniTogglez = Instance.new("TextButton")
 				MiniTogglez.Name = MiniToggle.Name
 				MiniTogglez.Parent = ScrollingFrame
@@ -604,8 +615,10 @@ function Library:CreateCore()
 				local function OnClickezd()
 					if MiniToggle.Enabled then
 						TweenEffect(MiniToggleCheckmark, {BackgroundColor3 = Color3.fromRGB(0, 175, 0)})
+						Settings.ToggleButton.MiniToggle[MiniToggle.Name].Enabled = MiniToggle.Enabled
 					else
 						TweenEffect(MiniToggleCheckmark, {BackgroundColor3 = Color3.fromRGB(175, 0, 0)})
+						Settings.ToggleButton.MiniToggle[MiniToggle.Name].Enabled = MiniToggle.Enabled
 					end
 				end
 
@@ -626,6 +639,7 @@ function Library:CreateCore()
 						MiniToggle.Callback(MiniToggle.Enabled)
 					end
 				end
+				
 				return MiniToggle
 			end
 
@@ -722,10 +736,19 @@ function Library:CreateCore()
 				Dropdowns = {
 					Name = Dropdowns.Name,
 					List = Dropdowns.List,
+					Default = Dropdowns.Default,
 					Callback = Dropdowns.Callback or function() 
 					end
 				}
-
+				
+				if not Settings.ToggleButton.Dropdown[Dropdowns.Name] then
+					Settings.ToggleButton.Dropdown[Dropdowns.Name] = {
+						Default = Dropdowns.Default
+					}
+				else
+					Dropdowns.Default = Settings.ToggleButton.Dropdown[Dropdowns.Name].Default
+				end
+				
 				local Dropdown = Instance.new("TextButton")
 				Dropdown.Name = Dropdowns.Name
 				Dropdown.Parent = ScrollingFrame
@@ -767,12 +790,18 @@ function Library:CreateCore()
 				SelectedText.TextSize = 13.000
 				SelectedText.TextXAlignment = Enum.TextXAlignment.Left
 
-				local currentIndex = 1
+				local CurrentDropdown = 1
 				Dropdown.MouseButton1Click:Connect(function()
-					SelectedText.Text = Dropdowns.List[currentIndex]
-					Dropdowns.Callback(Dropdowns.List[currentIndex])
-					currentIndex = currentIndex % #Dropdowns.List + 1
+					SelectedText.Text = Dropdowns.List[CurrentDropdown]
+					Dropdowns.Callback(Dropdowns.List[CurrentDropdown])
+					CurrentDropdown = CurrentDropdown % #Dropdowns.List + 1
+					Settings.ToggleButton.Dropdown[Dropdowns.Name].Default = Dropdowns.Default
 				end)
+				
+				if Dropdowns.Default then
+					Dropdowns.Callback(Dropdowns.Default)
+				end
+				
 				return Dropdowns
 			end
 			return ToggleButton
