@@ -9,8 +9,6 @@ local ConfigFolder = MainFolder .. "/config"
 local LogsFolder = MainFolder .. "/logs"
 local AutoSave = false
 local Settings = {
-	Keybind = "Insert",
-	Default = false,
 	Toggles = {},
 }
 
@@ -317,9 +315,9 @@ function Library:CreateCore()
 		function Tab:CreateToggle(ToggleButton)
 			ToggleButton = {
 				Name = ToggleButton.Name,
-				Keybind = ToggleButton.Keybind or "Insert" or Settings.Keybind,
+				Keybind = ToggleButton.Keybind or "Insert",
 				IsEnabled = ToggleButton.IsEnabled,
-				Default = ToggleButton.Default or Settings.Default,
+				Default = ToggleButton.Default,
 				Callback = ToggleButton.Callback or function()
 				end
 			}
@@ -486,6 +484,7 @@ function Library:CreateCore()
 
 				MobileButtonz.MouseButton1Click:Connect(function()
 					ToggleButton.IsEnabled = not ToggleButton.IsEnabled
+					ToggleButton.Default = not ToggleButton.Default
 					OnClickedButtonz()
 					OnClicked()
 
@@ -504,6 +503,7 @@ function Library:CreateCore()
 
 			ToggleButtonHolder.MouseButton1Click:Connect(function()
 				ToggleButton.IsEnabled = not ToggleButton.IsEnabled
+				ToggleButton.Default = not ToggleButton.Default
 				OnClicked()
 
 				if ToggleButton.Callback then
@@ -539,6 +539,7 @@ function Library:CreateCore()
 				UserInputService.InputBegan:Connect(function(Input, isTyping)
 					if Input.KeyCode == Enum.KeyCode[ToggleButton.Keybind] and not isTyping then
 						ToggleButton.IsEnabled = not ToggleButton.IsEnabled
+						ToggleButton.Default = not ToggleButton.Default
 						OnClicked()
 
 						if ToggleButton.Callback then
