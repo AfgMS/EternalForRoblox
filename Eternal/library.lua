@@ -9,6 +9,8 @@ local ConfigFolder = MainFolder .. "/config"
 local LogsFolder = MainFolder .. "/logs"
 local AutoSave = false
 local Settings = {
+	Keybind = "Insert",
+	Default = false,
 	Toggles = {},
 }
 
@@ -316,18 +318,16 @@ function Library:CreateCore()
 			ToggleButton = {
 				Name = ToggleButton.Name,
 				Keybind = ToggleButton.Keybind or "Insert",
-				IsEnabled = ToggleButton.IsEnabled,
+				Enabled = ToggleButton.Enabled,
 				Default = ToggleButton.Default,
 				Callback = ToggleButton.Callback or function()
 				end
 			}
 			if not Settings.Toggles[ToggleButton.Name] then
 				Settings.Toggles[ToggleButton.Name] = {
-					IsEnabled = ToggleButton.IsEnabled or false,
 					Default = ToggleButton.Default or false,
 				}
 			else
-				ToggleButton.IsEnabled = Settings.Toggles[ToggleButton.Name].IsEnabled
 				ToggleButton.Default = Settings.Toggles[ToggleButton.Name].Default
 			end
 
@@ -437,7 +437,7 @@ function Library:CreateCore()
 			end)
 
 			local function OnClicked()
-				if ToggleButton.IsEnabled then
+				if ToggleButton.Enabled then
 					TweenEffect(ToggleCheckmark, {BackgroundColor3 = Color3.fromRGB(0, 175, 0)})
 					InsertArray(ToggleButton.Name)
 				else
@@ -465,7 +465,7 @@ function Library:CreateCore()
 				Draggable(MobileButtonz)
 
 				local function OnClickedButtonz()
-					if ToggleButton.IsEnabled then
+					if ToggleButton.Enabled then
 						TweenEffect(MobileButtonz, {BackgroundColor3 = Color3.fromRGB(0, 175, 0)})
 					else
 						TweenEffect(MobileButtonz, {BackgroundColor3 = Color3.fromRGB(175, 0, 0)})
@@ -483,13 +483,13 @@ function Library:CreateCore()
 				UICorner.Parent = MobileButtonz
 
 				MobileButtonz.MouseButton1Click:Connect(function()
-					ToggleButton.IsEnabled = not ToggleButton.IsEnabled
+					ToggleButton.Enabled = not ToggleButton.Enabled
 					ToggleButton.Default = not ToggleButton.Default
 					OnClickedButtonz()
 					OnClicked()
 
 					if ToggleButton.Callback then
-						ToggleButton.Callback(ToggleButton.IsEnabled)
+						ToggleButton.Callback(ToggleButton.Enabled)
 					end
 				end)
 
@@ -502,17 +502,18 @@ function Library:CreateCore()
 			end
 
 			ToggleButtonHolder.MouseButton1Click:Connect(function()
-				ToggleButton.IsEnabled = not ToggleButton.IsEnabled
+				ToggleButton.Enabled = not ToggleButton.Enabled
 				ToggleButton.Default = not ToggleButton.Default
 				OnClicked()
 
 				if ToggleButton.Callback then
-					ToggleButton.Callback(ToggleButton.IsEnabled)
+					ToggleButton.Callback(ToggleButton.Enabled)
 				end
 			end)
 
 			ToggleButtonHolder.MouseButton2Click:Connect(function()
 				ToggleButtonMenu.Visible = not ToggleButtonMenu.Visible
+				ToggleButton.Default = not ToggleButton.Default
 			end)
 
 			local HoldTime = 5
@@ -538,30 +539,30 @@ function Library:CreateCore()
 			if ToggleButton.Keybind then
 				UserInputService.InputBegan:Connect(function(Input, isTyping)
 					if Input.KeyCode == Enum.KeyCode[ToggleButton.Keybind] and not isTyping then
-						ToggleButton.IsEnabled = not ToggleButton.IsEnabled
+						ToggleButton.Enabled = not ToggleButton.Enabled
 						ToggleButton.Default = not ToggleButton.Default
 						OnClicked()
 
 						if ToggleButton.Callback then
-							ToggleButton.Callback(ToggleButton.IsEnabled)
+							ToggleButton.Callback(ToggleButton.Enabled)
 						end
 					end
 				end)
 			end
 
 			if ToggleButton.Default then
-				ToggleButton.IsEnabled = not ToggleButton.IsEnabled
+				ToggleButton.Enabled = not ToggleButton.Enabled
 				OnClicked()
 
 				if ToggleButton.Callback then
-					ToggleButton.Callback(ToggleButton.IsEnabled)
+					ToggleButton.Callback(ToggleButton.Enabled)
 				end
 			end
 
 			function ToggleButton:CreateMiniToggle(MiniToggle)
 				MiniToggle = {
 					Name = MiniToggle.Name,
-					IsEnabled = MiniToggle.IsEnabled,
+					Enabled = MiniToggle.Enabled,
 					Default = MiniToggle.Default,
 					Callback = MiniToggle.Callback() or function()
 					end
@@ -608,7 +609,7 @@ function Library:CreateCore()
 				UICorneraa.Parent = MiniToggleCheckmark
 
 				local function OnClickezd()
-					if MiniToggle.IsEnabled then
+					if MiniToggle.Enabled then
 						TweenEffect(MiniToggleCheckmark, {BackgroundColor3 = Color3.fromRGB(0, 175, 0)})
 					else
 						TweenEffect(MiniToggleCheckmark, {BackgroundColor3 = Color3.fromRGB(175, 0, 0)})
@@ -616,20 +617,20 @@ function Library:CreateCore()
 				end
 
 				MiniTogglez.MouseButton1Click:Connect(function()
-					MiniToggle.IsEnabled = not MiniToggle.IsEnabled
+					MiniToggle.Enabled = not MiniToggle.Enabled
 					OnClickezd()
 
 					if MiniToggle.Callback then
-						MiniToggle.Callback(MiniToggle.IsEnabled)
+						MiniToggle.Callback(MiniToggle.Enabled)
 					end
 				end)
 
 				if MiniToggle.Default then
-					MiniToggle.IsEnabled = not MiniToggle.IsEnabled
+					MiniToggle.Enabled = not MiniToggle.Enabled
 					OnClickezd()
 
 					if MiniToggle.Callback then
-						MiniToggle.Callback(MiniToggle.IsEnabled)
+						MiniToggle.Callback(MiniToggle.Enabled)
 					end
 				end
 				return MiniToggle
