@@ -46,88 +46,45 @@ local function GetTool(matchname)
 	return nil
 end
 
---AutoSword
+local Uninject = Tabs.Misc:CreateToggle({
+	Name = "Uninject",
+	Callback = function(callback)
+		if callback then
+			Library.Uninjected = true
+			shared.UninjectA()
+			shared.UninjectB()
+			shared.UninjectC()
+		end
+	end
+})
+
+local MobileSupport = Tabs.Misc:CreateToggle({
+	Name = "MobileSupport",
+	Callback = function(callback)
+		if callback then
+			Library.MobileButtons = not Library.MobileButtons
+		end
+	end
+})
+
 local KillAuraDistance = 28
-local AutoSwordDelay
-local AutoSword = Tabs.Combat:CreateToggle({
-	Name = "AutoSword",
-	Callback = function(callback)
-		if callback then
-			AutoSwordDelay = 0.1
-			local Target = FindNearestPlayer(KillAuraDistance)
-			local Sword = GetTool("Sword")
-			if Target then
-				while true do
-					wait(AutoSwordDelay)
-					Humanoid:EquipTool(Sword)
-				end
-			end
-		else
-			AutoSwordDelay = 86400
-		end
-	end
-})
---Criticals
-local SelectedCrit = nil
-local PacketCrit = false
-local JumpCrit = false
-local Criticals = Tabs.Combat:CreateToggle({
-	Name = "Criticals",
-	Callback = function(callback)
-		if callback then
-			if SelectedCrit == "Packet" then
-				print(LocalPlayer.Name .. " C0-11")
-				PacketCrit = true
-				JumpCrit = false
-			elseif SelectedCrit == "Jump" then
-				print(LocalPlayer.Name .. "Jumped")
-				JumpCrit = true
-				PacketCrit = false
-			end
-		end
-	end
-})
---KillAura
-local KillAuraAutoBlock = nil
-local KillAuraSwordSwing = true
 local KillAura = Tabs.Combat:CreateToggle({
 	Name = "KillAura",
 	Callback = function(callback)
 		if callback then
 			local Target = FindNearestPlayer(KillAuraDistance)
 			local Sword = GetTool("Sword")
-			if Sword then
-				local KillAuraSwingAnim = Sword:WaitForChild("Animations"):FindFirstChild("Swing")
-				local KillAuraBlockAnim = Sword:WaitForChild("Animations"):FindFirstChild("Block")
-					repeat
-						task.wait()
-						local args = {
-							[1] = Target.Character,
-							[2] = PacketCrit,
-							[3] = Sword.Name
-						}
-
-						game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("AttackPlayerWithSword"):InvokeServer(unpack(args))
-					if KillAuraSwingAnim then
-						Humanoid:LoadAnimation(KillAuraSwingAnim):Play()
-					end
-					until not Sword
-				if KillAuraAutoBlock == "Fake" then
+			if Sword ~= nil then
+				print(Sword.Name)
+				repeat
+					wait()
 					local args = {
-						[1] = false,
-						[2] = Sword.Name
+						[1] = Target.Character,
+						[2] = true,
+						[3] = Sword.Name
 					}
-
-					game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
-					Humanoid:LoadAnimation(KillAuraBlockAnim):Play()
-				elseif KillAuraAutoBlock == "Packet" then
-					local args = {
-						[1] = true,
-						[2] = Sword.Name
-					}
-
-					game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
-				end
+					ReplicatedStorage.Packages.Knit.Services.ToolService.RF.AttackPlayerWithSword:InvokeServer(unpack(args))
+				until not Sword
 			end
 		end
 	end
