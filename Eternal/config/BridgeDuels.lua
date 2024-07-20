@@ -1,4 +1,5 @@
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/library.lua"))()
+---local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/library.lua"))()
+local Library = require(game.ReplicatedStorage.Roblox.New.Eternal.Eternal)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -116,8 +117,7 @@ local CriticalsMode = Criticals:CreateDropdown({
 
 --KillAura
 local KillAuraDistance
-local KillAuraSwing = false
-local ChoosedAutoBlock = nil
+local ChoosedAutoBlock = "Fake"
 local KillAuraDelay
 local Sword
 local KillAura = Tabs.Combat:CreateToggle({
@@ -138,16 +138,16 @@ local KillAura = Tabs.Combat:CreateToggle({
 					elseif ChoosedAutoBlock == "Packet" then
 						game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(true, Sword)
 					end
+					--[[[
 					while CriticalJump do
 						wait()
 						Humanoid.Jump = true
 					end
+					--]]
 					while true do
 						wait(KillAuraDelay)
 						DamagePlayer(Nearest.Character, KillAuraCriticals, Sword)
-						if KillAuraSwing then
-							Humanoid:LoadAnimation(SwingAnimation):Play()
-						end
+						Humanoid:LoadAnimation(SwingAnimation):Play()
 					end
 				end
 			end
@@ -170,11 +170,5 @@ local KillAuraBlockMode = KillAura:CreateDropdown({
 	List = {"Packet", "Fake"},
 	Callback = function(callback)
 		ChoosedAutoBlock = callback
-	end
-})
-local KillAuraSwingMode = KillAura:CreateMiniToggle({
-	Name = "Swing",
-	Callback = function(callback)
-		KillAuraSwing = not KillAuraSwing
 	end
 })
