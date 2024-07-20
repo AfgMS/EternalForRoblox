@@ -1,4 +1,5 @@
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/library.lua"))()
+---local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/library.lua"))()
+local Library = require(game.ReplicatedStorage.Roblox.New.Eternal.Eternal)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -47,15 +48,7 @@ local function GetTool(matchname)
 	return nil
 end
 
-local function DamagePlayer(plr, crit, tool)
-	local args = {
-		[1] = plr,
-		[2] = crit,
-		[3] = tool
-	}
-
-	ReplicatedStorage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("AttackPlayerWithSword"):InvokeServer(unpack(args))
-end
+local function DamagePlayer(plr, crit, tool)end
 
 --AutoSword
 local AutoSwordDistance
@@ -88,21 +81,22 @@ local AutoSwordCustomDistance = AutoSword:CreateSlider({
 })
 --Criticals
 local CriticalMode = nil
-local CriticalJump = false
-local KillAuraCriticals = false
+local PacketCrit = false
+local JumpCri = false
 local Criticals = Tabs.Combat:CreateToggle({
 	Name = "Criticals",
 	Callback = function(callback)
 		if callback then
 			if CriticalMode == "Packet" then
-				KillAuraCriticals = true
+				PacketCrit = true
+				JumpCri = false
 			elseif CriticalMode == "Jump" then
-				KillAuraCriticals = false
-				CriticalJump = true
+				JumpCri = true
+				PacketCrit = false
 			end
 		else
-			KillAuraCriticals = false
-			CriticalJump = false
+			PacketCrit = false
+			JumpCri = false
 		end
 	end
 })
@@ -113,61 +107,52 @@ local CriticalsMode = Criticals:CreateDropdown({
 		CriticalMode = callback
 	end
 })
-
 --KillAura
+local Sword = GetTool("Sword")
+local KillAuraSwingAnim = Sword:WaitForChild("Animations"):FindFirstChild("Swing")
+local KillAuraBlockAnim = Sword:WaitForChild("Animations"):FindFirstChild("Block")
+local ChoosedAutoBlock = nil
 local KillAuraDistance
-local ChoosedAutoBlock = "Fake"
-local KillAuraDelay
-local Sword
+local TargetESP
 local KillAura = Tabs.Combat:CreateToggle({
 	Name = "KillAura",
 	Callback = function(callback)
 		if callback then
-			KillAuraDelay = 0.1
-			KillAuraDistance = 30
+			KillAuraDistance = 28
 			local Nearest = FindNearestPlayer(KillAuraDistance)
-			Sword = GetTool("Sword")
 			if Nearest then
-				if Sword then
-					local SwingAnimation = Sword:WaitForChild("Animations"):FindFirstChild("Swing")
-					local BlockAnimation = Sword:WaitForChild("Animations"):FindFirstChild("Block")
-					if ChoosedAutoBlock == "Fake" then
-						game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(false, Sword)
-						Humanoid:LoadAnimation(BlockAnimation):Play()
-					elseif ChoosedAutoBlock == "Packet" then
-						game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(true, Sword)
-					end
-					--[[[
-					while CriticalJump do
-						wait()
-						Humanoid.Jump = true
-					end
-					--]]
-					while true do
-						wait(KillAuraDelay)
-						DamagePlayer(Nearest.Character, KillAuraCriticals, Sword)
-						Humanoid:LoadAnimation(SwingAnimation):Play()
-					end
+				if ChoosedAutoBlock == "Fake" then
+					Humanoid:LoadAnimation(KillAuraBlockAnim):Play()
+					local args = {
+						[1] = false,
+						[2] = Sword
+					}
+
+					game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
+				elseif ChoosedAutoBlock == "Packet" then
+					local args = {
+						[1] = true,
+						[2] = Sword
+					}
+
+					game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
+				elseif ChoosedAutoBlock == "Vanilla" then
+					local args = {
+						[1] = true,
+						[2] = Sword
+					}
+
+					game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
+					Humanoid:LoadAnimation(KillAuraBlockAnim):Play()
+				end
+				
+				while true do
+					wait(2)
+					print("Target: " .. Nearest.Name .. " | Health:" .. Nearest.Character:FindFirstChildOfClass("Humanoid").Health)
 				end
 			end
 		else
-			game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(false, Sword)
-			KillAuraDelay = 864000
+				KillAuraDistance = 0
 		end
-	end
-})
-local KillAuraCustomDistance = KillAura:CreateSlider({
-	Name = "Range",
-	Min = 0,
-	Max = 30,
-	Callback = function(callback)
-		KillAuraDistance = callback
-	end
-})
-local KillAuraBlockMode = KillAura:CreateDropdown({
-	Name = "AutoBlock",
-	List = {"Packet", "Fake"},
-	Callback = function(callback)
-		ChoosedAutoBlock = callback
 	end
 })
