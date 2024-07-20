@@ -1,5 +1,4 @@
----local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/library.lua"))()
-local Library = require(game.ReplicatedStorage.Roblox.New.Eternal.Eternal)
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/library.lua"))()
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -62,18 +61,20 @@ local KillAura = Tabs.Combat:CreateToggle({
 		if callback then
 			local Target = FindNearestPlayer(KillAuraDistance)
 			local Sword = GetTool("Sword")
-			if Sword ~= nil then
-				print(Sword.Name)
-				repeat
-					wait()
-					local args = {
-						[1] = Target.Character,
-						[2] = true,
-						[3] = Sword.Name
-					}
-					ReplicatedStorage.Packages.Knit.Services.ToolService.RF.AttackPlayerWithSword:InvokeServer(unpack(args))
-					print("TargetHud: " .. Target.Name .. ", Health: " .. Target.Character:FindFirstChildOfClass("Humanoid").Health)
-				until not Sword
+			if Target then
+				if Sword ~= nil then
+					print(Sword.Name)
+					repeat
+						wait()
+						local args = {
+							[1] = Target.Character,
+							[2] = true,
+							[3] = Sword.Name
+						}
+						ReplicatedStorage.Packages.Knit.Services.ToolService.RF.AttackPlayerWithSword:InvokeServer(unpack(args))
+						print("TargetHud: " .. Target.Name .. ", Health: " .. Target.Character:FindFirstChildOfClass("Humanoid").Health)
+					until not Sword
+				end
 			end
 		end
 	end
