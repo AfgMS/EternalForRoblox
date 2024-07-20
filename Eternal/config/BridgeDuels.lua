@@ -130,21 +130,6 @@ local KillAura = Tabs.Combat:CreateToggle({
 				else
 					KillAuraDelay = 0.1
 				end
-				KillAuraESP = Instance.new("Part")
-				KillAuraESP.Shape = "Ball"
-				KillAuraESP.Transparency = 0.45
-				KillAuraESP.Size = Vector3.new(1.2, 1.2, 1.2)
-				KillAuraESP.Anchored = true
-				KillAuraESP.CanCollide = false
-				KillAuraESP.CanTouch = false
-				KillAuraESP.CastShadow = false
-				KillAuraESP.Parent = game.Workspace
-				repeat
-					wait()
-					if Nearest.Character:WaitForChild("Head") then
-						KillAuraESP.Position = Nearest.Character.Head.Position + Vector3.new(0, 2, 0)
-					end
-				until not Nearest
 				if Sword then
 					local SwingAnimation = Sword:WaitForChild("Animations"):FindFirstChild("Swing")
 					local BlockAnimation = Sword:WaitForChild("Animations"):FindFirstChild("Block")
@@ -165,7 +150,7 @@ local KillAura = Tabs.Combat:CreateToggle({
 			else
 				KillAuraESP:Destroy()
 				game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(false, Sword)
-				KillAuraDistance = 0
+				KillAuraDelay = 86400
 			end
 		end
 	end
@@ -173,7 +158,7 @@ local KillAura = Tabs.Combat:CreateToggle({
 local KillAuraCustomDistance = KillAura:CreateSlider({
 	Name = "Range",
 	Min = 0,
-	Max = 30,
+	Max = 28,
 	Callback = function(callback)
 		KillAuraDistance = callback
 	end
