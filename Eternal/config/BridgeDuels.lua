@@ -1,4 +1,5 @@
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/library.lua"))()
+---local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/library.lua"))()
+local Library = require(game.ReplicatedStorage.Roblox.New.Eternal.Eternal)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -15,24 +16,22 @@ local Tabs = {
 	Misc = Main:CreateTab("Misc")
 }
 
-local function IsAlive(plr)
-	return plr and plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character:FindFirstChildOfClass("Humanoid").Health > 0.11
+local function IsAlive(v)
+	return v and v.Character and v.Character:FindFirstChildOfClass("Humanoid") and v.Character:FindFirstChildOfClass("Humanoid").Health > 0.11
 end
 
-local function FindNearestPlayer(distance)
-	local NearestPlayer = nil
-	local MinDistance = math.huge
+local function GetNearestPlayers(distance)
+	local PlayersTable = {}
 
 	for _, player in pairs(Players:GetPlayers()) do
 		if player ~= LocalPlayer and IsAlive(player) then
-			local Distances = (LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position - player.Character:FindFirstChild("HumanoidRootPart").Position).Magnitude
-			if Distances < MinDistance and Distances <= distance then
-				MinDistance = Distances
-				NearestPlayer = player
+			local ActualDistance = (LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position - player.Character:FindFirstChild("HumanoidRootPart").Position).Magnitude
+			if ActualDistance <= distance then
+				table.insert(PlayersTable, player)
 			end
 		end
 	end
-	return NearestPlayer
+	return PlayersTable
 end
 
 local function GetTool(matchname)
@@ -57,25 +56,31 @@ local MobileSupport = Tabs.Misc:CreateToggle({
 local KillAuraDistance = 28
 local KillAura = Tabs.Combat:CreateToggle({
 	Name = "KillAura",
-	Callback = function(callback)
-		if callback then
-			local Target = FindNearestPlayer(KillAuraDistance)
-			local Sword = GetTool("Sword")
-			if Target then
-				if Sword ~= nil then
-					print(Sword.Name)
-					repeat
-						wait()
-						local args = {
-							[1] = Target.Character,
-							[2] = true,
-							[3] = Sword.Name
-						}
-						ReplicatedStorage.Packages.Knit.Services.ToolService.RF.AttackPlayerWithSword:InvokeServer(unpack(args))
-						print("TargetHud: " .. Target.Name .. ", Health: " .. Target.Character:FindFirstChildOfClass("Humanoid").Health)
-					until not Sword
+	Callback = function(enabled)
+		if enabled then
+			task.spawn(function()
+				while enabled do
+					task.wait(0.03)
+					local targets = GetNearestPlayers(KillAuraDistance)
+					local sword = GetTool("Sword")
+					if #targets > 0 and sword then
+						for _, target in pairs(targets) do
+							repeat
+								task.wait()
+								print(target.Name .. ", Health: " .. target.Character:FindFirstChildOfClass("Humanoid").Health)
+								local args = {
+									[1] = target.Character,
+									[2] = true,
+									[3] = sword.Name
+								}
+								game:GetService("ReplicatedStorage").Packages.Knit.Services.ToolService.RF.AttackPlayerWithSword:InvokeServer(unpack(args))
+							until not IsAlive(target)
+						end
+					else
+						print("Nil")
+					end
 				end
-			end
+			end)
 		end
 	end
 })
