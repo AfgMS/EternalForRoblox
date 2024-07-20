@@ -10,7 +10,7 @@ local LogsFolder = MainFolder .. "/logs"
 local AutoSave = false
 local Settings = {
 	ToggleButton = {
-		MiniToggle = {}
+		MiniToggle = {},
 	}
 }
 
@@ -100,7 +100,8 @@ end
 local Library = {
 	LibraryVersion = 0.2,
 	GuiColor = Color3.fromRGB(255, 255, 255), 
-	MobileButtons = false
+	MobileButtons = false,
+	Uninjected = false
 }
 
 function Library:CreateCore()
@@ -114,7 +115,13 @@ function Library:CreateCore()
 	else
 		Eternal.Parent = CoreGui
 	end
-
+	
+	shared.UninjectA = function()
+		if Library.Uninjected then
+			Eternal:Destroy()
+		end
+	end
+	
 	local MainFrame = Instance.new("Frame")
 	MainFrame.Parent = Eternal
 	MainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -557,7 +564,18 @@ function Library:CreateCore()
 					ToggleButton.Callback(ToggleButton.Enabled)
 				end
 			end
+			
+			shared.UninjectB = function()
+				if Library.Uninjected then
+					ToggleButton.Enabled = false
+					OnClicked()
 
+					if ToggleButton.Callback then
+						ToggleButton.Callback(ToggleButton.Enabled)
+					end
+				end
+			end
+			
 			function ToggleButton:CreateMiniToggle(MiniToggle)
 				MiniToggle = {
 					Name = MiniToggle.Name,
@@ -639,6 +657,17 @@ function Library:CreateCore()
 
 					if MiniToggle.Callback then
 						MiniToggle.Callback(MiniToggle.Enabled)
+					end
+				end
+				
+				shared.UninjectC = function()
+					if Library.Uninjected then
+						MiniToggle.Enabled = false
+						OnClicked()
+
+						if MiniToggle.Callback then
+							MiniToggle.Callback(MiniToggle.Enabled)
+						end
 					end
 				end
 				
