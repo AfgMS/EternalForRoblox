@@ -119,6 +119,7 @@ local KillAura = Tabs.Combat:CreateToggle({
 			local Nearest = FindNearestPlayer(KillAuraDistance)
 			if Nearest then
 				if Sword then
+					--[[
 					local KillAuraSwingAnim = Sword:WaitForChild("Animations"):FindFirstChild("Swing")
 					local KillAuraBlockAnim = Sword:WaitForChild("Animations"):FindFirstChild("Block")
 					
@@ -152,7 +153,7 @@ local KillAura = Tabs.Combat:CreateToggle({
 							Humanoid:LoadAnimation(KillAuraBlockAnim):Play()
 						end
 					end
-
+					--]]
 					while true do
 						wait(2)
 						print("Target: " .. Nearest.Name .. " | Health:" .. Nearest.Character:FindFirstChildOfClass("Humanoid").Health)
