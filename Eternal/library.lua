@@ -13,7 +13,6 @@ local Settings = {
 		MiniToggle = {},
 	}
 }
-
 function LoadSettings(path)
 	if isfile(path) then
 		return HttpService:JSONDecode(readfile(path))
@@ -98,10 +97,9 @@ function TweenEffect(object, properties)
 end
 
 local Library = {
-	LibraryVersion = 0.2,
+	LibraryVersion = 1.2,
 	GuiColor = Color3.fromRGB(255, 255, 255), 
-	MobileButtons = false,
-	Uninjected = false
+	MobileButtons = false
 }
 
 function Library:CreateCore()
@@ -114,12 +112,6 @@ function Library:CreateCore()
 		Eternal.Parent = PlayerGui
 	else
 		Eternal.Parent = CoreGui
-	end
-	
-	shared.UninjectA = function()
-		if Library.Uninjected then
-			Eternal:Destroy()
-		end
 	end
 	
 	local MainFrame = Instance.new("Frame")
@@ -565,17 +557,6 @@ function Library:CreateCore()
 				end
 			end
 			
-			shared.UninjectB = function()
-				if Library.Uninjected then
-					ToggleButton.Enabled = false
-					OnClicked()
-
-					if ToggleButton.Callback then
-						ToggleButton.Callback(ToggleButton.Enabled)
-					end
-				end
-			end
-			
 			function ToggleButton:CreateMiniToggle(MiniToggle)
 				MiniToggle = {
 					Name = MiniToggle.Name,
@@ -657,17 +638,6 @@ function Library:CreateCore()
 
 					if MiniToggle.Callback then
 						MiniToggle.Callback(MiniToggle.Enabled)
-					end
-				end
-				
-				shared.UninjectC = function()
-					if Library.Uninjected then
-						MiniToggle.Enabled = false
-						OnClicked()
-
-						if MiniToggle.Callback then
-							MiniToggle.Callback(MiniToggle.Enabled)
-						end
 					end
 				end
 				
