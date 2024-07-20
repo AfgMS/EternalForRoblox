@@ -1,4 +1,5 @@
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/library.lua"))()
+---local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/library.lua"))()
+local Library = require(game.ReplicatedStorage.Roblox.New.Eternal.Eternal)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -23,14 +24,12 @@ local function FindNearestPlayer(distance)
 	local NearestPlayer = nil
 	local MinDistance = math.huge
 
-	for _, player in pairs(game:GetService("Players"):GetPlayers()) do
-		if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-			if IsAlive(player) then
-				local Distances = (LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position - player.Character:FindFirstChild("HumanoidRootPart").Position).Magnitude
-				if Distances < MinDistance and Distances <= distance then
-					MinDistance = Distances
-					NearestPlayer = player
-				end
+	for _, player in pairs(Players:GetPlayers()) do
+		if player ~= LocalPlayer and IsAlive(player) then
+			local Distances = (LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position - player.Character:FindFirstChild("HumanoidRootPart").Position).Magnitude
+			if Distances < MinDistance and Distances <= distance then
+				MinDistance = Distances
+				NearestPlayer = player
 			end
 		end
 	end
