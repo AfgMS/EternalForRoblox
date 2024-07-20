@@ -19,22 +19,22 @@ local function IsAlive(plr)
 	return plr and plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character:FindFirstChildOfClass("Humanoid").Health > 0.11
 end
 
-local function FindNearest(MaxDist)
-	local Nearest = nil
-	local MinDist = math.huge
+local function FindNearestPlayer(distance)
+	local NearestPlayer = nil
+	local MinDistance = math.huge
 
-	for _, player in pairs(Players:GetPlayers()) do
-		if player ~= LocalPlayer and player.Character and IsAlive(player) then
-			if player.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-				local distance = (LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position - player.Character:FindFirstChild("HumanoidRootPart").Position).Magnitude
-				if distance < MinDist and distance <= MaxDist then
-					MinDist = distance
-					Nearest = player
+	for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+		if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+			if IsAlive(player) then
+				local Distances = (LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position - player.Character:FindFirstChild("HumanoidRootPart").Position).Magnitude
+				if Distances < MinDistance and Distances <= distance then
+					MinDistance = Distances
+					NearestPlayer = player
 				end
 			end
 		end
 	end
-	return Nearest
+	return NearestPlayer
 end
 
 local function GetTool(matchname)
@@ -46,119 +46,89 @@ local function GetTool(matchname)
 	return nil
 end
 
-local function DamagePlayer(plr, crit, tool)end
-
 --AutoSword
-local AutoSwordDistance
+local KillAuraDistance = 28
+local AutoSwordDelay
 local AutoSword = Tabs.Combat:CreateToggle({
 	Name = "AutoSword",
 	Callback = function(callback)
 		if callback then
-			AutoSwordDistance = 28
-			local Nearest = FindNearest(AutoSwordDistance)
+			AutoSwordDelay = 0.1
+			local Target = FindNearestPlayer(KillAuraDistance)
 			local Sword = GetTool("Sword")
-			if Nearest then
-				if Sword then
+			if Target then
+				while true do
+					wait(AutoSwordDelay)
 					Humanoid:EquipTool(Sword)
 				end
 			end
 		else
-			AutoSwordDistance = 0
-		end
-	end
-})
-local AutoSwordCustomDistance = AutoSword:CreateSlider({
-	Name = "Distance",
-	Min = 0,
-	Max = 100,
-	Callback = function(callback)
-		if AutoSword.Enabled then
-			AutoSwordDistance = callback
+			AutoSwordDelay = 86400
 		end
 	end
 })
 --Criticals
-local CriticalMode = nil
+local SelectedCrit = nil
 local PacketCrit = false
-local JumpCri = false
+local JumpCrit = false
 local Criticals = Tabs.Combat:CreateToggle({
 	Name = "Criticals",
 	Callback = function(callback)
 		if callback then
-			if CriticalMode == "Packet" then
+			if SelectedCrit == "Packet" then
+				print(LocalPlayer.Name .. " C0-11")
 				PacketCrit = true
-				JumpCri = false
-			elseif CriticalMode == "Jump" then
-				JumpCri = true
+				JumpCrit = false
+			elseif SelectedCrit == "Jump" then
+				print(LocalPlayer.Name .. "Jumped")
+				JumpCrit = true
 				PacketCrit = false
 			end
-		else
-			PacketCrit = false
-			JumpCri = false
 		end
 	end
 })
-local CriticalsMode = Criticals:CreateDropdown({
-	Name = "Mode",
-	List = {"Packet", "Jump"},
-	Callback = function(callback)
-		CriticalMode = callback
-	end
-})
 --KillAura
-local Sword = GetTool("Sword")
-local ChoosedAutoBlock = nil
-local KillAuraDistance
-local TargetESP
+local KillAuraAutoBlock = nil
+local KillAuraSwordSwing = true
 local KillAura = Tabs.Combat:CreateToggle({
 	Name = "KillAura",
 	Callback = function(callback)
 		if callback then
-			KillAuraDistance = 28
-			local Nearest = FindNearest(KillAuraDistance)
-			if Nearest then
-				if Sword then
-					local KillAuraSwingAnim = Sword:WaitForChild("Animations"):FindFirstChild("Swing")
-					local KillAuraBlockAnim = Sword:WaitForChild("Animations"):FindFirstChild("Block")
-					
-					if ChoosedAutoBlock == "Fake" then
-						if KillAuraBlockAnim then
-							print("Founded" .. KillAuraBlockAnim.Name)
-							Humanoid:LoadAnimation(KillAuraBlockAnim):Play()
-						end
+			local Target = FindNearestPlayer(KillAuraDistance)
+			local Sword = GetTool("Sword")
+			if Sword then
+				local KillAuraSwingAnim = Sword:WaitForChild("Animations"):FindFirstChild("Swing")
+				local KillAuraBlockAnim = Sword:WaitForChild("Animations"):FindFirstChild("Block")
+					repeat
+						task.wait()
 						local args = {
-							[1] = false,
-							[2] = Sword
+							[1] = Target.Character,
+							[2] = PacketCrit,
+							[3] = Sword.Name
 						}
 
-						game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
-					elseif ChoosedAutoBlock == "Packet" then
-						local args = {
-							[1] = true,
-							[2] = Sword
-						}
-
-						game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
-					elseif ChoosedAutoBlock == "Vanilla" then
-						if KillAuraBlockAnim then
-							print("Founded" .. KillAuraBlockAnim.Name)
-							local args = {
-								[1] = true,
-								[2] = Sword
-							}
-
-							game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
-							Humanoid:LoadAnimation(KillAuraBlockAnim):Play()
-						end
+						game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("AttackPlayerWithSword"):InvokeServer(unpack(args))
+					if KillAuraSwingAnim then
+						Humanoid:LoadAnimation(KillAuraSwingAnim):Play()
 					end
-					while true do
-						wait(2)
-						print("Target: " .. Nearest.Name .. " | Health:" .. Nearest.Character:FindFirstChildOfClass("Humanoid").Health)
-					end
+					until not Sword
+				if KillAuraAutoBlock == "Fake" then
+					local args = {
+						[1] = false,
+						[2] = Sword.Name
+					}
+
+					game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
+					Humanoid:LoadAnimation(KillAuraBlockAnim):Play()
+				elseif KillAuraAutoBlock == "Packet" then
+					local args = {
+						[1] = true,
+						[2] = Sword.Name
+					}
+
+					game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
 				end
 			end
-		else
-				KillAuraDistance = 0
 		end
 	end
 })
