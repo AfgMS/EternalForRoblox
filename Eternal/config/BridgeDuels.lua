@@ -3,7 +3,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-local HumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 local CurrentCamera = game:GetService("Workspace").CurrentCamera
 
 local Main = Library:CreateCore()
@@ -20,22 +19,22 @@ local function IsAlive(plr)
 	return plr and plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character:FindFirstChildOfClass("Humanoid").Health > 0.11
 end
 
-local function FindNearestPlayer(distance)
-	local NearestPlayer = nil
-	local MinDistance = math.huge
+local function FindNearest(MaxDist)
+	local Nearest = nil
+	local MinDist = math.huge
 
 	for _, player in pairs(Players:GetPlayers()) do
-		if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-			if IsAlive(player) then
-				local Distances = (LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position - player.Character:FindFirstChild("HumanoidRootPart").Position).Magnitude
-				if Distances < MinDistance and Distances <= distance then
-					MinDistance = Distances
-					NearestPlayer = player
+		if player ~= LocalPlayer and player.Character and IsAlive(player) then
+			if player.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+				local distance = (LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position - player.Character:FindFirstChild("HumanoidRootPart").Position).Magnitude
+				if distance < MinDist and distance <= MaxDist then
+					MinDist = distance
+					Nearest = player
 				end
 			end
 		end
 	end
-	return NearestPlayer
+	return Nearest
 end
 
 local function GetTool(matchname)
@@ -56,7 +55,7 @@ local AutoSword = Tabs.Combat:CreateToggle({
 	Callback = function(callback)
 		if callback then
 			AutoSwordDistance = 28
-			local Nearest = FindNearestPlayer(AutoSwordDistance)
+			local Nearest = FindNearest(AutoSwordDistance)
 			local Sword = GetTool("Sword")
 			if Nearest then
 				if Sword then
@@ -116,10 +115,9 @@ local KillAura = Tabs.Combat:CreateToggle({
 	Callback = function(callback)
 		if callback then
 			KillAuraDistance = 28
-			local Nearest = FindNearestPlayer(KillAuraDistance)
+			local Nearest = FindNearest(KillAuraDistance)
 			if Nearest then
 				if Sword then
-					--[[
 					local KillAuraSwingAnim = Sword:WaitForChild("Animations"):FindFirstChild("Swing")
 					local KillAuraBlockAnim = Sword:WaitForChild("Animations"):FindFirstChild("Block")
 					
@@ -153,7 +151,6 @@ local KillAura = Tabs.Combat:CreateToggle({
 							Humanoid:LoadAnimation(KillAuraBlockAnim):Play()
 						end
 					end
-					--]]
 					while true do
 						wait(2)
 						print("Target: " .. Nearest.Name .. " | Health:" .. Nearest.Character:FindFirstChildOfClass("Humanoid").Health)
