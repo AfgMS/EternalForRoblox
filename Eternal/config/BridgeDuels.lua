@@ -1,4 +1,5 @@
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/library.lua"))()
+---local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/library.lua"))()
+local Library = require(game.ReplicatedStorage.Roblox.New.Eternal.Eternal)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -108,8 +109,6 @@ local CriticalsMode = Criticals:CreateDropdown({
 })
 --KillAura
 local Sword = GetTool("Sword")
-local KillAuraSwingAnim = Sword:WaitForChild("Animations"):FindFirstChild("Swing")
-local KillAuraBlockAnim = Sword:WaitForChild("Animations"):FindFirstChild("Block")
 local ChoosedAutoBlock = nil
 local KillAuraDistance
 local TargetESP
@@ -120,34 +119,45 @@ local KillAura = Tabs.Combat:CreateToggle({
 			KillAuraDistance = 28
 			local Nearest = FindNearestPlayer(KillAuraDistance)
 			if Nearest then
-				if ChoosedAutoBlock == "Fake" then
-					Humanoid:LoadAnimation(KillAuraBlockAnim):Play()
-					local args = {
-						[1] = false,
-						[2] = Sword
-					}
+				if Sword then
+					local KillAuraSwingAnim = Sword:WaitForChild("Animations"):FindFirstChild("Swing")
+					local KillAuraBlockAnim = Sword:WaitForChild("Animations"):FindFirstChild("Block")
+					
+					if ChoosedAutoBlock == "Fake" then
+						if KillAuraBlockAnim then
+							print("Founded" .. KillAuraBlockAnim.Name)
+							Humanoid:LoadAnimation(KillAuraBlockAnim):Play()
+						end
+						local args = {
+							[1] = false,
+							[2] = Sword
+						}
 
-					game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
-				elseif ChoosedAutoBlock == "Packet" then
-					local args = {
-						[1] = true,
-						[2] = Sword
-					}
+						game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
+					elseif ChoosedAutoBlock == "Packet" then
+						local args = {
+							[1] = true,
+							[2] = Sword
+						}
 
-					game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
-				elseif ChoosedAutoBlock == "Vanilla" then
-					local args = {
-						[1] = true,
-						[2] = Sword
-					}
+						game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
+					elseif ChoosedAutoBlock == "Vanilla" then
+						if KillAuraBlockAnim then
+							print("Founded" .. KillAuraBlockAnim.Name)
+							local args = {
+								[1] = true,
+								[2] = Sword
+							}
 
-					game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
-					Humanoid:LoadAnimation(KillAuraBlockAnim):Play()
-				end
-				
-				while true do
-					wait(2)
-					print("Target: " .. Nearest.Name .. " | Health:" .. Nearest.Character:FindFirstChildOfClass("Humanoid").Health)
+							game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
+							Humanoid:LoadAnimation(KillAuraBlockAnim):Play()
+						end
+					end
+
+					while true do
+						wait(2)
+						print("Target: " .. Nearest.Name .. " | Health:" .. Nearest.Character:FindFirstChildOfClass("Humanoid").Health)
+					end
 				end
 			end
 		else
