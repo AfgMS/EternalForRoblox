@@ -38,25 +38,14 @@ local function FindNearestPlayer(distance)
 end
 
 local function GetTool(matchname)
-	for _, tool in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
-		if tool:IsA("Tool") and string.match(tool.Name, matchname) then
-			return tool
+	local Item = nil
+	for i, v in pairs(LocalPlayer.Character:GetChildren()) do
+		if v:IsA("Tool") and string.match(v.Name, matchname) then
+			Item = v
 		end
 	end
-	return nil
+	return Item
 end
-
-local Uninject = Tabs.Misc:CreateToggle({
-	Name = "Uninject",
-	Callback = function(callback)
-		if callback then
-			Library.Uninjected = true
-			shared.UninjectA()
-			shared.UninjectB()
-			shared.UninjectC()
-		end
-	end
-})
 
 local MobileSupport = Tabs.Misc:CreateToggle({
 	Name = "MobileSupport",
@@ -84,6 +73,7 @@ local KillAura = Tabs.Combat:CreateToggle({
 						[3] = Sword.Name
 					}
 					ReplicatedStorage.Packages.Knit.Services.ToolService.RF.AttackPlayerWithSword:InvokeServer(unpack(args))
+					print("TargetHud: " .. Target.Name .. ", Health: " .. Target.Character:FindFirstChildOfClass("Humanoid").Health)
 				until not Sword
 			end
 		end
