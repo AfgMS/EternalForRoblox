@@ -154,11 +154,11 @@ local TargetHUD = Tabs.Render:CreateToggle({
 				task.wait()
 				local NearestPlayer = GetNearestPlayer(KillAuraRange)
 				if NearestPlayer then
-					Library:ShowTargetHUD(NearestPlayer, true)
+					Library:ShowTargetHUD(NearestPlayer, NearestPlayer.Name, NearestPlayer.Character:FindFirstChildOfClass("Humanoid").Health, true)
 				end
 			end
 		else
-			Library:ShowTargetHUD(LocalPlayer.Name, false)
+			Library:ShowTargetHUD(LocalPlayer, LocalPlayer.Name,Humanoid.Health, false)
 		end
 	end
 })
