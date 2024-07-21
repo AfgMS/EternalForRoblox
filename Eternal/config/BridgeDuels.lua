@@ -62,7 +62,7 @@ local AutoSword = Tabs.Combat:CreateToggle({
 		if callback then
 			AutoSwordDelay = 0.1
 			while true do
-				task.wait(AutoSwordDelay)
+				wait(AutoSwordDelay)
 				local NearestPlayer = GetNearestPlayer(28)
 				local Sword = GetTool("Sword")
 				if NearestPlayer then
@@ -91,6 +91,14 @@ local Criticals = Tabs.Combat:CreateToggle({
 				JumpCrit = false
 				PacketCrit = true
 			end
+			if JumpCrit then
+				while true do
+					wait()
+					game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("AttackPlayerWithSword").OnClientInvoke = function()
+						Humanoid.Jump = true
+					end 
+				end
+			end
 		else
 			JumpCrit = false
 			PacketCrit = false
@@ -118,18 +126,10 @@ local KillAura = Tabs.Combat:CreateToggle({
 						task.wait()
 					until IsAlive(LocalPlayer)
 				end
-				while JumpCrit do
-					task.wait()
-					game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("AttackPlayerWithSword").OnClientInvoke = function()
-						Humanoid.Jump = true
-					end
-				end
 				local NearestPlayer = GetNearestPlayer(KillAuraRange)
 				local Sword = GetTool("Sword")
 				if NearestPlayer then
-					print(NearestPlayer.Name .. NearestPlayer.Character:FindFirstChildOfClass("Humanoid").Health)
 					if Sword then
-						print(Sword.Name)
 						local args = {
 							[1] = NearestPlayer.Character,
 							[2] = PacketCrit,
@@ -142,6 +142,23 @@ local KillAura = Tabs.Combat:CreateToggle({
 			end
 		else
 			KillAuraRange = 0
+		end
+	end
+})
+
+local TargetHUD = Tabs.Render:CreateToggle({
+	Name = "TargetHUD",
+	Callback = function(callback)
+		if callback then
+			while true do
+				task.wait()
+				local NearestPlayer = GetNearestPlayer(KillAuraRange)
+				if NearestPlayer then
+					Library:ShowTargetHUD(NearestPlayer, true)
+				end
+			end
+		else
+			Library:ShowTargetHUD(LocalPlayer.Name, false)
 		end
 	end
 })
