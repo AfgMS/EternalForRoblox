@@ -237,7 +237,7 @@ function Library:CreateCore()
 	local HealthBack = Instance.new("Frame")
 	local HealthFront = Instance.new("Frame")
 	
-	function Library:ShowTargetHUD(target, targethudvisible)
+	function Library:ShowTargetHUD(target, targetname, targethealth, targethudvisible)
 
 		TargetHUD.Parent = MobileButtonsHolder
 		TargetHUD.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
@@ -296,9 +296,9 @@ function Library:CreateCore()
 		spawn(function()
 			while true do
 				if target then
-					TargetName.Text = target.Name
+					TargetName.Text = targetname
 					local LocalHumanoid = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-					local TargetHumanoid = target.Character:FindFirstChildOfClass("Humanoid")
+					local TargetHumanoid = targethealth
 					if LocalHumanoid and TargetHumanoid then
 						if LocalHumanoid.Health > TargetHumanoid.Health then
 							FightStatus.Text = "Winning"
