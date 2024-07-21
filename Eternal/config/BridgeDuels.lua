@@ -16,21 +16,22 @@ local Tabs = {
 }
 
 local function IsAlive(v)
-	return v and v.Character and v.Character:FindFirstChildOfClass("Humanoid") and v.Character:FindFirstChildOfClass("Humanoid").Health > 0.11
+	return v and v.Character and v.Character:FindFirstChildOfClass("Humanoid") and v.Character:FindFirstChildOfClass("Humanoid").Health > 0
 end
 
-local function GetNearestPlayers(distance)
-	local PlayersTable = {}
-
-	for _, player in pairs(Players:GetPlayers()) do
-		if player ~= LocalPlayer and IsAlive(player) then
-			local ActualDistance = (LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position - player.Character:FindFirstChild("HumanoidRootPart").Position).Magnitude
-			if ActualDistance <= distance then
-				table.insert(PlayersTable, player)
+local function GetNearestPlayer(MaxDist)
+	local Nearest, MinDist
+	
+	for i,v in pairs(Players:GetPlayers()) do
+		if v ~= LocalPlayer and IsAlive(v) then
+			local Distance = (v.Character:FindFirstChild("HumanoidRootPart").Position - LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position).Magnitude
+			if Distance <= MaxDist and (not MinDist or Distance < MinDist) then
+				MinDist = Distance
+				Nearest = v
 			end
 		end
 	end
-	return PlayersTable
+	return Nearest
 end
 
 local function GetTool(matchname)
@@ -52,34 +53,82 @@ local MobileSupport = Tabs.Misc:CreateToggle({
 	end
 })
 
-local KillAuraDistance = 28
-local KillAura = Tabs.Combat:CreateToggle({
-	Name = "KillAura",
-	Callback = function(enabled)
-		if enabled then
-			task.spawn(function()
-				while enabled do
-					task.wait(0.03)
-					local targets = GetNearestPlayers(KillAuraDistance)
-					local sword = GetTool("Sword")
-					if #targets > 0 and sword then
-						for _, target in pairs(targets) do
-							repeat
-								task.wait()
-								print(target.Name .. ", Health: " .. target.Character:FindFirstChildOfClass("Humanoid").Health)
-								local args = {
-									[1] = target.Character,
-									[2] = true,
-									[3] = sword.Name
-								}
-								game:GetService("ReplicatedStorage").Packages.Knit.Services.ToolService.RF.AttackPlayerWithSword:InvokeServer(unpack(args))
-							until not IsAlive(target)
-						end
-					else
-						print("Nil")
+local AutoSwordDelay
+local AutoSword = Tabs.Combat:CreateToggle({
+	Name = "AutoSword",
+	Callback = function(callback)
+		if callback then
+			AutoSwordDelay = 0.1
+			while true do
+				wait(AutoSwordDelay)
+				local NearestPlayer = GetNearestPlayer(28)
+				local Sword = GetTool("Sword")
+				if NearestPlayer then
+					if Sword then
+						Humanoid:EquipTool(Sword)
 					end
 				end
-			end)
+			end
+		else
+			AutoSwordDelay = 86400
+		end
+	end
+})
+
+local CriticalsMode = nil
+local JumpCrit = false
+local PacketCrit = false
+local Criticals = Tabs.Combat:CreateToggle({
+	Name = "Criticals",
+	Callback = function(callback)
+		if callback then
+			if CriticalsMode == "Jump" then
+				JumpCrit = true
+				PacketCrit = false
+			elseif CriticalsMode == "Packet" then
+				JumpCrit = false
+				PacketCrit = true
+			end
+		else
+			JumpCrit = false
+			PacketCrit = false
+		end
+	end
+})
+local CritMode = Criticals:CreateDropdown({
+	Name = "CritMode",
+	List = {"Jump", "Packet"},
+	Callback = function(callback)
+		CriticalsMode = callback
+	end
+})
+
+local KillAuraRange
+local KillAura = Tabs.Combat:CreateToggle({
+	Name = "KillAura",
+	Callback = function(callback)
+		if callback then
+			KillAuraRange = 28
+			while true do
+				task.wait()
+				local NearestPlayer = GetNearestPlayer(KillAuraRange)
+				local Sword = GetTool("Sword")
+				if NearestPlayer then
+					print(NearestPlayer.Name .. NearestPlayer.Character:FindFirstChildOfClass("Humanoid").Health)
+					if Sword then
+						print(Sword.Name)
+						local args = {
+							[1] = NearestPlayer.Character,
+							[2] = PacketCrit,
+							[3] = Sword.Name
+						}
+
+						game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("AttackPlayerWithSword"):InvokeServer(unpack(args))
+					end
+				end
+			end
+		else
+			KillAuraRange = 0
 		end
 	end
 })
