@@ -146,19 +146,95 @@ local KillAura = Tabs.Combat:CreateToggle({
 	end
 })
 
+local ScreenGui
 local TargetHUD = Tabs.Render:CreateToggle({
 	Name = "TargetHUD",
 	Callback = function(callback)
 		if callback then
+			ScreenGui = Instance.new("ScreenGui")
+			local Frame = Instance.new("Frame")
+			local TargetHUD = Instance.new("Frame")
+			local TargetName = Instance.new("TextLabel")
+			local FightStatus = Instance.new("TextLabel")
+			local HealthBack = Instance.new("Frame")
+			local HealthFront = Instance.new("Frame")
+			
+			ScreenGui.Parent = LocalPlayer.PlayerGui
+			ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+			Frame.Parent = ScreenGui
+			Frame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			Frame.BackgroundTransparency = 1.000
+			Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			Frame.BorderSizePixel = 0
+			Frame.Size = UDim2.new(1, 0, 1, 0)
+
+			TargetHUD.Parent = Frame
+			TargetHUD.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+			TargetHUD.BackgroundTransparency = 0.350
+			TargetHUD.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			TargetHUD.BorderSizePixel = 0
+			TargetHUD.Position = UDim2.new(0.577536166, 0, 0.670803726, 0)
+			TargetHUD.Size = UDim2.new(0, 165, 0, 50)
+
+			TargetName.Parent = TargetHUD
+			TargetName.AnchorPoint = Vector2.new(0.5, 0.5)
+			TargetName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			TargetName.BackgroundTransparency = 1.000
+			TargetName.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			TargetName.BorderSizePixel = 0
+			TargetName.Position = UDim2.new(0.629999995, 0, 0.25, 0)
+			TargetName.Size = UDim2.new(0, 120, 0, 14)
+			TargetName.Font = Enum.Font.SourceSans
+			TargetName.TextColor3 = Color3.fromRGB(255, 255, 255)
+			TargetName.TextScaled = true
+			TargetName.TextSize = 14.000
+			TargetName.TextWrapped = true
+			TargetName.TextXAlignment = Enum.TextXAlignment.Left
+
+			FightStatus.Parent = TargetHUD
+			FightStatus.AnchorPoint = Vector2.new(0.5, 0.5)
+			FightStatus.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			FightStatus.BackgroundTransparency = 1.000
+			FightStatus.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			FightStatus.BorderSizePixel = 0
+			FightStatus.Position = UDim2.new(0.629999995, 0, 0.5, 0)
+			FightStatus.Size = UDim2.new(0, 120, 0, 14)
+			FightStatus.Font = Enum.Font.SourceSans
+			FightStatus.Text = "Winning"
+			FightStatus.TextColor3 = Color3.fromRGB(255, 255, 255)
+			FightStatus.TextScaled = true
+			FightStatus.TextSize = 14.000
+			FightStatus.TextWrapped = true
+			FightStatus.TextXAlignment = Enum.TextXAlignment.Left
+
+			HealthBack.Parent = TargetHUD
+			HealthBack.AnchorPoint = Vector2.new(0.5, 0.5)
+			HealthBack.BackgroundColor3 = Color3.fromRGB(48, 48, 48)
+			HealthBack.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			HealthBack.BorderSizePixel = 0
+			HealthBack.Position = UDim2.new(0.5, 0, 0.850000024, 0)
+			HealthBack.Size = UDim2.new(0, 155, 0, 5)
+
+			HealthFront.Parent = HealthBack
+			HealthFront.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			HealthFront.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			HealthFront.BorderSizePixel = 0
+			HealthFront.Size = UDim2.new(0, 155, 0, 5)
+			
 			while true do
-				task.wait()
-				local NearestPlayer = GetNearestPlayer(KillAuraRange)
-				if NearestPlayer then
-					Library:ShowTargetHUD(NearestPlayer, NearestPlayer.Name, NearestPlayer.Character:FindFirstChildOfClass("Humanoid").Health, true)
+				wait()
+				local NearestPlayer  = GetNearestPlayer(KillAuraRange)
+				TargetName.Text = NearestPlayer.Name
+				HealthFront.Size = UDim2.new(NearestPlayer.Character:FindFirstChildOfClass("Humanoid").Health / NearestPlayer.Character:FindFirstChildOfClass("Humanoid").MaxHealth, 0, 1, 0)
+				if Humanoid.Health > NearestPlayer.Character:FindFirstChildOfClass("Humanoid").Health then
+					FightStatus.Text = "Winning"
+				elseif Humanoid.Health < NearestPlayer.Character:FindFirstChildOfClass("Humanoid").Health then
+					FightStatus.Text = "Losing"
 				end
 			end
 		else
-			Library:ShowTargetHUD(LocalPlayer, LocalPlayer.Name,Humanoid.Health, false)
+			ScreenGui:Destroy()
 		end
 	end
 })
