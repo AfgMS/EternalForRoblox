@@ -1,5 +1,4 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/library.lua"))()
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
@@ -23,7 +22,10 @@ local function GetNearestPlayer(MaxDist)
 	local Nearest, MinDist
 	
 	for i,v in pairs(Players:GetPlayers()) do
-		if v ~= LocalPlayer and IsAlive(v) then
+		if v ~= LocalPlayer then
+			if not IsAlive(v) then
+				repeat task.wait() until IsAlive(v)
+			end
 			local Distance = (v.Character:FindFirstChild("HumanoidRootPart").Position - LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position).Magnitude
 			if Distance <= MaxDist and (not MinDist or Distance < MinDist) then
 				MinDist = Distance
@@ -60,7 +62,7 @@ local AutoSword = Tabs.Combat:CreateToggle({
 		if callback then
 			AutoSwordDelay = 0.1
 			while true do
-				wait(AutoSwordDelay)
+				task.wait(AutoSwordDelay)
 				local NearestPlayer = GetNearestPlayer(28)
 				local Sword = GetTool("Sword")
 				if NearestPlayer then
@@ -111,6 +113,17 @@ local KillAura = Tabs.Combat:CreateToggle({
 			KillAuraRange = 28
 			while true do
 				task.wait()
+				if not IsAlive(LocalPlayer) then
+					repeat
+						task.wait()
+					until IsAlive(LocalPlayer)
+				end
+				while JumpCrit do
+					task.wait()
+					game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("AttackPlayerWithSword").OnClientInvoke = function()
+						Humanoid.Jump = true
+					end
+				end
 				local NearestPlayer = GetNearestPlayer(KillAuraRange)
 				local Sword = GetTool("Sword")
 				if NearestPlayer then
