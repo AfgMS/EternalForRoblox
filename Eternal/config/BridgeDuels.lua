@@ -1,4 +1,5 @@
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/library.lua"))()
+--local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Eternal/library.lua"))()
+local Library = require(game.ReplicatedStorage.Roblox.New.Eternal.Eternal)
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
@@ -20,7 +21,7 @@ end
 
 local function GetNearestPlayer(MaxDist)
 	local Nearest, MinDist
-	
+
 	for i,v in pairs(Players:GetPlayers()) do
 		if v ~= LocalPlayer then
 			if not IsAlive(v) then
@@ -91,14 +92,6 @@ local Criticals = Tabs.Combat:CreateToggle({
 				JumpCrit = false
 				PacketCrit = true
 			end
-			if JumpCrit then
-				while true do
-					wait()
-					game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("AttackPlayerWithSword").OnClientInvoke = function()
-						Humanoid.Jump = true
-					end 
-				end
-			end
 		else
 			JumpCrit = false
 			PacketCrit = false
@@ -130,13 +123,22 @@ local KillAura = Tabs.Combat:CreateToggle({
 				local Sword = GetTool("Sword")
 				if NearestPlayer then
 					if Sword then
+						local BlockAnim = Sword:WaitForChild("Animations").BlockHit
+						local SwingAnim = Sword:WaitForChild("Animations").Swing
 						local args = {
 							[1] = NearestPlayer.Character,
 							[2] = PacketCrit,
 							[3] = Sword.Name
 						}
-
 						game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("AttackPlayerWithSword"):InvokeServer(unpack(args))
+						if JumpCrit then
+							game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("AttackPlayerWithSword").OnClientInvoke = function()
+								Humanoid.Jump = true
+							end 
+						end
+						if SwingAnim then
+							Humanoid:LoadAnimation(SwingAnim):Play()
+						end
 					end
 				end
 			end
