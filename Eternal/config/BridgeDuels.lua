@@ -6,12 +6,12 @@ local CurrentCamera = game:GetService("Workspace").CurrentCamera
 
 local Main = Library:CreateCore()
 local Tabs = {
-	Combat = Main:CreateTab({Name = "Combat"}),
-	Movement = Main:CreateTab({Name = "Movement"}),
-	Player = Main:CreateTab({Name = "Player"}),
-	Render = Main:CreateTab({Name = "Render"}),
-	Exploit = Main:CreateTab({Name = "Exploit"}),
-	Misc = Main:CreateTab({Name = "Misc", ZSettings = true})
+	Combat = Main:CreateTab("Combat"),
+	Movement = Main:CreateTab("Movement"),
+	Player = Main:CreateTab("Player"),
+	Render = Main:CreateTab("Render"),
+	Exploit = Main:CreateTab("Exploit"),
+	Misc = Main:CreateTab("Misc")
 }
 
 local function IsAlive(v)
@@ -20,7 +20,7 @@ end
 
 local function GetNearestPlayer(MaxDist)
 	local Nearest, MinDist
-
+	
 	for i,v in pairs(Players:GetPlayers()) do
 		if v ~= LocalPlayer then
 			if not IsAlive(v) then
@@ -50,7 +50,7 @@ local MobileSupport = Tabs.Misc:CreateToggle({
 	Name = "MobileSupport",
 	Callback = function(callback)
 		if callback then
-			Library.Settings.MobileButtons = not Library.Settings.MobileButtons
+			Library.MobileButtons = not Library.MobileButtons
 		end
 	end
 })
@@ -66,7 +66,9 @@ local AutoSword = Tabs.Combat:CreateToggle({
 				local NearestPlayer = GetNearestPlayer(28)
 				local Sword = GetTool("Sword")
 				if NearestPlayer then
-					Humanoid:EquipTool(Sword)
+					if Sword then
+						Humanoid:EquipTool(Sword)
+					end
 				end
 			end
 		else
@@ -90,9 +92,12 @@ local Criticals = Tabs.Combat:CreateToggle({
 				PacketCrit = true
 			end
 			if JumpCrit then
-				game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("AttackPlayerWithSword").OnClientInvoke = function()
-					Humanoid.Jump = true
-				end 
+				while true do
+					wait()
+					game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("AttackPlayerWithSword").OnClientInvoke = function()
+						Humanoid.Jump = true
+					end 
+				end
 			end
 		else
 			JumpCrit = false
@@ -137,36 +142,6 @@ local KillAura = Tabs.Combat:CreateToggle({
 			end
 		else
 			KillAuraRange = 0
-		end
-	end
-})
-
-local TargetHUD = Tabs.Render:CreateToggle({
-	Name = "TargetHUD",
-	Callback = function(callback)
-		if callback then
-			while true do
-				wait()
-				if not IsAlive(LocalPlayer) then
-					repeat
-						task.wait()
-					until IsAlive(LocalPlayer)
-				end
-			end
-			local NearestPlayer = GetNearestPlayer(KillAuraRange)
-			if NearestPlayer then
-				Main:CreateTargetHud({
-					TargetName = NearestPlayer.Name,
-					TargetImage = Players:GetUserThumbnailAsync(NearestPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48),
-					TargetHumanoid = NearestPlayer.Character:FindFirstChildOfClass("Humanoid"),
-					PlayerHumanoid = Humanoid,
-					HudVisible = true
-				})
-			end
-		else
-			Main:CreateTargetHud({
-				HudVisible = false
-			})
 		end
 	end
 })
