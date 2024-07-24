@@ -64,10 +64,10 @@ local AutoSword = Tabs.Combat:CreateToggle({
 			while true do
 				wait(AutoSwordDelay)
 				local NearestPlayer = GetNearestPlayer(28)
-				local Sword = GetTool("Sword")
 				if NearestPlayer then
+					local Sword = LocalPlayer.Backpack:FindFirstChild("WoodenSword")
 					if Sword then
-						Humanoid:EquipTool(Sword)
+						Humanoid:EquipTool()
 					end
 				end
 			end
