@@ -55,13 +55,14 @@ local MobileSupport = Tabs.Misc:CreateToggle({
 	end
 })
 
+local KillAuraRange = 28
 local AutoSword = Tabs.Combat:CreateToggle({
 	Name = "AutoSword",
 	Callback = function(callback)
 		if callback then
 			while true do
 				wait()
-				local NearestPlayer = GetNearestPlayer(28)
+				local NearestPlayer = GetNearestPlayer(KillAuraRange)
 				if NearestPlayer then
 					for i, v in pairs(LocalPlayer.Backpack:GetChildren()) do
 						if v:IsA("Tool") and v.Name:match("Sword") then
@@ -91,15 +92,17 @@ local Criticals = Tabs.Combat:CreateToggle({
 		end
 	end
 })
-local KillAuraRange
+
+local KillAuraEnabled = false
+local BlockAnim, SwingAnim
 local KillAura = Tabs.Combat:CreateToggle({
 	Name = "KillAura",
 	Callback = function(callback)
 		if callback then
-			KillAuraRange = 28
+			KillAuraEnabled = true
 			local NearestPlayer = GetNearestPlayer(KillAuraRange)
-			while true do
-				wait()
+			repeat
+				task.wait()
 				if not IsAlive(LocalPlayer) then
 					repeat
 						task.wait()
@@ -108,22 +111,23 @@ local KillAura = Tabs.Combat:CreateToggle({
 				if NearestPlayer then
 					local Sword = GetTool("Sword")
 					if Sword then
-						local BlockAnim = Sword:WaitForChild("Animations").BlockHit
-						local SwingAnim = Sword:WaitForChild("Animations").Swing
-						local args = {
-							[1] = NearestPlayer.Character,
-							[2] = PacketMode,
-							[3] = Sword.Name
-						}
-						game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("AttackPlayerWithSword"):InvokeServer(unpack(args))
-						if SwingAnim then
+						BlockAnim = Sword:WaitForChild("Animations").BlockHit
+						SwingAnim = Sword:WaitForChild("Animations").Swing
+						if BlockAnim and SwingAnim then
+							local args = {
+								[1] = NearestPlayer.Character,
+								[2] = PacketMode,
+								[3] = Sword.Name
+							}
+							game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("AttackPlayerWithSword"):InvokeServer(unpack(args))
 							Humanoid:LoadAnimation(SwingAnim):Play()
 						end
 					end
 				end
-			end
+			until not KillAuraEnabled
 		else
-			KillAuraRange = 86400
+			Humanoid:LoadAnimation(SwingAnim):Stop()
+			KillAuraEnabled = false
 		end
 	end
 })
