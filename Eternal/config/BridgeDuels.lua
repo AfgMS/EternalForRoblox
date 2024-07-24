@@ -55,86 +55,67 @@ local MobileSupport = Tabs.Misc:CreateToggle({
 	end
 })
 
-local AutoSwordDelay
 local AutoSword = Tabs.Combat:CreateToggle({
 	Name = "AutoSword",
 	Callback = function(callback)
 		if callback then
-			AutoSwordDelay = 0.1
 			while true do
-				wait(AutoSwordDelay)
+				wait()
 				local NearestPlayer = GetNearestPlayer(28)
 				if NearestPlayer then
-					local Sword = LocalPlayer.Backpack:FindFirstChild("WoodenSword")
-					if Sword then
-						Humanoid:EquipTool()
+					for i, v in pairs(LocalPlayer.Backpack:GetChildren()) do
+						if v:IsA("Tool") and v.Name:match("Sword") then
+							Humanoid:EquipTool(v)
+						end
 					end
 				end
 			end
-		else
-			AutoSwordDelay = 86400
 		end
 	end
 })
 
 local CriticalsMode = nil
-local JumpCrit = false
-local PacketCrit = false
+local PacketMode, JumpMode = false, false
 local Criticals = Tabs.Combat:CreateToggle({
 	Name = "Criticals",
+	Enabled = true,
 	Callback = function(callback)
 		if callback then
-			if CriticalsMode == "Jump" then
-				JumpCrit = true
-				PacketCrit = false
-			elseif CriticalsMode == "Packet" then
-				JumpCrit = false
-				PacketCrit = true
+			if CriticalsMode == "Packet" then
+				PacketMode, JumpMode = true, false
+			elseif CriticalsMode == "Jump" then
+				PacketMode, JumpMode = false, true
 			end
 		else
-			JumpCrit = false
-			PacketCrit = false
+			PacketMode, JumpMode = false, false
 		end
 	end
 })
-local CritMode = Criticals:CreateDropdown({
-	Name = "CritMode",
-	List = {"Jump", "Packet"},
-	Callback = function(callback)
-		CriticalsMode = callback
-	end
-})
-
 local KillAuraRange
 local KillAura = Tabs.Combat:CreateToggle({
 	Name = "KillAura",
 	Callback = function(callback)
 		if callback then
 			KillAuraRange = 28
+			local NearestPlayer = GetNearestPlayer(KillAuraRange)
 			while true do
-				task.wait()
+				wait()
 				if not IsAlive(LocalPlayer) then
 					repeat
 						task.wait()
 					until IsAlive(LocalPlayer)
 				end
-				local NearestPlayer = GetNearestPlayer(KillAuraRange)
-				local Sword = GetTool("Sword")
 				if NearestPlayer then
+					local Sword = GetTool("Sword")
 					if Sword then
 						local BlockAnim = Sword:WaitForChild("Animations").BlockHit
 						local SwingAnim = Sword:WaitForChild("Animations").Swing
 						local args = {
 							[1] = NearestPlayer.Character,
-							[2] = PacketCrit,
+							[2] = PacketMode,
 							[3] = Sword.Name
 						}
 						game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("AttackPlayerWithSword"):InvokeServer(unpack(args))
-						if JumpCrit then
-							game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("AttackPlayerWithSword").OnClientInvoke = function()
-								Humanoid.Jump = true
-							end 
-						end
 						if SwingAnim then
 							Humanoid:LoadAnimation(SwingAnim):Play()
 						end
@@ -142,7 +123,7 @@ local KillAura = Tabs.Combat:CreateToggle({
 				end
 			end
 		else
-			KillAuraRange = 0
+			KillAuraRange = 86400
 		end
 	end
 })
