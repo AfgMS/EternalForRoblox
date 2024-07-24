@@ -288,6 +288,7 @@ function Library:CreateCore()
 			TargetImage = TargetHud.TargetImage,
 			TargetHumanoid = TargetHud.TargetHumanoid,
 			PlayerHumanoid = TargetHud.PlayerHumanoid,
+			HudVisible = TargetHud.HudVisible
 		}
 		TargetHudFrame.Parent = HudsFrame
 		TargetHudFrame.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -351,7 +352,7 @@ function Library:CreateCore()
 		TargetPicture.Position = UDim2.new(0.150000006, 0, 0.400000006, 0)
 		TargetPicture.Size = UDim2.new(0, 28, 0, 28)
 		
-		TargetHudFrame.Visible = TargetHud.TVisible
+		TargetHudFrame.Visible = TargetHud.HudVisible
 		TargetName.Text = TargetHud.TargetName
 		if TargetHud.PlayerHumanoid and TargetHud.TargetHumanoid then
 			if TargetHud.PlayerHumanoid.Health > TargetHud.TargetHumanoid.Health then
