@@ -44,6 +44,7 @@ local function GetTool(matchname)
 	return Item
 end
 
+--MobileSupport
 local MobileSupport = Tabs.Misc:CreateToggle({
 	Name = "MobileSupport",
 	Callback = function(callback)
@@ -53,22 +54,24 @@ local MobileSupport = Tabs.Misc:CreateToggle({
 	end
 })
 
+--AutoClicker
 local AutoClickerEnabled = false
-local AutoClickerCPS = 12
+local AutoClickerCPS = 8
+local Item = {"Sword", "Blocks"}
 local AutoClicker = Tabs.Combat:CreateToggle({
 	Name = "AutoClicker",
 	Callback = function(callback)
 		AutoClickerEnabled = callback
 		if callback then
-			spawn(function()
-				while AutoClickerEnabled do
-					task.wait(1 / AutoClickerCPS)
-					local Tool = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildWhichIsA("Tool")
-					if Tool and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
-						Tool:Activate()
+			repeat
+				task.wait(1 / AutoClickerCPS)
+				for i,v in pairs(Item) do
+					local Item = GetTool(v)
+					if Item and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
+						Item:Activate()
 					end
 				end
-			end)
+			until not AutoClickerEnabled
 		end
 	end
 })
@@ -83,6 +86,7 @@ local CustomAutoClickerCPS = AutoClicker:CreateSlider({
 	end
 })
 
+--AutoSword
 local KillAuraRange = 28
 local AutoSword = Tabs.Combat:CreateToggle({
 	Name = "AutoSword",
@@ -103,6 +107,7 @@ local AutoSword = Tabs.Combat:CreateToggle({
 	end
 })
 
+--Criticals
 local KillAuraCrit = false
 local Criticals = Tabs.Combat:CreateToggle({
 	Name = "Criticals",
@@ -114,9 +119,9 @@ local Criticals = Tabs.Combat:CreateToggle({
 	end
 })
 
+--KillAura
 local KillAuraEnabled = false
 local KillAuraSwing = false
-local KillAuraESP = Instance.new("Part", game.Workspace)
 local ChooseBlockMode = "Fake"
 local BlockAnim, SwingAnim
 local KillAura = Tabs.Combat:CreateToggle({
@@ -134,13 +139,6 @@ local KillAura = Tabs.Combat:CreateToggle({
 				end
 				local NearestPlayer = GetNearestPlayer(KillAuraRange)
 				if NearestPlayer then
-					KillAuraESP.Shape = "Ball"
-					KillAuraESP.CanCollide = false
-					KillAuraESP.Anchored = true
-					KillAuraESP.CastShadow = false
-					KillAuraESP.Transparency = 0.25
-					KillAuraESP.Size = Vector3.new(0.8, 0.8, 0.8)
-					KillAuraESP.Position = NearestPlayer.Character:WaitForChild("Head").Position + Vector3.new(0, 2, 0)
 					local Sword = GetTool("Sword")
 					if Sword then
 						BlockAnim = Sword:WaitForChild("Animations").BlockHit
@@ -179,7 +177,7 @@ local KillAura = Tabs.Combat:CreateToggle({
 	end
 })
 local KillAuraSwingMode = KillAura:CreateMiniToggle({
-	Name = "Swing",
+	Name = "NoSwing",
 	Enabled = true,
 	Callback = function(callback)
 		KillAuraSwing = not KillAuraSwing
