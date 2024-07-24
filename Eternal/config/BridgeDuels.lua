@@ -56,7 +56,7 @@ local MobileSupport = Tabs.Misc:CreateToggle({
 
 --AutoClicker
 local AutoClickerEnabled = false
-local AutoClickerCPS = 8
+local AutoClickerCPS = 12
 local AutoClicker = Tabs.Combat:CreateToggle({
 	Name = "AutoClicker",
 	Callback = function(callback)
@@ -64,7 +64,7 @@ local AutoClicker = Tabs.Combat:CreateToggle({
 		if callback then
 			repeat
 				task.wait(1 / AutoClickerCPS)
-				local Tool = LocalPlayer.Character:FindFirstChildOfClass("Tool")
+				local Tool = LocalPlayer.Character:FindFirstChildWhichIsA("Tool")
 				if Tool and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
 					Tool:Activate()
 				end
@@ -186,5 +186,33 @@ local KillAuraSwingMode = KillAura:CreateMiniToggle({
 	Enabled = true,
 	Callback = function(callback)
 		KillAuraSwing = not KillAuraSwing
+	end
+})
+
+--NoSlow
+local NoSlowEnabled = false
+local NoSlowAmplifier = 16
+local NoSlow = Tabs.Movement:CreateToggle({
+	Name = "NoSlow",
+	Callback = function(callback)
+		NoSlowEnabled = callback
+		if callback then
+			repeat
+				task.wait()
+				game:GetService("RunService").RenderStepped:Connect(function()
+					LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame = LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame + LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame.LookVector * (NoSlowAmplifier / 60)
+				end)
+			until not NoSlowEnabled
+		end
+	end
+})
+local CustomNoSlow = NoSlow:CreateSlider({
+	Name = "Slowdown",
+	Min = 0,
+	Max = 100,
+	Callback = function(callback)
+		if callback then
+			NoSlowAmplifier = callback
+		end
 	end
 })
