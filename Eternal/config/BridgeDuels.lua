@@ -22,10 +22,7 @@ local function GetNearestPlayer(MaxDist)
 	local Nearest, MinDist
 
 	for i,v in pairs(Players:GetPlayers()) do
-		if v ~= LocalPlayer then
-			if not IsAlive(v) then
-				repeat task.wait() until IsAlive(v)
-			end
+		if v ~= LocalPlayer and IsAlive(v) then
 			local Distance = (v.Character:FindFirstChild("HumanoidRootPart").Position - LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position).Magnitude
 			if Distance <= MaxDist and (not MinDist or Distance < MinDist) then
 				MinDist = Distance
@@ -75,37 +72,20 @@ local AutoSword = Tabs.Combat:CreateToggle({
 	end
 })
 
-local CriticalsMode = nil
-local PacketMode, JumpMode = false, false
+local KillAuraCrit = false
 local Criticals = Tabs.Combat:CreateToggle({
 	Name = "Criticals",
 	Enabled = true,
 	Callback = function(callback)
 		if callback then
-			if CriticalsMode == "Packet" then
-				PacketMode, JumpMode = true, false
-			elseif CriticalsMode == "Jump" then
-				PacketMode, JumpMode = false, true
-			end
-		else
-			PacketMode, JumpMode = false, false
+			KillAuraCrit = not KillAuraCrit
 		end
 	end
 })
-local CriticalMode = Criticals:CreateDropdown({
-	Name = "CriticalsMode",
-	List = {"Packet", "Jump"},
-	Callback = function(callback)
-		if callback then
-			CriticalsMode = callback
-		end
-	end
-})
-	
-	
+
 local KillAuraEnabled = false
-local KillAuraSwing = false
-local KillAuraFakeBlock = false
+local KillAuraNoSwing = false
+local ChooseBlockMode = "Fake"
 local BlockAnim, SwingAnim
 local KillAura = Tabs.Combat:CreateToggle({
 	Name = "KillAura",
@@ -113,7 +93,6 @@ local KillAura = Tabs.Combat:CreateToggle({
 		KillAuraEnabled = callback
 		if callback then
 			KillAuraEnabled = true
-			local NearestPlayer = GetNearestPlayer(KillAuraRange)
 			repeat
 				task.wait()
 				if not IsAlive(LocalPlayer) then
@@ -121,23 +100,39 @@ local KillAura = Tabs.Combat:CreateToggle({
 						task.wait()
 					until IsAlive(LocalPlayer)
 				end
+				local NearestPlayer = GetNearestPlayer(KillAuraRange)
 				if NearestPlayer then
 					local Sword = GetTool("Sword")
 					if Sword then
 						BlockAnim = Sword:WaitForChild("Animations").BlockHit
 						SwingAnim = Sword:WaitForChild("Animations").Swing
+						if not KillAuraNoSwing then
+							Humanoid:LoadAnimation(SwingAnim):Play()
+						end
+						if ChooseBlockMode == "Fake" then
+							Humanoid:LoadAnimation(BlockAnim):Play()
+							local args = {
+								[1] = false,
+								[2] = Sword.Name
+							}
+
+							game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
+						elseif ChooseBlockMode == "Packet" then
+							Humanoid:LoadAnimation(BlockAnim):Stop()
+							local args = {
+								[1] = true,
+								[2] = Sword.Name
+							}
+
+							game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
+
+						end
 						local args = {
 							[1] = NearestPlayer.Character,
-							[2] = PacketMode,
+							[2] = KillAuraCrit,
 							[3] = Sword.Name
 						}
 						game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("AttackPlayerWithSword"):InvokeServer(unpack(args))
-						if KillAuraSwing then
-							Humanoid:LoadAnimation(SwingAnim):Play()
-						end
-						if KillAuraFakeBlock then
-							Humanoid:LoadAnimation(BlockAnim):Play()
-						end
 					end
 				end
 			until not KillAuraEnabled
@@ -145,15 +140,18 @@ local KillAura = Tabs.Combat:CreateToggle({
 	end
 })
 local KillAuraSwingMode = KillAura:CreateMiniToggle({
-	Name = "Swing Anim",
+	Name = "NoSwing",
 	Enabled = true,
 	Callback = function(callback)
-		KillAuraSwing = not KillAuraSwing
-	end,
+		KillAuraNoSwing = not KillAuraNoSwing
+	end
 })
-local KillAuraFakeBlock = KillAura:CreateMiniToggle({
-	Name = "BlockHit",
+local AutoBlockMode = KillAura:CreateDropdown({
+	Name = "AutoBlockMode",
+	List = {"Fake", "Packet"},
 	Callback = function(callback)
-		KillAuraFakeBlock = not KillAuraFakeBlock
-	end,
+		if callback then
+			ChooseBlockMode = callback
+		end
+	end
 })
