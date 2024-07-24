@@ -84,7 +84,8 @@ local Criticals = Tabs.Combat:CreateToggle({
 })
 
 local KillAuraEnabled = false
-local KillAuraNoSwing = false
+local KillAuraSwing = false
+local KillAuraESP = Instance.new("Part", game.Workspace)
 local ChooseBlockMode = "Fake"
 local BlockAnim, SwingAnim
 local KillAura = Tabs.Combat:CreateToggle({
@@ -102,11 +103,15 @@ local KillAura = Tabs.Combat:CreateToggle({
 				end
 				local NearestPlayer = GetNearestPlayer(KillAuraRange)
 				if NearestPlayer then
+					KillAuraESP.Shape = "Ball"
+					KillAuraESP.Transparency = 0.45
+					KillAuraESP.Size = Vector3.new(15, 15, 15)
+					KillAuraESP.Position = NearestPlayer.Character:WaitForChild("Head").Position + Vector3.new(0, 2, 0)
 					local Sword = GetTool("Sword")
 					if Sword then
 						BlockAnim = Sword:WaitForChild("Animations").BlockHit
 						SwingAnim = Sword:WaitForChild("Animations").Swing
-						if not KillAuraNoSwing then
+						if KillAuraSwing then
 							Humanoid:LoadAnimation(SwingAnim):Play()
 						end
 						if ChooseBlockMode == "Fake" then
@@ -143,7 +148,7 @@ local KillAuraSwingMode = KillAura:CreateMiniToggle({
 	Name = "NoSwing",
 	Enabled = true,
 	Callback = function(callback)
-		KillAuraNoSwing = not KillAuraNoSwing
+		KillAuraSwing = not KillAuraSwing
 	end
 })
 local AutoBlockMode = KillAura:CreateDropdown({
