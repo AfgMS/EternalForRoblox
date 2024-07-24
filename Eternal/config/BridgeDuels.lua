@@ -92,12 +92,25 @@ local Criticals = Tabs.Combat:CreateToggle({
 		end
 	end
 })
-
+local CriticalMode = Criticals:CreateDropdown({
+	Name = "CriticalsMode",
+	List = {"Packet", "Jump"},
+	Callback = function(callback)
+		if callback then
+			CriticalsMode = callback
+		end
+	end
+})
+	
+	
 local KillAuraEnabled = false
+local KillAuraSwing = false
+local KillAuraFakeBlock = false
 local BlockAnim, SwingAnim
 local KillAura = Tabs.Combat:CreateToggle({
 	Name = "KillAura",
 	Callback = function(callback)
+		KillAuraEnabled = callback
 		if callback then
 			KillAuraEnabled = true
 			local NearestPlayer = GetNearestPlayer(KillAuraRange)
@@ -113,21 +126,34 @@ local KillAura = Tabs.Combat:CreateToggle({
 					if Sword then
 						BlockAnim = Sword:WaitForChild("Animations").BlockHit
 						SwingAnim = Sword:WaitForChild("Animations").Swing
-						if BlockAnim and SwingAnim then
-							local args = {
-								[1] = NearestPlayer.Character,
-								[2] = PacketMode,
-								[3] = Sword.Name
-							}
-							game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("AttackPlayerWithSword"):InvokeServer(unpack(args))
+						local args = {
+							[1] = NearestPlayer.Character,
+							[2] = PacketMode,
+							[3] = Sword.Name
+						}
+						game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("AttackPlayerWithSword"):InvokeServer(unpack(args))
+						if KillAuraSwing then
 							Humanoid:LoadAnimation(SwingAnim):Play()
+						end
+						if KillAuraFakeBlock then
+							Humanoid:LoadAnimation(BlockAnim):Play()
 						end
 					end
 				end
 			until not KillAuraEnabled
-		else
-			Humanoid:LoadAnimation(SwingAnim):Stop()
-			KillAuraEnabled = false
 		end
 	end
+})
+local KillAuraSwingMode = KillAura:CreateMiniToggle({
+	Name = "Swing Anim",
+	Enabled = true,
+	Callback = function(callback)
+		KillAuraSwing = not KillAuraSwing
+	end,
+})
+local KillAuraFakeBlock = KillAura:CreateMiniToggle({
+	Name = "BlockHit",
+	Callback = function(callback)
+		KillAuraFakeBlock = not KillAuraFakeBlock
+	end,
 })
