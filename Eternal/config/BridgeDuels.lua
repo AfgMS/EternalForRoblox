@@ -57,7 +57,6 @@ local MobileSupport = Tabs.Misc:CreateToggle({
 --AutoClicker
 local AutoClickerEnabled = false
 local AutoClickerCPS = 8
-local Item = {"Sword", "Blocks"}
 local AutoClicker = Tabs.Combat:CreateToggle({
 	Name = "AutoClicker",
 	Callback = function(callback)
@@ -65,11 +64,9 @@ local AutoClicker = Tabs.Combat:CreateToggle({
 		if callback then
 			repeat
 				task.wait(1 / AutoClickerCPS)
-				for i,v in pairs(Item) do
-					local Item = GetTool(v)
-					if Item and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
-						Item:Activate()
-					end
+				local Sword = GetTool("Sword")
+				if Sword and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
+					Sword:Activate()
 				end
 			until not AutoClickerEnabled
 		end
@@ -189,6 +186,35 @@ local AutoBlockMode = KillAura:CreateDropdown({
 	Callback = function(callback)
 		if callback then
 			ChooseBlockMode = callback
+		end
+	end
+})
+
+--FastPlace
+local FastPlaceEnabled = false
+local FastPlaceDelay = 0
+local FastPlace = Tabs.Player:CreateToggle({
+	Name = "FastPlace",
+	Callback = function(callback)
+		FastPlaceEnabled = callback
+		if callback then
+			repeat
+				task.wait(FastPlaceDelay)
+				local Block = GetTool("Block")
+				if Block and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
+					Block:Activate()
+				end
+			until not AutoClickerEnabled
+		end
+	end
+})
+local CustomFastPlaceDelay = FastPlace:CreateSlider({
+	Name = "Delay",
+	Min = 0,
+	Max = 5,
+	Callback = function(callback)
+		if callback then
+			FastPlaceDelay = callback
 		end
 	end
 })
