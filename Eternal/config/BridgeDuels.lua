@@ -64,9 +64,9 @@ local AutoClicker = Tabs.Combat:CreateToggle({
 		if callback then
 			repeat
 				task.wait(1 / AutoClickerCPS)
-				local Sword = GetTool("Sword")
-				if Sword and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
-					Sword:Activate()
+				local Tool = LocalPlayer.Character:FindFirstChildOfClass("Tool")
+				if Tool and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
+					Tool:Activate()
 				end
 			until not AutoClickerEnabled
 		end
@@ -84,14 +84,15 @@ local CustomAutoClickerCPS = AutoClicker:CreateSlider({
 })
 
 --AutoSword
-local KillAuraRange = 28
+local AutoSwordEnabled = false
 local AutoSword = Tabs.Combat:CreateToggle({
 	Name = "AutoSword",
 	Callback = function(callback)
+		AutoSwordEnabled = callback
 		if callback then
-			while true do
-				wait()
-				local NearestPlayer = GetNearestPlayer(KillAuraRange)
+			repeat
+				task.wait()
+				local NearestPlayer = GetNearestPlayer(28)
 				if NearestPlayer then
 					for i, v in pairs(LocalPlayer.Backpack:GetChildren()) do
 						if v:IsA("Tool") and v.Name:match("Sword") then
@@ -99,7 +100,7 @@ local AutoSword = Tabs.Combat:CreateToggle({
 						end
 					end
 				end
-			end
+			until not AutoSwordEnabled	
 		end
 	end
 })
@@ -117,10 +118,8 @@ local Criticals = Tabs.Combat:CreateToggle({
 })
 
 --KillAura
-local KillAuraEnabled = false
-local KillAuraSwing = false
 local ChooseBlockMode = "Fake"
-local BlockAnim, SwingAnim
+local KillAuraEnabled, KillAuraSwing, BlockAnim, SwingAnim = false, false, nil, nil
 local KillAura = Tabs.Combat:CreateToggle({
 	Name = "KillAura",
 	Callback = function(callback)
@@ -134,7 +133,7 @@ local KillAura = Tabs.Combat:CreateToggle({
 						task.wait()
 					until IsAlive(LocalPlayer)
 				end
-				local NearestPlayer = GetNearestPlayer(KillAuraRange)
+				local NearestPlayer = GetNearestPlayer(28)
 				if NearestPlayer then
 					local Sword = GetTool("Sword")
 					if Sword then
@@ -173,13 +172,6 @@ local KillAura = Tabs.Combat:CreateToggle({
 		end
 	end
 })
-local KillAuraSwingMode = KillAura:CreateMiniToggle({
-	Name = "NoSwing",
-	Enabled = true,
-	Callback = function(callback)
-		KillAuraSwing = not KillAuraSwing
-	end
-})
 local AutoBlockMode = KillAura:CreateDropdown({
 	Name = "AutoBlockMode",
 	List = {"Fake", "Packet"},
@@ -189,32 +181,10 @@ local AutoBlockMode = KillAura:CreateDropdown({
 		end
 	end
 })
-
---FastPlace
-local FastPlaceEnabled = false
-local FastPlaceDelay = 0
-local FastPlace = Tabs.Player:CreateToggle({
-	Name = "FastPlace",
+local KillAuraSwingMode = KillAura:CreateMiniToggle({
+	Name = "Swing",
+	Enabled = true,
 	Callback = function(callback)
-		FastPlaceEnabled = callback
-		if callback then
-			repeat
-				task.wait(FastPlaceDelay)
-				local Block = GetTool("Block")
-				if Block and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
-					Block:Activate()
-				end
-			until not AutoClickerEnabled
-		end
-	end
-})
-local CustomFastPlaceDelay = FastPlace:CreateSlider({
-	Name = "Delay",
-	Min = 0,
-	Max = 5,
-	Callback = function(callback)
-		if callback then
-			FastPlaceDelay = callback
-		end
+		KillAuraSwing = not KillAuraSwing
 	end
 })
