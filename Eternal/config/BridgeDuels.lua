@@ -3,6 +3,7 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
 local CurrentCamera = game:GetService("Workspace").CurrentCamera
+local UserInputService = game:GetService("UserInputService")
 
 local Main = Library:CreateCore()
 local Tabs = {
@@ -48,6 +49,36 @@ local MobileSupport = Tabs.Misc:CreateToggle({
 	Callback = function(callback)
 		if callback then
 			Library.MobileButtons = not Library.MobileButtons
+		end
+	end
+})
+
+local AutoClickerEnabled = false
+local AutoClickerCPS = 12
+local AutoClicker = Tabs.Combat:CreateToggle({
+	Name = "AutoClicker",
+	Callback = function(callback)
+		AutoClickerEnabled = callback
+		if callback then
+			spawn(function()
+				while AutoClickerEnabled do
+					task.wait(1 / AutoClickerCPS)
+					local Tool = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildWhichIsA("Tool")
+					if Tool and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
+						Tool:Activate()
+					end
+				end
+			end)
+		end
+	end
+})
+local CustomAutoClickerCPS = AutoClicker:CreateSlider({
+	Name = "CPS",
+	Min = 0,
+	Max = 100,
+	Callback = function(callback)
+		if callback then
+			AutoClickerCPS = callback
 		end
 	end
 })
@@ -104,8 +135,11 @@ local KillAura = Tabs.Combat:CreateToggle({
 				local NearestPlayer = GetNearestPlayer(KillAuraRange)
 				if NearestPlayer then
 					KillAuraESP.Shape = "Ball"
-					KillAuraESP.Transparency = 0.45
-					KillAuraESP.Size = Vector3.new(15, 15, 15)
+					KillAuraESP.CanCollide = false
+					KillAuraESP.Anchored = true
+					KillAuraESP.CastShadow = false
+					KillAuraESP.Transparency = 0.25
+					KillAuraESP.Size = Vector3.new(0.8, 0.8, 0.8)
 					KillAuraESP.Position = NearestPlayer.Character:WaitForChild("Head").Position + Vector3.new(0, 2, 0)
 					local Sword = GetTool("Sword")
 					if Sword then
@@ -145,7 +179,7 @@ local KillAura = Tabs.Combat:CreateToggle({
 	end
 })
 local KillAuraSwingMode = KillAura:CreateMiniToggle({
-	Name = "NoSwing",
+	Name = "Swing",
 	Enabled = true,
 	Callback = function(callback)
 		KillAuraSwing = not KillAuraSwing
