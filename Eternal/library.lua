@@ -105,7 +105,7 @@ local Library = {
 function Library:CreateCore()
 	local Core = {}
 	local Eternal = Instance.new("ScreenGui")
-	Eternal.Name = Spoof(math.random(18, 20))
+	Eternal.Name = "Eternal_" .. Library.LibraryVersion
 	Eternal.ResetOnSpawn = false
 	if RunService:IsStudio() or game.PlaceId == 11630038968 then
 		warn("CoreGui Denied")
