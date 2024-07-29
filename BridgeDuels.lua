@@ -1,0 +1,590 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Library.lua"))()
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+local CurrentCamera = game:GetService("Workspace").CurrentCamera
+
+local Main = Library:CreateMain()
+local Tabs = {
+	Combat = Main:CreateTab("Combat", false),
+	Movement = Main:CreateTab("Movement", false),
+	Player = Main:CreateTab("Player", false),
+	Render = Main:CreateTab("Render", false),
+	Exploit = Main:CreateTab("Exploit", false),
+	Misc = Main:CreateTab("Misc", true)
+}
+
+local function IsAlive(v)
+	return v and v.Character and v.Character:FindFirstChildOfClass("Humanoid") and v.Character:FindFirstChildOfClass("Humanoid").Health > 0
+end
+
+local function GetNearestPlayer(MaxDist)
+	local Nearest, MinDist
+
+	for i,v in pairs(Players:GetPlayers()) do
+		if v ~= LocalPlayer and IsAlive(v) then
+			local Distance = (v.Character:FindFirstChild("HumanoidRootPart").Position - LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position).Magnitude
+			if Distance <= MaxDist and (not MinDist or Distance < MinDist) then
+				MinDist = Distance
+				Nearest = v
+			end
+		end
+	end
+	return Nearest
+end
+
+local function GetTool(matchname)
+	local Item = nil
+	for i, v in pairs(LocalPlayer.Character:GetChildren()) do
+		if v:IsA("Tool") and string.match(v.Name, matchname) then
+			Item = v
+		end
+	end
+	return Item
+end
+
+spawn(function()
+	local Enabled, Range, Delays, Object, Direction, Hold = false, 28, 0.4, nil, nil, false
+	local AimAssist = Tabs.Combat:CreateToggle({
+		Name = "AimAssist",
+		Callback = function(callback)
+			Enabled = callback
+			if callback then
+				repeat
+					task.wait(Delays)
+					local NearestPlayer = GetNearestPlayer(Range)
+					if NearestPlayer then
+						if Object == "Head" then
+							Direction = (NearestPlayer.Character:WaitForChild("Head").Position - CurrentCamera.CFrame.Position).unit
+						elseif Object == "HumRootPart" then
+							Direction = (NearestPlayer.Character:WaitForChild("HumanoidRootPart").Position - CurrentCamera.CFrame.Position).unit
+						elseif Object == "LowerTorso" then
+							Direction = (NearestPlayer.Character:WaitForChild("LowerTorso").Position - CurrentCamera.CFrame.Position).unit
+						end
+						local SetLookAt = CFrame.new(CurrentCamera.CFrame.Position, CurrentCamera.CFrame.Position + Direction)
+						if Hold then
+							if UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
+								CurrentCamera.CFrame = SetLookAt
+							end
+						else
+							CurrentCamera.CFrame = SetLookAt
+						end
+					end
+				until not Enabled
+			end
+		end
+	})
+	local HoldToAim = AimAssist:CreateMiniToggle({
+		Name = "Hold",
+		Enabled = true,
+		Callback = function(callback)
+			if callback then
+				Hold = true
+			else
+				Hold = false
+			end
+		end
+	})
+	local CustomRange = AimAssist:CreateSlider({
+		Name = "Range",
+		Min = 0,
+		Max = 100,
+		Default = 28,
+		Callback = function(callback)
+			if callback then
+				Range = callback
+			end
+		end
+	})
+	local CustomDelay = AimAssist:CreateSlider({
+		Name = "Delay",
+		Min = 0,
+		Max = 5,
+		Default = 0.4,
+		Callback = function(callback)
+			if callback then
+				Delays = callback
+			end
+		end
+	})
+	local CustomObject = AimAssist:CreateDropdown({
+		Name = "AimPart",
+		List = {"Head", "HumRootPart", "LowerTorso"},
+		Default = "HumRootPart",
+		Callback = function(callback)
+			if callback then
+				Object = callback
+			end
+		end
+	})
+end)
+
+spawn(function()
+	local Enabled, CPS = false, 20
+	local AutoClicker = Tabs.Combat:CreateToggle({
+		Name = "AutoClicker",
+		Callback = function(callback)
+			Enabled = callback
+			if callback then
+				repeat
+					task.wait(1 / CPS)
+					local Tool = LocalPlayer.Character:FindFirstChildWhichIsA("Tool")
+					if Tool and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
+						Tool:Activate()
+					end
+				until not Enabled
+			end
+		end
+	})
+	local CustomCPS = AutoClicker:CreateSlider({
+		Name = "CPS",
+		Min = 0,
+		Max = 100,
+		Default = 20,
+		Callback = function(callback)
+			if callback then
+				CPS = callback
+			end
+		end
+	})
+end)
+
+spawn(function()
+	local Enabled = false
+	local AutoSword = Tabs.Combat:CreateToggle({
+		Name = "AutoSword",
+		Callback = function(callback)
+			Enabled = callback
+			if callback then
+				repeat
+					task.wait()
+					local NearestPlayer = GetNearestPlayer(28)
+					if NearestPlayer then
+						for i, v in pairs(LocalPlayer.Backpack:GetChildren()) do
+							if v:IsA("Tool") and v.Name:match("Sword") then
+								Humanoid:EquipTool(v)
+							end
+						end
+					end
+				until not Enabled
+			end
+		end
+	})
+end)
+
+local KillAuraCrit = false
+spawn(function()
+	local Criticals = Tabs.Combat:CreateToggle({
+		Name = "Criticals",
+		Enabled = true,
+		Callback = function(callback)
+			if callback then
+				KillAuraCrit = true
+			else
+				KillAuraCrit = false
+			end
+		end
+	})
+end)
+
+spawn(function()
+	local Enabled, Range, Swing, Mode, BlockAnim, SwingAnim = false, 28, false, nil, nil, nil
+	local KillAura = Tabs.Combat:CreateToggle({
+		Name = "KillAura",
+		Callback = function(callback)
+			Enabled = callback
+			if callback then
+				repeat
+					task.wait()
+					if not IsAlive(LocalPlayer) then repeat task.wait() until IsAlive(LocalPlayer) end
+					local NearestPlayer = GetNearestPlayer(Range)
+					if NearestPlayer then
+						local Sword = GetTool("Sword")
+						if Sword then
+							BlockAnim = Sword:WaitForChild("Animations").BlockHit
+							SwingAnim = Sword:WaitForChild("Animations").Swing
+							if Swing then
+								Humanoid:LoadAnimation(SwingAnim):Play()
+							end
+							if Mode == "Fake" then
+								Humanoid:LoadAnimation(BlockAnim):Play()
+								local args = {
+									[1] = false,
+									[2] = Sword.Name
+								}
+
+								game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
+							elseif Mode == "Remote" then
+								Humanoid:LoadAnimation(BlockAnim):Stop()
+								local args = {
+									[1] = true,
+									[2] = Sword.Name
+								}
+
+								game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
+							elseif Mode == "Legit" then
+								Humanoid:LoadAnimation(BlockAnim):Play()
+								local args = {
+									[1] = true,
+									[2] = Sword.Name
+								}
+
+								game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
+							end
+							local args = {
+								[1] = NearestPlayer.Character,
+								[2] = KillAuraCrit,
+								[3] = Sword.Name
+							}
+							game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("AttackPlayerWithSword"):InvokeServer(unpack(args))
+						end
+					end
+				until not Enabled
+			end
+		end
+	})
+	local CustomRange = KillAura:CreateSlider({
+		Name = "Range",
+		Min = 0,
+		Max = 28,
+		Default = 28,
+		Callback = function(callback)
+			if callback then
+				Range = callback
+			end
+		end
+	})
+	local CustomSwing = KillAura:CreateMiniToggle({
+		Name = "Swing",
+		Enabled = true,
+		Callback = function(callback)
+			if callback then
+				Swing = true
+			else
+				Swing = false
+			end
+		end
+	})
+	local CustomMode = KillAura:CreateDropdown({
+		Name = "AutoBlock",
+		List = {"Fake", "Remote", "Legit"},
+		Default = "Fake",
+		Callback = function(callback)
+			if callback then
+				Mode = callback
+			end
+		end
+	})
+end)
+
+spawn(function()
+	local Enabled, YPos = false, 1
+	local YRoot =  LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position.Y
+	local OldGravity = game.Workspace.Gravity
+	local Speed = 28
+	local OldSpeed = Humanoid.WalkSpeed
+	UserInputService.JumpRequest:Connect(function()
+		YPos = YPos + 1
+	end)
+	UserInputService.InputBegan:Connect(function(Input, IsTyping)
+		if IsTyping then return end
+		if Input.KeyCode == Enum.KeyCode.LeftShift then
+			YPos = YPos - 1
+		end
+	end)
+	local Fly = Tabs.Movement:CreateToggle({
+		Name = "Fly",
+		Callback = function(callback)
+			Enabled = callback
+			if callback then
+				YPos = 1
+				repeat
+					task.wait()
+					local velo = LocalPlayer.Character.Humanoid.MoveDirection * Speed
+					LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Velocity = Vector3.new(velo.X, LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Velocity.Y, velo.Z)
+					LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position.X, YRoot + YPos, LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position.Z) * LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame.Rotation
+					game.Workspace.Gravity = 0
+				until not Enabled
+				YPos = 1
+				Humanoid.WalkSpeed = OldSpeed
+				game.Workspace.Gravity = OldGravity
+				LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame = LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame
+			end
+		end
+	})
+	local CustomSpeed = Fly:CreateSlider({
+		Name = "Speed",
+		Min = 0,
+		Max = 100,
+		Default = 28,
+		Callback = function(callback)
+			if callback then
+				Speed = callback
+			end
+		end
+	})
+end)
+
+spawn(function()
+	local Enabled, Boost = false, 12
+	local OldJumpHeight = Humanoid.JumpHeight
+	local HighJump = Tabs.Movement:CreateToggle({
+		Name = "HighJump",
+		Callback = function(callback)
+			Enabled = callback
+			if callback then
+				Humanoid.JumpHeight = Humanoid.JumpHeight + Boost
+			else
+				Humanoid.JumpHeight = OldJumpHeight
+			end
+		end
+	})
+	local CustomBoost = HighJump:CreateSlider({
+		Name = "Boost",
+		Min = 0,
+		Max = 50,
+		Default = 12,
+		Callback = function(callback)
+			if callback then
+				Boost = callback
+			end
+		end
+	})
+end)
+
+spawn(function()
+	local Boost = 150
+	local LongJump = Tabs.Movement:CreateToggle({
+		Name = "LongJump",
+		AutoDisable = true,
+		Enabled = false,
+		Callback = function(callback)
+			if callback then
+				Humanoid.Jump = true
+				LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Velocity = LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame.LookVector * Boost + Vector3.new(0, Humanoid.JumpPower, 0)
+			end
+		end
+	})
+	local CustomBoost = LongJump:CreateSlider({
+		Name = "Boost",
+		Min = 50,
+		Max = 245,
+		Default = 145,
+		Callback = function(callback)
+			if callback then
+				Boost = callback
+			end
+		end
+	})
+end)
+
+spawn(function()
+	local OriginalPos = Vector3.new(0, 0, 0)
+	local function GetPlacePos(pos, diagonal)
+		local SelfPos = Vector3.new(math.floor((pos.X / 3) + 0.5) * 3, math.floor((pos.Y / 3) + 0.5) * 3, math.floor((pos.Z / 3) + 0.5) * 3)
+		local OffsetPos = OriginalPos - SelfPos
+
+		if LocalPlayer then
+			local PosAngle = math.deg(math.atan2(-Humanoid.MoveDirection.X, -Humanoid.MoveDirection.Z))
+			local DiagonalMode = (PosAngle >= 130 and PosAngle <= 150) or (PosAngle <= -35 and PosAngle >= -50) or
+				(PosAngle >= 35 and PosAngle <= 50) or (PosAngle <= -130 and PosAngle >= -150)
+
+			if DiagonalMode and ((OffsetPos.X == 0 and OffsetPos.Z ~= 0) or (OffsetPos.X ~= 0 and OffsetPos.Z == 0)) and diagonal then
+				return OriginalPos
+			end
+		end
+
+		OriginalPos = SelfPos
+		return SelfPos
+	end
+
+	local Enabled, ToolCheck = false, false
+	local Scaffold = Tabs.Movement:CreateToggle({
+		Name = "Scaffold",
+		Callback = function(callback)
+			Enabled = callback
+			if callback then
+				repeat
+					wait()
+					if not IsAlive(LocalPlayer) then repeat task.wait() until IsAlive(LocalPlayer) end
+					local PlacePos = GetPlacePos(LocalPlayer.Character:FindFirstChild("Head").Position + Vector3.new(1, -math.floor(Humanoid.HipHeight * 3), 0) + Humanoid.MoveDirection)
+					local Blocks = GetTool("Blocks")
+					if ToolCheck then
+						if Blocks then
+							local args = {
+								[1] = PlacePos
+							}
+
+							game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("PlaceBlock"):InvokeServer(unpack(args))
+						end
+					else
+						local args = {
+							[1] = PlacePos
+						}
+
+						game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("PlaceBlock"):InvokeServer(unpack(args))
+					end
+				until not Enabled
+			end
+		end
+	})
+	local ToolChecks = Scaffold:CreateMiniToggle({
+		Name = "ToolCheck",
+		Callback = function(callback)
+			if callback then
+				ToolCheck = true
+			else
+				ToolCheck = false
+			end
+		end
+	})
+end)
+
+spawn(function()
+	local Enabled, NewSpeed, Mode = true, 23, nil
+	local OldGravity = game.Workspace.Gravity
+	local OldJumpHeight = Humanoid.JumpHeight
+	local OldWalkspeed = Humanoid.WalkSpeed
+	local HumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+	local Speed = Tabs.Movement:CreateToggle({
+		Name = "Speed",
+		Callback = function(callback)
+			Enabled = callback
+			if callback then
+				repeat
+					wait()
+					if not IsAlive(LocalPlayer) then repeat task.wait() until IsAlive(LocalPlayer) end
+					if Mode == "WalkSpeed" then
+						Humanoid.JumpHeight = OldJumpHeight
+						Humanoid.WalkSpeed = NewSpeed
+					elseif Mode == "Hop" then
+						game.Workspace.Gravity = 82
+						Humanoid.WalkSpeed = OldWalkspeed
+						local velo = LocalPlayer.Character.Humanoid.MoveDirection * NewSpeed
+						HumanoidRootPart.Velocity = Vector3.new(velo.X, HumanoidRootPart.Velocity.Y, velo.Z)
+						Humanoid.Jump = true
+					elseif Mode == "LowHop" then
+						Humanoid.WalkSpeed = OldWalkspeed
+						game.Workspace.Gravity = OldGravity
+						Humanoid.JumpHeight = 0.20
+						local velo = LocalPlayer.Character.Humanoid.MoveDirection * (NewSpeed + 15)
+						HumanoidRootPart.Velocity = Vector3.new(velo.X, HumanoidRootPart.Velocity.Y, velo.Z)
+						Humanoid.Jump = true
+					end
+				until not Enabled
+				Humanoid.WalkSpeed = OldWalkspeed
+				game.Workspace.Gravity = OldGravity
+				Humanoid.JumpHeight = OldJumpHeight
+			end
+		end
+	})
+	local CustomSpeedMode = Speed:CreateDropdown({
+		Name = "SpeedMode",
+		List = {"WalkSpeed", "Hop", "LowHop"},
+		Default = "Hop",
+		Callback = function(callback)
+			if callback then
+				Mode = callback
+			end
+		end
+	})
+	local CustomSpeed = Speed:CreateSlider({
+		Name = "Speed",
+		Min = 0,
+		Max = 50,
+		Default = 28,
+		Callback = function(callback)
+			if callback then
+				NewSpeed = callback
+			end
+		end
+	})
+end)
+
+spawn(function()
+	local OldHipHeight = Humanoid.HipHeight
+	local Steps = Tabs.Movement:CreateToggle({
+		Name = "Steps",
+		Callback = function(callback)
+			if callback then
+				Humanoid.HipHeight = 3
+			else
+				Humanoid.HipHeight = OldHipHeight
+			end
+		end
+	})
+end)
+
+spawn(function()
+	local Enabled, Radius, Speed, Angle = false, nil, nil, 0
+	local TargetStrafe = Tabs.Movement:CreateToggle({
+		Name = "TargetStrafe",
+		Callback = function(callback)
+			Enabled = callback
+			if callback then
+				repeat
+					wait()
+					local NearestPlayer = GetNearestPlayer(28)
+					if NearestPlayer then
+						Angle += Speed
+						local Offsets = Vector3.new(math.cos(math.rad(Angle)), 0, math.sin(math.rad(Angle))) * Radius
+						local NewPos = NearestPlayer.Character.PrimaryPart.Position + Offsets
+						LocalPlayer.Character:SetPrimaryPartCFrame(CFrame.new(NewPos, NearestPlayer.Character.PrimaryPart.Position))
+					end
+				until not Enabled
+			end
+		end
+	})
+	local CustomRadius = TargetStrafe:CreateSlider({
+		Name = "Radius",
+		Min = 0,
+		Max = 28,
+		Default = 8,
+		Callback = function(callback)
+			if callback then
+				Radius = callback
+			end
+		end
+	})
+	local CustomSpeed = TargetStrafe:CreateSlider({
+		Name = "Speed",
+		Min = 0,
+		Max = 20,
+		Default = 10,
+		Callback = function(callback)
+			if callback then
+				Speed = callback
+			end
+		end
+	})
+end)
+
+spawn(function()
+	local ChatWindowConfiguration = game:GetService("TextChatService"):FindFirstChild("ChatWindowConfiguration")
+	local Streamer = Tabs.Render:CreateToggle({
+		Name = "Streamer",
+		Callback = function(callback)
+			if callback then
+				ChatWindowConfiguration.Enabled = false
+				for _,bodypart in pairs(LocalPlayer.Character:GetChildren()) do
+					if bodypart:IsA("MeshPart") then
+						bodypart.BrickColor = BrickColor.Random()
+						for _, accessories in pairs(LocalPlayer.Character:GetChildren()) do
+							if accessories:IsA("Accessory") then
+								accessories:Destroy()
+								for _,clothes in pairs(LocalPlayer.Character:GetChildren()) do
+									if clothes:IsA("Shirt") or clothes:IsA("Pants") then
+										clothes:Destroy()
+									end
+								end
+							end
+						end
+					end
+				end
+			else
+				ChatWindowConfiguration.Enabled = true
+			end
+		end
+	})
+end)
