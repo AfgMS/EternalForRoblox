@@ -1,4 +1,5 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Library.lua"))()
+local Library = require(game.ReplicatedStorage.Roblox.New.Eternal.EternalRewrite)
 local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -45,7 +46,7 @@ local function GetTool(matchname)
 end
 
 spawn(function()
-	local Enabled, Range, Delays, Object, Direction, Hold = false, 28, 0.4, nil, nil, false
+	local Enabled, Range, Delays, Object, Direction, Hold = false, nil, 0, nil, nil, false
 	local AimAssist = Tabs.Combat:CreateToggle({
 		Name = "AimAssist",
 		Callback = function(callback)
@@ -97,17 +98,6 @@ spawn(function()
 			end
 		end
 	})
-	local CustomDelay = AimAssist:CreateSlider({
-		Name = "Delay",
-		Min = 0,
-		Max = 5,
-		Default = 0.4,
-		Callback = function(callback)
-			if callback then
-				Delays = callback
-			end
-		end
-	})
 	local CustomObject = AimAssist:CreateDropdown({
 		Name = "AimPart",
 		List = {"Head", "HumRootPart", "LowerTorso"},
@@ -121,7 +111,7 @@ spawn(function()
 end)
 
 spawn(function()
-	local Enabled, CPS = false, 20
+	local Enabled, CPS = false, nil
 	local AutoClicker = Tabs.Combat:CreateToggle({
 		Name = "AutoClicker",
 		Callback = function(callback)
@@ -141,7 +131,7 @@ spawn(function()
 		Name = "CPS",
 		Min = 0,
 		Max = 100,
-		Default = 20,
+		Default = 10,
 		Callback = function(callback)
 			if callback then
 				CPS = callback
@@ -159,6 +149,7 @@ spawn(function()
 			if callback then
 				repeat
 					task.wait()
+					if not IsAlive(LocalPlayer) then repeat task.wait() until IsAlive(LocalPlayer) end
 					local NearestPlayer = GetNearestPlayer(28)
 					if NearestPlayer then
 						for i, v in pairs(LocalPlayer.Backpack:GetChildren()) do
@@ -189,7 +180,7 @@ spawn(function()
 end)
 
 spawn(function()
-	local Enabled, Range, Swing, Mode, BlockAnim, SwingAnim = false, 28, false, nil, nil, nil
+	local Enabled, Range, Swing, Mode, BlockAnim, SwingAnim = false, nil, false, nil, nil, nil
 	local KillAura = Tabs.Combat:CreateToggle({
 		Name = "KillAura",
 		Callback = function(callback)
@@ -279,18 +270,18 @@ spawn(function()
 end)
 
 spawn(function()
-	local Enabled, YPos = false, 1
+	local Enabled, YPos = false, 0
 	local YRoot =  LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position.Y
 	local OldGravity = game.Workspace.Gravity
-	local Speed = 28
+	local Speed = nil
 	local OldSpeed = Humanoid.WalkSpeed
 	UserInputService.JumpRequest:Connect(function()
-		YPos = YPos + 1
+		YPos = YPos + 3
 	end)
 	UserInputService.InputBegan:Connect(function(Input, IsTyping)
 		if IsTyping then return end
 		if Input.KeyCode == Enum.KeyCode.LeftShift then
-			YPos = YPos - 1
+			YPos = YPos - 3
 		end
 	end)
 	local Fly = Tabs.Movement:CreateToggle({
@@ -298,7 +289,8 @@ spawn(function()
 		Callback = function(callback)
 			Enabled = callback
 			if callback then
-				YPos = 1
+				YRoot =  LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position.Y
+				YPos = 0
 				repeat
 					task.wait()
 					local velo = LocalPlayer.Character.Humanoid.MoveDirection * Speed
@@ -306,7 +298,8 @@ spawn(function()
 					LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position.X, YRoot + YPos, LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position.Z) * LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame.Rotation
 					game.Workspace.Gravity = 0
 				until not Enabled
-				YPos = 1
+				YRoot =  LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position.Y
+				YPos = 0
 				Humanoid.WalkSpeed = OldSpeed
 				game.Workspace.Gravity = OldGravity
 				LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame = LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame
@@ -327,24 +320,36 @@ spawn(function()
 end)
 
 spawn(function()
-	local Enabled, Boost = false, 12
-	local OldJumpHeight = Humanoid.JumpHeight
+	local Enabled, Boost = false, nil
+	local HumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 	local HighJump = Tabs.Movement:CreateToggle({
 		Name = "HighJump",
+		AutoDisable = true,
 		Callback = function(callback)
 			Enabled = callback
 			if callback then
-				Humanoid.JumpHeight = Humanoid.JumpHeight + Boost
+				local OldBodyVelo = LocalPlayer.Character:FindFirstChildWhichIsA("BodyVelocity")
+				if OldBodyVelo then
+					OldBodyVelo:Destroy()
+				end
+				local BodyVelo = Instance.new("BodyVelocity")
+				BodyVelo.Velocity = Vector3.new(0, Boost, 0)
+				BodyVelo.P = Boost
+				BodyVelo.MaxForce = Vector3.new(0, math.huge, 0)
+				BodyVelo.Parent = HumanoidRootPart
 			else
-				Humanoid.JumpHeight = OldJumpHeight
+				local BodyVelo = HumanoidRootPart:FindFirstChildOfClass("BodyVelocity")
+				if BodyVelo then
+					BodyVelo:Destroy()
+				end
 			end
 		end
 	})
 	local CustomBoost = HighJump:CreateSlider({
 		Name = "Boost",
 		Min = 0,
-		Max = 50,
-		Default = 12,
+		Max = 1000,
+		Default = 140,
 		Callback = function(callback)
 			if callback then
 				Boost = callback
@@ -354,52 +359,52 @@ spawn(function()
 end)
 
 spawn(function()
-	local Boost = 150
+	local Boost = nil
+	local HumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 	local LongJump = Tabs.Movement:CreateToggle({
 		Name = "LongJump",
 		AutoDisable = true,
 		Enabled = false,
-		Callback = function(callback)
-			if callback then
-				Humanoid.Jump = true
-				LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Velocity = LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame.LookVector * Boost + Vector3.new(0, Humanoid.JumpPower, 0)
+		Callback = function(enabled)
+			if enabled then
+				if HumanoidRootPart then
+					Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+					local velo = HumanoidRootPart.CFrame.LookVector * Boost
+					HumanoidRootPart.Velocity = Vector3.new(velo.X, HumanoidRootPart.Velocity.Y, velo.Z)
+				end
 			end
 		end
 	})
-	local CustomBoost = LongJump:CreateSlider({
+
+	LongJump:CreateSlider({
 		Name = "Boost",
-		Min = 50,
-		Max = 245,
-		Default = 145,
-		Callback = function(callback)
-			if callback then
-				Boost = callback
-			end
+		Min = 100,
+		Max = 200,
+		Default = 140,
+		Callback = function(value)
+			Boost = value
 		end
 	})
 end)
 
 spawn(function()
-	local OriginalPos = Vector3.new(0, 0, 0)
-	local function GetPlacePos(pos, diagonal)
+	local OriginPos = Vector3.new(0, 0, 0)
+
+	local function GetPlacePos(pos, diagonalmode)
 		local SelfPos = Vector3.new(math.floor((pos.X / 3) + 0.5) * 3, math.floor((pos.Y / 3) + 0.5) * 3, math.floor((pos.Z / 3) + 0.5) * 3)
-		local OffsetPos = OriginalPos - SelfPos
-
-		if LocalPlayer then
-			local PosAngle = math.deg(math.atan2(-Humanoid.MoveDirection.X, -Humanoid.MoveDirection.Z))
-			local DiagonalMode = (PosAngle >= 130 and PosAngle <= 150) or (PosAngle <= -35 and PosAngle >= -50) or
-				(PosAngle >= 35 and PosAngle <= 50) or (PosAngle <= -130 and PosAngle >= -150)
-
-			if DiagonalMode and ((OffsetPos.X == 0 and OffsetPos.Z ~= 0) or (OffsetPos.X ~= 0 and OffsetPos.Z == 0)) and diagonal then
-				return OriginalPos
+		local Offsets = (OriginPos - SelfPos)
+		if IsAlive(LocalPlayer) then
+			local HumanoidAngle = math.deg(math.atan2(-Humanoid.MoveDirection.X, -Humanoid.MoveDirection.Z))
+			local DiagonalPos = (HumanoidAngle >= 130 and HumanoidAngle <= 150) or (HumanoidAngle <= -35 and HumanoidAngle >= -50) or (HumanoidAngle >= 35 and HumanoidAngle <= 50) or (HumanoidAngle <= -130 and HumanoidAngle >= -150)
+			if DiagonalPos and ((Offsets.X == 0 and Offsets.Z ~= 0) or (Offsets.X ~= 0 and Offsets.Z == 0)) and diagonalmode then
+				return OriginPos
 			end
 		end
-
-		OriginalPos = SelfPos
+		OriginPos = SelfPos
 		return SelfPos
 	end
 
-	local Enabled, ToolCheck = false, false
+	local Enabled, Tower = false, false
 	local Scaffold = Tabs.Movement:CreateToggle({
 		Name = "Scaffold",
 		Callback = function(callback)
@@ -410,39 +415,34 @@ spawn(function()
 					if not IsAlive(LocalPlayer) then repeat task.wait() until IsAlive(LocalPlayer) end
 					local PlacePos = GetPlacePos(LocalPlayer.Character:FindFirstChild("Head").Position + Vector3.new(1, -math.floor(Humanoid.HipHeight * 3), 0) + Humanoid.MoveDirection)
 					local Blocks = GetTool("Blocks")
-					if ToolCheck then
-						if Blocks then
-							local args = {
-								[1] = PlacePos
-							}
-
-							game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("PlaceBlock"):InvokeServer(unpack(args))
-						end
-					else
+					if Tower then
+						UserInputService.JumpRequest:Connect(function()
+							Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+						end)
+					end
 						local args = {
 							[1] = PlacePos
 						}
-
+						
 						game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("PlaceBlock"):InvokeServer(unpack(args))
-					end
 				until not Enabled
 			end
 		end
 	})
-	local ToolChecks = Scaffold:CreateMiniToggle({
-		Name = "ToolCheck",
+	local TowerMode = Scaffold:CreateMiniToggle({
+		Name = "Tower",
 		Callback = function(callback)
 			if callback then
-				ToolCheck = true
+				Tower = true
 			else
-				ToolCheck = false
+				Tower = false
 			end
 		end
 	})
 end)
 
 spawn(function()
-	local Enabled, NewSpeed, Mode = true, 23, nil
+	local Enabled, NewSpeed, Mode = true, nil, nil
 	local OldGravity = game.Workspace.Gravity
 	local OldJumpHeight = Humanoid.JumpHeight
 	local OldWalkspeed = Humanoid.WalkSpeed
@@ -530,7 +530,7 @@ spawn(function()
 						Angle += Speed
 						local Offsets = Vector3.new(math.cos(math.rad(Angle)), 0, math.sin(math.rad(Angle))) * Radius
 						local NewPos = NearestPlayer.Character.PrimaryPart.Position + Offsets
-						LocalPlayer.Character:SetPrimaryPartCFrame(CFrame.new(NewPos, NearestPlayer.Character.PrimaryPart.Position))
+						Humanoid:MoveTo(NewPos)
 					end
 				until not Enabled
 			end
