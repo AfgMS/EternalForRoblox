@@ -149,7 +149,7 @@ spawn(function()
 				repeat
 					task.wait()
 					if not IsAlive(LocalPlayer) then repeat task.wait() until IsAlive(LocalPlayer) end
-					local NearestPlayer = GetNearestPlayer(28)
+					local NearestPlayer = GetNearestPlayer(30)
 					if NearestPlayer then
 						for i, v in pairs(LocalPlayer.Backpack:GetChildren()) do
 							if v:IsA("Tool") and v.Name:match("Sword") then
@@ -237,8 +237,8 @@ spawn(function()
 	local CustomRange = KillAura:CreateSlider({
 		Name = "Range",
 		Min = 0,
-		Max = 28,
-		Default = 28,
+		Max = 30,
+		Default = 30,
 		Callback = function(callback)
 			if callback then
 				Range = callback
@@ -377,9 +377,9 @@ spawn(function()
 
 	LongJump:CreateSlider({
 		Name = "Boost",
-		Min = 100,
-		Max = 200,
-		Default = 140,
+		Min = 50,
+		Max = 120,
+		Default = 85,
 		Callback = function(value)
 			Boost = value
 		end
@@ -390,7 +390,7 @@ spawn(function()
 	local OriginPos = Vector3.new(0, 0, 0)
 
 	local function GetPlacePos(pos, diagonalmode)
-		local SelfPos = Vector3.new(math.floor((pos.X / 3) + 0.5) * 3, math.floor((pos.Y / 3) + 0.5) * 3, math.floor((pos.Z / 3) + 0.5) * 3)
+		local SelfPos = Vector3.new(math.floor((pos.X / 3) + 0.3) * 3, math.floor((pos.Y / 3) + 0.3) * 3, math.floor((pos.Z / 3) + 0.3) * 3)
 		local Offsets = (OriginPos - SelfPos)
 		if IsAlive(LocalPlayer) then
 			local HumanoidAngle = math.deg(math.atan2(-Humanoid.MoveDirection.X, -Humanoid.MoveDirection.Z))
