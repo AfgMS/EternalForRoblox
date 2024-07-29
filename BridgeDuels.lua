@@ -1,5 +1,4 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Library.lua"))()
-local Library = require(game.ReplicatedStorage.Roblox.New.Eternal.EternalRewrite)
 local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -404,7 +403,7 @@ spawn(function()
 		return SelfPos
 	end
 
-	local Enabled, Tower = false, false
+	local Enabled = false
 	local Scaffold = Tabs.Movement:CreateToggle({
 		Name = "Scaffold",
 		Callback = function(callback)
@@ -414,28 +413,12 @@ spawn(function()
 					wait()
 					if not IsAlive(LocalPlayer) then repeat task.wait() until IsAlive(LocalPlayer) end
 					local PlacePos = GetPlacePos(LocalPlayer.Character:FindFirstChild("Head").Position + Vector3.new(1, -math.floor(Humanoid.HipHeight * 3), 0) + Humanoid.MoveDirection)
-					local Blocks = GetTool("Blocks")
-					if Tower then
-						UserInputService.JumpRequest:Connect(function()
-							Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-						end)
-					end
 						local args = {
 							[1] = PlacePos
 						}
 						
 						game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("PlaceBlock"):InvokeServer(unpack(args))
 				until not Enabled
-			end
-		end
-	})
-	local TowerMode = Scaffold:CreateMiniToggle({
-		Name = "Tower",
-		Callback = function(callback)
-			if callback then
-				Tower = true
-			else
-				Tower = false
 			end
 		end
 	})
@@ -511,50 +494,6 @@ spawn(function()
 				Humanoid.HipHeight = 3
 			else
 				Humanoid.HipHeight = OldHipHeight
-			end
-		end
-	})
-end)
-
-spawn(function()
-	local Enabled, Radius, Speed, Angle = false, nil, nil, 0
-	local TargetStrafe = Tabs.Movement:CreateToggle({
-		Name = "TargetStrafe",
-		Callback = function(callback)
-			Enabled = callback
-			if callback then
-				repeat
-					wait()
-					local NearestPlayer = GetNearestPlayer(28)
-					if NearestPlayer then
-						Angle += Speed
-						local Offsets = Vector3.new(math.cos(math.rad(Angle)), 0, math.sin(math.rad(Angle))) * Radius
-						local NewPos = NearestPlayer.Character.PrimaryPart.Position + Offsets
-						Humanoid:MoveTo(NewPos)
-					end
-				until not Enabled
-			end
-		end
-	})
-	local CustomRadius = TargetStrafe:CreateSlider({
-		Name = "Radius",
-		Min = 0,
-		Max = 28,
-		Default = 8,
-		Callback = function(callback)
-			if callback then
-				Radius = callback
-			end
-		end
-	})
-	local CustomSpeed = TargetStrafe:CreateSlider({
-		Name = "Speed",
-		Min = 0,
-		Max = 20,
-		Default = 10,
-		Callback = function(callback)
-			if callback then
-				Speed = callback
 			end
 		end
 	})
