@@ -390,11 +390,11 @@ spawn(function()
 	local OriginPos = Vector3.new(0, 0, 0)
 
 	local function GetPlacePos(pos, diagonalmode)
-		local SelfPos = Vector3.new(math.floor((pos.X / 3) + 0.3) * 3, math.floor((pos.Y / 3) + 0.3) * 3, math.floor((pos.Z / 3) + 0.3) * 3)
+		local SelfPos = Vector3.new(math.floor(pos.X / 3) * 3, math.floor(pos.Y / 3) * 3, math.floor(pos.Z / 3) * 3)
 		local Offsets = (OriginPos - SelfPos)
 		if IsAlive(LocalPlayer) then
 			local HumanoidAngle = math.deg(math.atan2(-Humanoid.MoveDirection.X, -Humanoid.MoveDirection.Z))
-			local DiagonalPos = (HumanoidAngle >= 130 and HumanoidAngle <= 150) or (HumanoidAngle <= -35 and HumanoidAngle >= -50) or (HumanoidAngle >= 35 and HumanoidAngle <= 50) or (HumanoidAngle <= -130 and HumanoidAngle >= -150)
+			local DiagonalPos = (HumanoidAngle >= 130 and HumanoidAngle <= 160) or (HumanoidAngle <= -30 and HumanoidAngle >= -60) or (HumanoidAngle >= 30 and HumanoidAngle <= 60) or (HumanoidAngle <= -130 and HumanoidAngle >= -160)
 			if DiagonalPos and ((Offsets.X == 0 and Offsets.Z ~= 0) or (Offsets.X ~= 0 and Offsets.Z == 0)) and diagonalmode then
 				return OriginPos
 			end
