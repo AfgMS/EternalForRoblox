@@ -388,13 +388,12 @@ end)
 
 spawn(function()
 	local OriginPos = Vector3.new(0, 0, 0)
-
 	local function GetPlacePos(pos, diagonalmode)
 		local SelfPos = Vector3.new(math.floor((pos.X / 3) + 0.3) * 3, math.floor((pos.Y / 3) + 0.3) * 3, math.floor((pos.Z / 3) + 0.3) * 3)
 		local Offsets = (OriginPos - SelfPos)
 		if IsAlive(LocalPlayer) then
 			local HumanoidAngle = math.deg(math.atan2(-Humanoid.MoveDirection.X, -Humanoid.MoveDirection.Z))
-			local DiagonalPos = (HumanoidAngle >= 135 and HumanoidAngle <= 145) or (HumanoidAngle <= -45 and HumanoidAngle >= -35) or (HumanoidAngle >= 35 and HumanoidAngle <= 45) or (HumanoidAngle <= -145 and HumanoidAngle >= -135)
+			local DiagonalPos = (HumanoidAngle >= 130 and HumanoidAngle <= 150) or (HumanoidAngle <= -35 and HumanoidAngle >= -50) or (HumanoidAngle >= 35 and HumanoidAngle <= 50) or (HumanoidAngle <= -130 and HumanoidAngle >= -150)
 			if DiagonalPos and ((Offsets.X == 0 and Offsets.Z ~= 0) or (Offsets.X ~= 0 and Offsets.Z == 0)) and diagonalmode then
 				return OriginPos
 			end
@@ -412,7 +411,7 @@ spawn(function()
 				repeat
 					wait()
 					if not IsAlive(LocalPlayer) then repeat task.wait() until IsAlive(LocalPlayer) end
-					local PlacePos = GetPlacePos(LocalPlayer.Character.PrimaryPart.Position + Vector3.new(1, -math.floor(Humanoid.HipHeight * 3), 0) + Humanoid.MoveDirection)
+					local PlacePos = GetPlacePos(LocalPlayer.Character:FindFirstChild("Head").Position + Vector3.new(1, -math.floor(Humanoid.HipHeight * 3), 0) + Humanoid.MoveDirection)
 					local args = {
 						[1] = PlacePos
 					}
@@ -451,7 +450,7 @@ spawn(function()
 						Humanoid.WalkSpeed = OldWalkspeed
 						game.Workspace.Gravity = OldGravity
 						Humanoid.JumpHeight = 0.20
-						local velo = LocalPlayer.Character.Humanoid.MoveDirection * NewSpeed
+						local velo = LocalPlayer.Character.Humanoid.MoveDirection * (NewSpeed + 15)
 						HumanoidRootPart.Velocity = Vector3.new(velo.X, HumanoidRootPart.Velocity.Y, velo.Z)
 						Humanoid.Jump = true
 					end
@@ -494,6 +493,53 @@ spawn(function()
 				Humanoid.HipHeight = 3
 			else
 				Humanoid.HipHeight = OldHipHeight
+			end
+		end
+	})
+end)
+
+spawn(function()
+	local HumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+	local Enabled, Radius, Speed, Angle = false, nil, nil, 0
+	local TargetStrafe = Tabs.Movement:CreateToggle({
+		Name = "TargetStrafe",
+		Callback = function(callback)
+			Enabled = callback
+			if callback then
+				repeat
+					wait()
+					local NearestPlayer = GetNearestPlayer(28)
+					if NearestPlayer then
+						Angle += Speed
+						local Offsets = Vector3.new(math.cos(math.rad(Angle)), 0, math.sin(math.rad(Angle))) * Radius
+						local NewPos = NearestPlayer.Character.PrimaryPart.Position + Offsets
+						local velo = LocalPlayer.Character.Humanoid.MoveDirection * Speed
+						HumanoidRootPart.Velocity = Vector3.new(velo.X, HumanoidRootPart.Velocity.Y, velo.Z)
+						Humanoid:MoveTo(NewPos)
+					end
+				until not Enabled
+			end
+		end
+	})
+	local CustomRadius = TargetStrafe:CreateSlider({
+		Name = "Radius",
+		Min = 0,
+		Max = 28,
+		Default = 14,
+		Callback = function(callback)
+			if callback then
+				Radius = callback
+			end
+		end
+	})
+	local CustomSpeed = TargetStrafe:CreateSlider({
+		Name = "Speed",
+		Min = 0,
+		Max = 28,
+		Default = 25,
+		Callback = function(callback)
+			if callback then
+				Speed = callback
 			end
 		end
 	})
