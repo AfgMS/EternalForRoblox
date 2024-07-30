@@ -390,8 +390,9 @@ end)
 
 spawn(function()
 	local HumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-	local Enabled, Diagonal, Expand = false, false, true
+	local Enabled, Diagonal, Expand = false, false, nil
 	local DefaultPos = Vector3.zero
+
 	local function GetPlacePos(pos, diagonalmode)
 		local NewPos = Vector3.new(math.floor((pos.X / 3) + 0.5) * 3, math.floor((pos.Y / 3) + 0.5) * 3, math.floor((pos.Z / 3) + 0.5) * 3)
 		local Offset = (DefaultPos - NewPos)
@@ -404,7 +405,7 @@ spawn(function()
 		end
 		return NewPos
 	end
-	
+
 	local Scaffold = Tabs.Movement:CreateToggle({
 		Name = "Scaffold",
 		Callback = function(callback)
@@ -413,13 +414,9 @@ spawn(function()
 				repeat
 					task.wait()
 					if IsAlive(LocalPlayer) then
-						local Towers = UserInputService:IsKeyDown(Enum.KeyCode.Space) and UserInputService:GetFocusedTextBox() == nil
-						if Towers then
-							HumanoidRootPart.Velocity = Vector3.new(HumanoidRootPart.Velocity.X, 28, HumanoidRootPart.Velocity.Z)
-						end
 						for i = 1, Expand do
-							local PlacePos = GetPlacePos((HumanoidRootPart.Position + (Humanoid.MoveDirection * (i * 3.5))) + Vector3.new(0, -((HumanoidRootPart.Size.Y / 2) + Humanoid.HipHeight + 1.5)), 0)
-							PlacePos = Vector3.new(PlacePos.X, PlacePos.Y - (Towers and 4 or 0), PlacePos.Z)
+							local PlacePos = GetPlacePos((HumanoidRootPart.Position + (Humanoid.MoveDirection * (i * 3.5))) + Vector3.new(0, -((HumanoidRootPart.Size.Y / 2) + Humanoid.HipHeight + 1.5)), Diagonal)
+							PlacePos = Vector3.new(PlacePos.X, PlacePos.Y, PlacePos.Z)
 							local args = {
 								[1] = PlacePos
 							}
@@ -433,6 +430,28 @@ spawn(function()
 					end
 				until not Enabled
 				DefaultPos = Vector3.zero
+			end
+		end
+	})
+	local CustomExpand = Scaffold:CreateSlider({
+		Name = "Expand",
+		Min = 0,
+		Max = 10,
+		Default = 1,
+		Callback = function(callback)
+			if callback then
+				Expand = callback
+			end
+		end
+	})
+	local DiagonalMode = Scaffold:CreateMiniToggle({
+		Name = "Diagonal",
+		Enabled = true,
+		Callback = function(callback)
+			if callback then
+				Diagonal = true
+			else
+				Diagonal = false
 			end
 		end
 	})
@@ -509,52 +528,6 @@ spawn(function()
 				Humanoid.HipHeight = 3
 			else
 				Humanoid.HipHeight = OldHipHeight
-			end
-		end
-	})
-end)
-
-spawn(function()
-	local Enabled, Radius, Speed, Angle = false, nil, nil, 0
-	local TargetStrafe = Tabs.Movement:CreateToggle({
-		Name = "TargetStrafe",
-		Callback = function(callback)
-			Enabled = callback
-			if callback then
-				repeat
-					wait()
-					local NearestPlayer = GetNearestPlayer(28)
-					if NearestPlayer then
-						local DeltaTime = wait()
-						Angle = Angle + Speed * DeltaTime
-						local XPos = math.cos(Angle) * Radius
-						local ZPos = math.sin(Angle) * Radius
-						local NewPos = NearestPlayer.Character:FindFirstChild("HumanoidRootPart").Position + Vector3.new(XPos, 0, ZPos)
-						Humanoid:MoveTo(NewPos)
-					end
-				until not Enabled
-			end
-		end
-	})
-	local CustomRadius = TargetStrafe:CreateSlider({
-		Name = "Radius",
-		Min = 0,
-		Max = 28,
-		Default = 12,
-		Callback = function(callback)
-			if callback then
-				Radius = callback
-			end
-		end
-	})
-	local CustomSpeed = TargetStrafe:CreateSlider({
-		Name = "Speed",
-		Min = 0,
-		Max = 28,
-		Default = 25,
-		Callback = function(callback)
-			if callback then
-				Speed = callback
 			end
 		end
 	})
