@@ -1,5 +1,7 @@
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Library.lua"))()
+--local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Library.lua"))()
+local Library = require(game.ReplicatedStorage.Roblox.New.Eternal.EternalRewrite)
 local UserInputService = game:GetService("UserInputService")
+local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
@@ -277,12 +279,12 @@ spawn(function()
 	local Speed = nil
 	local OldSpeed = Humanoid.WalkSpeed
 	UserInputService.JumpRequest:Connect(function()
-		YPos = YPos + 3
+		YPos = YPos + 6
 	end)
 	UserInputService.InputBegan:Connect(function(Input, IsTyping)
 		if IsTyping then return end
 		if Input.KeyCode == Enum.KeyCode.LeftShift then
-			YPos = YPos - 3
+			YPos = YPos - 6
 		end
 	end)
 	local Fly = Tabs.Movement:CreateToggle({
@@ -376,8 +378,7 @@ spawn(function()
 			end
 		end
 	})
-
-	LongJump:CreateSlider({
+	local CustomBoost = LongJump:CreateSlider({
 		Name = "Boost",
 		Min = 50,
 		Max = 120,
@@ -394,7 +395,7 @@ spawn(function()
 	local DefaultPos = Vector3.zero
 
 	local function GetPlacePos(pos, diagonalmode)
-		local NewPos = Vector3.new(math.floor((pos.X / 3) + 0.3) * 3, math.floor((pos.Y / 3) + 0.3) * 3, math.floor((pos.Z / 3) + 0.3) * 3)
+		local NewPos = Vector3.new(math.floor((pos.X / 3) + 0.5) * 3, math.floor((pos.Y / 3) + 0.5) * 3, math.floor((pos.Z / 3) + 0.5) * 3)
 		local Offset = (DefaultPos - NewPos)
 		if IsAlive(LocalPlayer) then
 			local HumanoidAngle = math.deg(math.atan2(-Humanoid.MoveDirection.X, -Humanoid.MoveDirection.Z))
@@ -422,6 +423,9 @@ spawn(function()
 							}
 
 							game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("PlaceBlock"):InvokeServer(unpack(args))
+							if Expand > 1 then
+								task.wait()
+							end
 							DefaultPos = PlacePos
 						end
 					end
@@ -465,14 +469,24 @@ spawn(function()
 							Humanoid.WalkSpeed = OldWalkspeed
 							local velo = LocalPlayer.Character.Humanoid.MoveDirection * NewSpeed
 							HumanoidRootPart.Velocity = Vector3.new(velo.X, HumanoidRootPart.Velocity.Y, velo.Z)
-							Humanoid.Jump = true
+							spawn(function()
+								while Enabled do
+									wait()
+									Humanoid.Jump = true
+								end
+							end)
 						elseif Mode == "LowHop" then
 							Humanoid.WalkSpeed = OldWalkspeed
 							game.Workspace.Gravity = OldGravity
 							Humanoid.JumpHeight = 0.20
-							local velo = LocalPlayer.Character.Humanoid.MoveDirection * (NewSpeed + 15)
+							local velo = LocalPlayer.Character.Humanoid.MoveDirection * NewSpeed
 							HumanoidRootPart.Velocity = Vector3.new(velo.X, HumanoidRootPart.Velocity.Y, velo.Z)
-							Humanoid.Jump = true
+							spawn(function()
+								while Enabled do
+									wait()
+									Humanoid.Jump = true
+								end
+							end)
 						end
 					end
 				until not Enabled
@@ -544,7 +558,7 @@ spawn(function()
 			Enabled = callback
 			if callback then
 				repeat
-					wait()
+					task.wait()
 					Players.PlayerAdded:Connect(Hightlight)
 					Players.PlayerRemoving:Connect(RemoveHighlight)
 					for i,v in pairs(Players:GetChildren()) do
@@ -570,10 +584,45 @@ spawn(function()
 					wait()
 					local NearestPlayer = GetNearestPlayer(30)
 					if NearestPlayer then
-						local TargetImage = Players:GetUserThumbnailAsync(NearestPlayer.UserId, Enum.ThumbnailType.AvatarThumbnail, Enum.ThumbnailSize.Size48x48)
+						local TargetImage = Players:GetUserThumbnailAsync(NearestPlayer.UserId, Enum.ThumbnailType.AvatarBust, Enum.ThumbnailSize.Size48x48)
 						Main:TargetHud(NearestPlayer.Name, TargetImage, NearestPlayer.Character:FindFirstChildOfClass("Humanoid"), Humanoid)
 					end
 				until not Enabled
+			end
+		end
+	})
+end)
+
+spawn(function()
+	local Blurz, Size, Enabled = nil, nil, false
+	local Blur = Tabs.Render:CreateToggle({
+		Name = "Blur",
+		Callback = function(callback)
+			Enabled = callback
+			if callback then
+				if not Lighting:FindFirstChildWhichIsA("BlurEffect") then
+					Blurz = Instance.new("BlurEffect")
+					Blurz.Parent = Lighting
+				end
+				repeat
+					wait()
+					Blurz.Size = Size
+				until not Enabled
+			else
+				if Blurz then
+					Blurz:Destroy()
+				end
+			end
+		end
+	})
+	local CustomSize = Blur:CreateSlider({
+		Name = "Size",
+		Min = 0,
+		Max = 100,
+		Default = 28,
+		Callback = function(callback)
+			if callback then
+				Size = callback
 			end
 		end
 	})
