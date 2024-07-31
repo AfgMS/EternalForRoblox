@@ -394,7 +394,7 @@ spawn(function()
 	local DefaultPos = Vector3.zero
 
 	local function GetPlacePos(pos, diagonalmode)
-		local NewPos = Vector3.new(math.floor((pos.X / 3) + 0.5) * 3, math.floor((pos.Y / 3) + 0.5) * 3, math.floor((pos.Z / 3) + 0.5) * 3)
+		local NewPos = Vector3.new(math.floor((pos.X / 3) + 0.3) * 3, math.floor((pos.Y / 3) + 0.3) * 3, math.floor((pos.Z / 3) + 0.3) * 3)
 		local Offset = (DefaultPos - NewPos)
 		if IsAlive(LocalPlayer) then
 			local HumanoidAngle = math.deg(math.atan2(-Humanoid.MoveDirection.X, -Humanoid.MoveDirection.Z))
@@ -422,25 +422,11 @@ spawn(function()
 							}
 
 							game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("PlaceBlock"):InvokeServer(unpack(args))
-							if Expand > 1 then
-								task.wait()
-							end
 							DefaultPos = PlacePos
 						end
 					end
 				until not Enabled
 				DefaultPos = Vector3.zero
-			end
-		end
-	})
-	local CustomExpand = Scaffold:CreateSlider({
-		Name = "Expand",
-		Min = 0,
-		Max = 10,
-		Default = 1,
-		Callback = function(callback)
-			if callback then
-				Expand = callback
 			end
 		end
 	})
@@ -534,19 +520,60 @@ spawn(function()
 end)
 
 spawn(function()
-	local ChatWindowConfiguration = game:GetService("TextChatService"):FindFirstChild("ChatWindowConfiguration")
-	local Streamer = Tabs.Render:CreateToggle({
-		Name = "Streamer",
+	local function Hightlight(player)
+		if player ~= LocalPlayer and IsAlive(player) then
+			if not player.Character:FindFirstChildOfClass("Highlight") then
+				local highlight = Instance.new("Highlight")
+				highlight.Parent = player.Character
+				highlight.FillTransparency = 1
+				highlight.OutlineTransparency = 0.45
+			end
+		end
+	end
+
+	local function RemoveHighlight(player)
+		if player ~= LocalPlayer and IsAlive(player) and player.Character:FindFirstChildOfClass("Highlight") then
+			player.Character:FindFirstChildOfClass("Highlight"):Destroy()
+		end
+	end
+
+	local Enabled = false
+	local Chams = Tabs.Render:CreateToggle({
+		Name = "Chams",
 		Callback = function(callback)
+			Enabled = callback
 			if callback then
-				ChatWindowConfiguration.Enabled = false
-				for _,bodypart in pairs(LocalPlayer.Character:GetChildren()) do
-					if bodypart:IsA("MeshPart") then
-						bodypart.BrickColor = BrickColor.Random()
+				repeat
+					wait()
+					Players.PlayerAdded:Connect(Hightlight)
+					Players.PlayerRemoving:Connect(RemoveHighlight)
+					for i,v in pairs(Players:GetChildren()) do
+						Hightlight(v)
 					end
+				until not Enabled
+				for i,v in pairs(Players:GetChildren()) do
+					RemoveHighlight(v)
 				end
-			else
-				ChatWindowConfiguration.Enabled = true
+			end
+		end
+	})
+end)
+
+spawn(function()
+	local Enabled = false
+	local TargetHUD = Tabs.Render:CreateToggle({
+		Name = "TargetHUD",
+		Callback = function(callback)
+			Enabled = callback
+			if callback then
+				repeat
+					wait()
+					local NearestPlayer = GetNearestPlayer(30)
+					if NearestPlayer then
+						local TargetImage = Players:GetUserThumbnailAsync(NearestPlayer.UserId, Enum.ThumbnailType.AvatarThumbnail, Enum.ThumbnailSize.Size48x48)
+						Main:TargetHud(NearestPlayer.Name, TargetImage, NearestPlayer.Character:FindFirstChildOfClass("Humanoid"), Humanoid)
+					end
+				until not Enabled
 			end
 		end
 	})
