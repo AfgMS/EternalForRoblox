@@ -79,7 +79,7 @@ end
 
 function Library:CreateMain()
 	local Main = {}
-	
+
 	local ScreenGui = Instance.new("ScreenGui")
 	ScreenGui.Name = "Eternal_" .. Library.CurrentVersion
 	ScreenGui.ResetOnSpawn = false
@@ -89,7 +89,7 @@ function Library:CreateMain()
 	else
 		ScreenGui.Parent = CoreGui
 	end
-	
+
 	local MainFrame = Instance.new("Frame")
 	MainFrame.Parent = ScreenGui
 	MainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -104,12 +104,12 @@ function Library:CreateMain()
 	UIListLayout.FillDirection = Enum.FillDirection.Horizontal
 	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	UIListLayout.Padding = UDim.new(0, 5)
-	
+
 	local UIPadding = Instance.new("UIPadding")
 	UIPadding.Parent = MainFrame
 	UIPadding.PaddingLeft = UDim.new(0, 20)
 	UIPadding.PaddingTop = UDim.new(0, 55)
-	
+
 	local OtherFrame = Instance.new("Frame")
 	OtherFrame.Parent = ScreenGui
 	OtherFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -118,7 +118,7 @@ function Library:CreateMain()
 	OtherFrame.BorderSizePixel = 0
 	OtherFrame.Size = UDim2.new(1, 0, 1, 0)
 	OtherFrame.ZIndex = -1
-	
+
 	local TrashCans = Instance.new("ImageLabel")
 	TrashCans.Parent = OtherFrame
 	TrashCans.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -130,11 +130,11 @@ function Library:CreateMain()
 	TrashCans.Size = UDim2.new(0, 80, 0, 80)
 	TrashCans.Image = "rbxassetid://8463436236"
 	TrashCans.Visible = false
-	
+
 	local UICorner_7 = Instance.new("UICorner")
 	UICorner_7.CornerRadius = UDim.new(0, 4)
 	UICorner_7.Parent = TrashCans
-	
+
 	local HudsFrame = Instance.new("Frame")
 	HudsFrame.Parent = ScreenGui
 	HudsFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -143,7 +143,7 @@ function Library:CreateMain()
 	HudsFrame.BorderSizePixel = 0
 	HudsFrame.Size = UDim2.new(1, 0, 1, 0)
 	HudsFrame.ZIndex = -1
-	
+
 	local LogoFrame = Instance.new("Frame")
 	LogoFrame.Parent = HudsFrame
 	LogoFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
@@ -152,14 +152,14 @@ function Library:CreateMain()
 	LogoFrame.BorderSizePixel = 0
 	LogoFrame.Position = UDim2.new(0.00932994019, 0, 0.0187969916, 0)
 	LogoFrame.Size = UDim2.new(0, 155, 0, 22)
-	
+
 	local TopFrame = Instance.new("Frame")
 	TopFrame.Parent = LogoFrame
 	TopFrame.BackgroundColor3 = Library.Settings.LibraryColor
 	TopFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	TopFrame.BorderSizePixel = 0
 	TopFrame.Size = UDim2.new(1, 0, 0, 2)
-	
+
 	local LogoText = Instance.new("TextLabel")
 	LogoText.Parent = LogoFrame
 	LogoText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -174,10 +174,10 @@ function Library:CreateMain()
 	LogoText.TextSize = 14.000
 	LogoText.TextWrapped = true
 	LogoText.TextXAlignment = Enum.TextXAlignment.Left
-	
+
 	local NewSize = game:GetService("TextService"):GetTextSize(LogoText.Text, LogoText.TextSize, LogoText.Font, Vector2.new(math.huge, math.huge))
 	LogoFrame.Size = UDim2.new(0, NewSize.X + 12, 0, 21)
-	
+
 	local OpenGui = Instance.new("TextButton")
 	OpenGui.Parent = ScreenGui
 	OpenGui.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -197,7 +197,7 @@ function Library:CreateMain()
 	local UICorner_5 = Instance.new("UICorner")
 	UICorner_5.CornerRadius = UDim.new(0, 4)
 	UICorner_5.Parent = OpenGui
-	
+
 	local ArraylistFrame = Instance.new("Frame")
 	ArraylistFrame.Parent = HudsFrame
 	ArraylistFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -206,12 +206,12 @@ function Library:CreateMain()
 	ArraylistFrame.BorderSizePixel = 0
 	ArraylistFrame.Position = UDim2.new(0.799537122, 0, 0.0243661068, 0)
 	ArraylistFrame.Size = UDim2.new(0.168943331, 0, 0.975633919, 0)
-	
+
 	local UIListLayout_5 = Instance.new("UIListLayout")
 	UIListLayout_5.Parent = ArraylistFrame
 	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	UIListLayout_5.HorizontalAlignment = Enum.HorizontalAlignment.Center
-	
+
 	local function AddArray(name)
 		local TextLabel = Instance.new("TextLabel")
 		TextLabel.Parent = ArraylistFrame
@@ -230,7 +230,7 @@ function Library:CreateMain()
 		TextLabel.TextXAlignment = Enum.TextXAlignment.Right
 		TextLabel.LayoutOrder = -#name
 	end
-	
+
 	local function RemoveArray(name)
 		for i,v in pairs(ArraylistFrame:GetChildren()) do
 			if v:IsA("TextLabel") and v.Name == name then
@@ -238,11 +238,11 @@ function Library:CreateMain()
 			end
 		end
 	end
-	
+
 	OpenGui.MouseButton1Click:Connect(function()
-			MainFrame.Visible = not MainFrame.Visible
-			TrashCans.Visible = not TrashCans.Visible
-		end)
+		MainFrame.Visible = not MainFrame.Visible
+		TrashCans.Visible = not TrashCans.Visible
+	end)
 
 	UserInputService.InputBegan:Connect(function(Input, isTyping)
 		if Input.KeyCode == Enum.KeyCode[Library.Settings.LibraryKeybind] and not isTyping then
@@ -250,11 +250,17 @@ function Library:CreateMain()
 			TrashCans.Visible = not TrashCans.Visible
 		end
 	end)
-	
-	function Main:TargetHud(targetname, targetpfp, targethumanoid, localplayerhumanoid)
+
+	local TargetHudFrame = Instance.new("Frame")
+	local TargetName = Instance.new("TextLabel")
+	local FightResult = Instance.new("TextLabel")
+	local HealthBack = Instance.new("Frame")
+	local HealthFront = Instance.new("Frame")
+	local TargetPicture = Instance.new("ImageLabel")
+
+	function Main:TargetHud(targetname, targetpfp, targethumanoid, localplayerhumanoid, visibletarget)
 		local TargetHuds = {}
 
-		local TargetHudFrame = Instance.new("Frame")
 		TargetHudFrame.Parent = HudsFrame
 		TargetHudFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 		TargetHudFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
@@ -263,9 +269,9 @@ function Library:CreateMain()
 		TargetHudFrame.BorderSizePixel = 0
 		TargetHudFrame.Position = UDim2.new(0.649999976, 0, 0.649999976, 0)
 		TargetHudFrame.Size = UDim2.new(0, 165, 0, 50)
+		TargetHudFrame.Visible = visibletarget
 		MakeDraggable(TargetHudFrame)
 
-		local TargetName = Instance.new("TextLabel")
 		TargetName.Parent = TargetHudFrame
 		TargetName.AnchorPoint = Vector2.new(0.5, 0.5)
 		TargetName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -281,7 +287,6 @@ function Library:CreateMain()
 		TargetName.TextWrapped = true
 		TargetName.TextXAlignment = Enum.TextXAlignment.Left
 
-		local FightResult = Instance.new("TextLabel")
 		FightResult.Parent = TargetHudFrame
 		FightResult.AnchorPoint = Vector2.new(0.5, 0.5)
 		FightResult.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -297,7 +302,6 @@ function Library:CreateMain()
 		FightResult.TextWrapped = true
 		FightResult.TextXAlignment = Enum.TextXAlignment.Left
 
-		local HealthBack = Instance.new("Frame")
 		HealthBack.Parent = TargetHudFrame
 		HealthBack.AnchorPoint = Vector2.new(0.5, 0.5)
 		HealthBack.BackgroundColor3 = Color3.fromRGB(48, 48, 48)
@@ -306,14 +310,12 @@ function Library:CreateMain()
 		HealthBack.Position = UDim2.new(0.5, 0, 0.850000024, 0)
 		HealthBack.Size = UDim2.new(0, 155, 0, 5)
 
-		local HealthFront = Instance.new("Frame")
 		HealthFront.Parent = HealthBack
 		HealthFront.BackgroundColor3 = Library.Settings.LibraryColor
 		HealthFront.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		HealthFront.BorderSizePixel = 0
 		HealthFront.Size = UDim2.new(0, 155, 0, 5)
 
-		local TargetPicture = Instance.new("ImageLabel")
 		TargetPicture.Name = "TargetPicture"
 		TargetPicture.Parent = TargetHudFrame
 		TargetPicture.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -343,7 +345,7 @@ function Library:CreateMain()
 	
 	function Main:CreateTab(name, customsettings)
 		local Tabs = {}
-		
+
 		local TabHolder = Instance.new("Frame")
 		TabHolder.Name = name
 		TabHolder.Parent = MainFrame
@@ -351,7 +353,7 @@ function Library:CreateMain()
 		TabHolder.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		TabHolder.BorderSizePixel = 0
 		TabHolder.Size = UDim2.new(0, 118, 0, 25)
-		
+
 		local TabName = Instance.new("TextLabel")
 		TabName.Parent = TabHolder
 		TabName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -365,11 +367,11 @@ function Library:CreateMain()
 		TabName.TextScaled = true
 		TabName.TextSize = 14.000
 		TabName.TextWrapped = true
-		
+
 		local UITextSizeConstraint = Instance.new("UITextSizeConstraint")
 		UITextSizeConstraint.Parent = TabName
 		UITextSizeConstraint.MaxTextSize = 14
-		
+
 		local TogglesList = Instance.new("Frame")
 		TogglesList.Parent = TabHolder
 		TogglesList.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -378,11 +380,11 @@ function Library:CreateMain()
 		TogglesList.BorderSizePixel = 0
 		TogglesList.Position = UDim2.new(0, 0, 1, 0)
 		TogglesList.Size = UDim2.new(1, 0, -6.24980021, 211)
-		
+
 		local UIListLayout_2 = Instance.new("UIListLayout")
 		UIListLayout_2.Parent = TogglesList
 		UIListLayout_2.SortOrder = Enum.SortOrder.LayoutOrder
-		
+
 		local ClientSettings = Instance.new("TextButton")
 		ClientSettings.Parent = TogglesList
 		ClientSettings.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
@@ -393,7 +395,7 @@ function Library:CreateMain()
 		ClientSettings.Text = ""
 		ClientSettings.Size = UDim2.new(1, 0, 0, 22)
 		ClientSettings.Visible = false
-		
+
 		local OpenClientMenu = false
 		local ClientOpen = Instance.new("TextButton")
 		ClientOpen.Parent = ClientSettings
@@ -410,7 +412,7 @@ function Library:CreateMain()
 		ClientOpen.TextScaled = true
 		ClientOpen.TextSize = 14.000
 		ClientOpen.TextWrapped = true
-		
+
 		local SettingsName = Instance.new("TextLabel")
 		SettingsName.Parent = ClientSettings
 		SettingsName.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -425,7 +427,7 @@ function Library:CreateMain()
 		SettingsName.TextColor3 = Color3.fromRGB(255, 255, 255)
 		SettingsName.TextSize = 13.000
 		SettingsName.TextXAlignment = Enum.TextXAlignment.Left
-		
+
 		local ClientMenuOld = UDim2.new(1, 0, 0, 0)
 		local ClientMenuNew = UDim2.new(1, 0, 0, 65)
 		local ClientMenu = Instance.new("Frame")
@@ -437,7 +439,7 @@ function Library:CreateMain()
 		ClientMenu.Position = UDim2.new(0, 0, 0.497959971, 0)
 		ClientMenu.Size = UDim2.new(1, 0, 0, 65)
 		ClientMenu.Visible = false
-		
+
 		local ClientList = Instance.new("ScrollingFrame")
 		ClientList.Parent = ClientMenu
 		ClientList.Active = true
@@ -450,11 +452,11 @@ function Library:CreateMain()
 		ClientList.VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Left
 		ClientList.ScrollBarImageColor3 = Color3.fromRGB(0, 255, 255)
 		ClientList.CanvasSize = UDim2.new(0, 0, 1, 0)
-		
+
 		local UIListLayout_4 = Instance.new("UIListLayout")
 		UIListLayout_4.Parent = ClientList
 		UIListLayout_4.SortOrder = Enum.SortOrder.LayoutOrder
-		
+
 		local MobileSupport = Instance.new("TextButton")
 		MobileSupport.Parent = ClientList
 		MobileSupport.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -467,7 +469,7 @@ function Library:CreateMain()
 		MobileSupport.Text = ""
 		MobileSupport.TextColor3 = Color3.fromRGB(0, 0, 0)
 		MobileSupport.TextSize = 14.000
-		
+
 		local MobileSupportName = Instance.new("TextLabel")
 		MobileSupportName.Parent = MobileSupport
 		MobileSupportName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -481,7 +483,7 @@ function Library:CreateMain()
 		MobileSupportName.TextColor3 = Color3.fromRGB(255, 255, 255)
 		MobileSupportName.TextSize = 13.000
 		MobileSupportName.TextXAlignment = Enum.TextXAlignment.Left
-		
+
 		local MobileSupportEnabled = false
 		local MobileSupportStatus = Instance.new("Frame")
 		MobileSupportStatus.Name = "MobileSupportStatus"
@@ -491,11 +493,11 @@ function Library:CreateMain()
 		MobileSupportStatus.BorderSizePixel = 0
 		MobileSupportStatus.Position = UDim2.new(0.075000003, 0, 0.254000008, 0)
 		MobileSupportStatus.Size = UDim2.new(0, 10, 0, 10)
-		
+
 		local UICorner_4 = Instance.new("UICorner")
 		UICorner_4.CornerRadius = UDim.new(0, 3)
 		UICorner_4.Parent = MobileSupportStatus
-		
+
 		MobileSupport.MouseButton1Click:Connect(function()
 			MobileSupportEnabled = not MobileSupportEnabled
 			if MobileSupportEnabled then
@@ -506,7 +508,7 @@ function Library:CreateMain()
 				MobileSupportStatus.BackgroundColor3 = Color3.fromRGB(175, 0, 0)
 			end
 		end)
-		
+
 		local KeybindChanger = Instance.new("TextBox")
 		KeybindChanger.Parent = ClientList
 		KeybindChanger.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
@@ -530,11 +532,11 @@ function Library:CreateMain()
 				end       
 			end
 		end)
-		
+
 		if customsettings then
 			ClientSettings.Visible = true
 		end
-		
+
 		ClientSettings.MouseButton2Click:Connect(function()
 			OpenClientMenu = not OpenClientMenu
 			if OpenClientMenu then
@@ -545,7 +547,7 @@ function Library:CreateMain()
 				TweenService:Create(ClientMenu, TweenInfo.new(0.2), {Visible = false, Size = ClientMenuOld}):Play()
 			end
 		end)
-		
+
 		ClientOpen.MouseButton1Click:Connect(function()
 			OpenClientMenu = not OpenClientMenu
 			if OpenClientMenu then
@@ -556,7 +558,7 @@ function Library:CreateMain()
 				TweenService:Create(ClientMenu, TweenInfo.new(0.2), {Visible = false, Size = ClientMenuOld}):Play()
 			end
 		end)
-		
+
 		function Tabs:CreateToggle(ToggleButton)
 			ToggleButton = {
 				Name = ToggleButton.Name,
@@ -574,7 +576,7 @@ function Library:CreateMain()
 				ToggleButton.Enabled = Settings.ToggleButton[ToggleButton.Name].Enabled
 				ToggleButton.Keybind = Settings.ToggleButton[ToggleButton.Name].Keybind
 			end
-			
+
 			local ToggleButtonHolder = Instance.new("TextButton")
 			ToggleButtonHolder.Parent = TogglesList
 			ToggleButtonHolder.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
@@ -588,7 +590,7 @@ function Library:CreateMain()
 			ToggleButtonHolder.Text = ""
 			ToggleButtonHolder.TextColor3 = Color3.fromRGB(0, 0, 0)
 			ToggleButtonHolder.TextSize = 14.000
-			
+
 			local OpenToggleMenu = false
 			local OpenMenu = Instance.new("TextButton")
 			OpenMenu.Parent = ToggleButtonHolder
@@ -604,7 +606,7 @@ function Library:CreateMain()
 			OpenMenu.TextScaled = true
 			OpenMenu.TextSize = 14.000
 			OpenMenu.TextWrapped = true
-			
+
 			local ToggleStatus = Instance.new("Frame")
 			ToggleStatus.Parent = ToggleButtonHolder
 			ToggleStatus.BackgroundColor3 = Color3.fromRGB(175, 0, 0)
@@ -612,11 +614,11 @@ function Library:CreateMain()
 			ToggleStatus.BorderSizePixel = 0
 			ToggleStatus.Position = UDim2.new(0.0508474559, 0, 0.254365265, 0)
 			ToggleStatus.Size = UDim2.new(0, 10, 0, 10)
-			
+
 			local UICorner_2 = Instance.new("UICorner")
 			UICorner_2.CornerRadius = UDim.new(0, 3)
 			UICorner_2.Parent = ToggleStatus
-			
+
 			local ToggleName = Instance.new("TextLabel")
 			ToggleName.Parent = ToggleButtonHolder
 			ToggleName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -630,7 +632,7 @@ function Library:CreateMain()
 			ToggleName.TextColor3 = Color3.fromRGB(255, 255, 255)
 			ToggleName.TextSize = 13.000
 			ToggleName.TextXAlignment = Enum.TextXAlignment.Left
-			
+
 			local ToggleMenuOld = UDim2.new(1, 0, 0, 0)
 			local ToggleMenuNew = UDim2.new(1, 0, 0, 65)
 			local ToggleMenu = Instance.new("Frame")
@@ -643,7 +645,7 @@ function Library:CreateMain()
 			ToggleMenu.Position = UDim2.new(0, 0, 0.497959971, 0)
 			ToggleMenu.Size = UDim2.new(1, 0, 0, 0)
 			ToggleMenu.Visible = false
-			
+
 			local KeyBinds = Instance.new("TextBox")
 			KeyBinds.Parent = ToggleMenu
 			KeyBinds.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
@@ -667,7 +669,7 @@ function Library:CreateMain()
 					end       
 				end
 			end)
-			
+
 			local SettingsList = Instance.new("ScrollingFrame")
 			SettingsList.Parent = ToggleMenu
 			SettingsList.Active = true
@@ -680,11 +682,11 @@ function Library:CreateMain()
 			SettingsList.VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Left
 			SettingsList.ScrollBarImageColor3 = Color3.fromRGB(0, 255, 255)
 			SettingsList.Visible = false
-			
+
 			local UIListLayout_3 = Instance.new("UIListLayout")
 			UIListLayout_3.Parent = SettingsList
 			UIListLayout_3.SortOrder = Enum.SortOrder.LayoutOrder
-			
+
 			local function ToggleButtonClicked()
 				if ToggleButton.Enabled then
 					ToggleStatus.BackgroundColor3 = Color3.fromRGB(0, 175, 0)
@@ -696,7 +698,7 @@ function Library:CreateMain()
 					Settings.ToggleButton[ToggleButton.Name].Enabled = ToggleButton.Enabled
 				end
 			end
-			
+
 			local function ToggleButtonOnHeld()
 				local MobileButtons = Instance.new("TextButton")
 				MobileButtons.Parent = OtherFrame
@@ -715,11 +717,11 @@ function Library:CreateMain()
 				MobileButtons.TextWrapped = true
 				MobileButtons.TextScaled = true
 				MakeDraggable(MobileButtons)
-					
+
 				local UICorner_6 = Instance.new("UICorner")
 				UICorner_6.CornerRadius = UDim.new(1, 0)
 				UICorner_6.Parent = MobileButtons
-					
+
 				local function MobileButtonsOnClicked()
 					if ToggleButton.Enabled then
 						MobileButtons.BackgroundColor3 = Color3.fromRGB(0, 175, 0)
@@ -733,13 +735,13 @@ function Library:CreateMain()
 						Settings.ToggleButton[ToggleButton.Name].Enabled = ToggleButton.Enabled
 					end
 				end
-					
+
 				local function CheckPos()
 					local CheckX = MobileButtons.AbsolutePosition.X >= TrashCans.AbsolutePosition.X and MobileButtons.AbsolutePosition.X + MobileButtons.AbsoluteSize.X <= TrashCans.AbsolutePosition.X + TrashCans.AbsoluteSize.X
 					local CheckY = MobileButtons.AbsolutePosition.Y >= TrashCans.AbsolutePosition.Y and MobileButtons.AbsolutePosition.Y + MobileButtons.AbsoluteSize.Y <= TrashCans.AbsolutePosition.Y + TrashCans.AbsoluteSize.Y
 					return CheckX and CheckY
 				end
-					
+
 				MobileButtons.MouseButton1Click:Connect(function()
 					ToggleButton.Enabled = not ToggleButton.Enabled
 					MobileButtonsOnClicked()
@@ -748,7 +750,7 @@ function Library:CreateMain()
 						ToggleButton.Callback(ToggleButton.Enabled)
 					end
 				end)
-					
+
 				spawn(function()
 					while true do
 						wait()
@@ -758,16 +760,16 @@ function Library:CreateMain()
 					end
 				end)
 			end
-			
+
 			ToggleButtonHolder.MouseButton1Click:Connect(function()
 				ToggleButton.Enabled = not ToggleButton.Enabled
 				ToggleButtonClicked()
-				
+
 				if ToggleButton.Callback then
 					ToggleButton.Callback(ToggleButton.Enabled)
 				end
 			end)
-			
+
 			OpenMenu.MouseButton1Click:Connect(function()
 				OpenToggleMenu = not OpenToggleMenu
 				if OpenToggleMenu then
@@ -780,7 +782,7 @@ function Library:CreateMain()
 					SettingsList.Visible = false
 				end
 			end)
-			
+
 			local HoldTime = 3
 			local Holding = false
 			ToggleButtonHolder.MouseButton1Down:Connect(function()
@@ -792,7 +794,7 @@ function Library:CreateMain()
 					end
 				end
 			end)
-			
+
 			ToggleButtonHolder.MouseButton2Click:Connect(function()
 				OpenToggleMenu = not OpenToggleMenu
 				if OpenToggleMenu then
@@ -805,7 +807,7 @@ function Library:CreateMain()
 					SettingsList.Visible = false
 				end
 			end)
-			
+
 			if ToggleButton.Keybind then
 				UserInputService.InputBegan:Connect(function(Input, isTyping)
 					if Input.KeyCode == Enum.KeyCode[ToggleButton.Keybind] and not isTyping then
@@ -822,12 +824,12 @@ function Library:CreateMain()
 			if ToggleButton.Enabled then
 				ToggleButton.Enabled = true
 				ToggleButtonClicked()
-				
+
 				if ToggleButton.Callback then
 					ToggleButton.Callback(ToggleButton.Enabled)
 				end
 			end
-			
+
 			spawn(function()
 				repeat
 					wait()
@@ -841,7 +843,7 @@ function Library:CreateMain()
 					end
 				until not ToggleButton.AutoDisable
 			end)
-			
+
 			function ToggleButton:CreateMiniToggle(MiniToggle)
 				MiniToggle = {
 					Name = MiniToggle.Name,
@@ -855,7 +857,7 @@ function Library:CreateMain()
 				else
 					MiniToggle.Enabled = Settings.ToggleButton.MiniToggle[MiniToggle.Name].Enabled
 				end
-				
+
 				local MiniToggleHolder = Instance.new("TextButton")
 				MiniToggleHolder.Parent = SettingsList
 				MiniToggleHolder.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -868,7 +870,7 @@ function Library:CreateMain()
 				MiniToggleHolder.Text = ""
 				MiniToggleHolder.TextColor3 = Color3.fromRGB(0, 0, 0)
 				MiniToggleHolder.TextSize = 14.000
-				
+
 				local MiniToggleHolderName = Instance.new("TextLabel")
 				MiniToggleHolderName.Parent = MiniToggleHolder
 				MiniToggleHolderName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -882,7 +884,7 @@ function Library:CreateMain()
 				MiniToggleHolderName.TextColor3 = Color3.fromRGB(255, 255, 255)
 				MiniToggleHolderName.TextSize = 13.000
 				MiniToggleHolderName.TextXAlignment = Enum.TextXAlignment.Left
-				
+
 				local MiniToggleHolderStatus = Instance.new("Frame")
 				MiniToggleHolderStatus.Parent = MiniToggleHolder
 				MiniToggleHolderStatus.BackgroundColor3 = Color3.fromRGB(175, 0, 0)
@@ -890,11 +892,11 @@ function Library:CreateMain()
 				MiniToggleHolderStatus.BorderSizePixel = 0
 				MiniToggleHolderStatus.Position = UDim2.new(0.075000003, 0, 0.254000008, 0)
 				MiniToggleHolderStatus.Size = UDim2.new(0, 10, 0, 10)
-				
+
 				local UICorner = Instance.new("UICorner")
 				UICorner.CornerRadius = UDim.new(0, 3)
 				UICorner.Parent = MiniToggleHolderStatus
-				
+
 				local function MiniToggleClick()
 					if MiniToggle.Enabled then
 						MiniToggleHolderStatus.BackgroundColor3 = Color3.fromRGB(0, 175, 0)
@@ -904,27 +906,27 @@ function Library:CreateMain()
 						Settings.ToggleButton.MiniToggle[MiniToggle.Name].Enabled = MiniToggle.Enabled
 					end
 				end
-				
+
 				MiniToggleHolder.MouseButton1Click:Connect(function()
 					MiniToggle.Enabled = not MiniToggle.Enabled
 					MiniToggleClick()
-					
+
 					if MiniToggle.Callback then
 						MiniToggle.Callback(MiniToggle.Enabled)
 					end
 				end)
-				
+
 				if MiniToggle.Enabled then
 					MiniToggle.Enabled = true
 					MiniToggleClick()
-					
+
 					if MiniToggle.Callback then
 						MiniToggle.Callback(MiniToggle.Enabled)
 					end
 				end
 				return MiniToggle
 			end
-			
+
 			function ToggleButton:CreateSlider(Slider)
 				Slider = {
 					Name = Slider.Name,
@@ -940,10 +942,10 @@ function Library:CreateMain()
 				else
 					Slider.Default = Settings.ToggleButton.Sliders[Slider.Name].Default
 				end
-				
+
 				local Value
 				local Dragged = false
-				
+
 				local SliderHolder = Instance.new("Frame")
 				SliderHolder.Parent = SettingsList
 				SliderHolder.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -951,7 +953,7 @@ function Library:CreateMain()
 				SliderHolder.BorderColor3 = Color3.fromRGB(0, 0, 0)
 				SliderHolder.BorderSizePixel = 0
 				SliderHolder.Size = UDim2.new(1, 0, 0, 25)
-				
+
 				local SliderHolderName = Instance.new("TextLabel")
 				SliderHolderName.Parent = SliderHolder
 				SliderHolderName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -965,7 +967,7 @@ function Library:CreateMain()
 				SliderHolderName.TextColor3 = Color3.fromRGB(255, 255, 255)
 				SliderHolderName.TextSize = 13.000
 				SliderHolderName.TextXAlignment = Enum.TextXAlignment.Left
-				
+
 				local SliderHolderBack = Instance.new("Frame")
 				SliderHolderBack.Parent = SliderHolder
 				SliderHolderBack.BackgroundColor3 = Color3.fromRGB(105, 85, 85)
@@ -973,14 +975,14 @@ function Library:CreateMain()
 				SliderHolderBack.BorderSizePixel = 0
 				SliderHolderBack.Position = UDim2.new(0.0850000009, 0, 0.800000012, 0)
 				SliderHolderBack.Size = UDim2.new(0, 100, 0, 2)
-				
+
 				local SliderHolderFront = Instance.new("Frame")
 				SliderHolderFront.Parent = SliderHolderBack
 				SliderHolderFront.BackgroundColor3 = Color3.fromRGB(89, 143, 77)
 				SliderHolderFront.BorderColor3 = Color3.fromRGB(0, 0, 0)
 				SliderHolderFront.BorderSizePixel = 0
 				SliderHolderFront.Size = UDim2.new(0, 50, 0, 2)
-				
+
 				local SliderHolderTriggerer = Instance.new("TextButton")
 				SliderHolderTriggerer.Parent = SliderHolderFront
 				SliderHolderTriggerer.BackgroundColor3 = Color3.fromRGB(88, 117, 153)
@@ -992,7 +994,7 @@ function Library:CreateMain()
 				SliderHolderTriggerer.Text = ""
 				SliderHolderTriggerer.TextColor3 = Color3.fromRGB(0, 0, 0)
 				SliderHolderTriggerer.TextSize = 14.000
-				
+
 				local function SliderDragged(input)
 					local InputPos = input.Position
 					Value = math.clamp((InputPos.X - SliderHolderBack.AbsolutePosition.X) / SliderHolderBack.AbsoluteSize.X, 0, 1)
@@ -1000,7 +1002,7 @@ function Library:CreateMain()
 					SliderHolderFront.Size = UDim2.fromScale(Value, 1)
 					SliderHolderName.Text = Slider.Name .. ": " .. SliderValue
 					Slider.Callback(SliderValue)
-					Settings.ToggleButton.Sliders[Slider.Name].Default = Slider.Default
+					Settings.ToggleButton.Sliders[Slider.Name].Default = SliderValue
 				end
 
 				SliderHolderTriggerer.MouseButton1Down:Connect(function()
@@ -1018,14 +1020,16 @@ function Library:CreateMain()
 						Dragged = false
 					end
 				end)
-				
+
 				if Slider.Default then
+					Value = (Slider.Default - Slider.Min) / (Slider.Max - Slider.Min)
+					SliderHolderFront.Size = UDim2.fromScale(Value, 1)
 					SliderHolderName.Text = Slider.Name .. ": " .. Slider.Default
 					Slider.Callback(Slider.Default)
 				end
 				return Slider
 			end
-			
+
 			function ToggleButton:CreateDropdown(Dropdown)
 				Dropdown = {
 					Name = Dropdown.Name,
@@ -1041,6 +1045,8 @@ function Library:CreateMain()
 					Dropdown.Default = Settings.ToggleButton.Dropdown[Dropdown.Name].Default
 				end
 				
+				local Selected
+				
 				local DropdownHolder = Instance.new("TextButton")
 				DropdownHolder.Name = "DropdownHolder"
 				DropdownHolder.Parent = SettingsList
@@ -1053,7 +1059,7 @@ function Library:CreateMain()
 				DropdownHolder.Text = ""
 				DropdownHolder.TextColor3 = Color3.fromRGB(0, 0, 0)
 				DropdownHolder.TextSize = 14.000
-				
+
 				local ModeText = Instance.new("TextLabel")
 				ModeText.Parent = DropdownHolder
 				ModeText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -1067,7 +1073,7 @@ function Library:CreateMain()
 				ModeText.TextColor3 = Color3.fromRGB(255, 255, 255)
 				ModeText.TextSize = 13.000
 				ModeText.TextXAlignment = Enum.TextXAlignment.Left
-				
+
 				local SelectedText = Instance.new("TextLabel")
 				SelectedText.Parent = DropdownHolder
 				SelectedText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -1081,19 +1087,20 @@ function Library:CreateMain()
 				SelectedText.TextColor3 = Color3.fromRGB(255, 255, 255)
 				SelectedText.TextSize = 13.000
 				SelectedText.TextXAlignment = Enum.TextXAlignment.Left
-			
+
 				local CurrentDropdown = 1
 				DropdownHolder.MouseButton1Click:Connect(function()
 					SelectedText.Text = Dropdown.List[CurrentDropdown]
+					Selected = Dropdown.List[CurrentDropdown]
 					Dropdown.Callback(Dropdown.List[CurrentDropdown])
 					CurrentDropdown = CurrentDropdown % #Dropdown.List + 1
-					Settings.ToggleButton.Dropdown[Dropdown.Name].Default = Dropdown.Default
+					Settings.ToggleButton.Dropdown[Dropdown.Name].Default = Selected
 				end)
-				
+
 				if Dropdown.Default then
 					Dropdown.Callback(Dropdown.Default)
+					SelectedText.Text = Dropdown.Default
 				end
-				
 				return Dropdown
 			end
 			return ToggleButton
