@@ -361,7 +361,7 @@ spawn(function()
 end)
 
 spawn(function()
-	local Boost = nil
+	local Boost = 75
 	local HumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 	local LongJump = Tabs.Movement:CreateToggle({
 		Name = "LongJump",
@@ -377,17 +377,18 @@ spawn(function()
 			end
 		end
 	})
-	local CustomBoost = LongJump:CreateSlider({
+	local CustomBoostL = LongJump:CreateSlider({
 		Name = "Boost",
 		Min = 50,
 		Max = 120,
-		Default = 85,
+		Default = 75,
 		Callback = function(value)
 			Boost = value
 		end
 	})
 end)
 
+--[[
 spawn(function()
 	local HumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 	local Enabled, Diagonal, Expand = false, false, nil
@@ -445,7 +446,7 @@ spawn(function()
 		end
 	})
 end)
-
+--]]
 spawn(function()
 	local Enabled, NewSpeed, Mode = true, nil, nil
 	local OldGravity = game.Workspace.Gravity
@@ -573,7 +574,7 @@ spawn(function()
 end)
 
 spawn(function()
-	local Enabled = false
+	local Enabled, NearestPlayer, TargetImage  = false, nil, nil
 	local TargetHUD = Tabs.Render:CreateToggle({
 		Name = "TargetHUD",
 		Callback = function(callback)
@@ -581,12 +582,13 @@ spawn(function()
 			if callback then
 				repeat
 					wait()
-					local NearestPlayer = GetNearestPlayer(30)
+					NearestPlayer = GetNearestPlayer(30)
 					if NearestPlayer then
-						local TargetImage = Players:GetUserThumbnailAsync(NearestPlayer.UserId, Enum.ThumbnailType.AvatarBust, Enum.ThumbnailSize.Size48x48)
-						Main:TargetHud(NearestPlayer.Name, TargetImage, NearestPlayer.Character:FindFirstChildOfClass("Humanoid"), Humanoid)
+						TargetImage = Players:GetUserThumbnailAsync(NearestPlayer.UserId, Enum.ThumbnailType.AvatarBust, Enum.ThumbnailSize.Size48x48)
+						Main:TargetHud(NearestPlayer.Name, TargetImage, NearestPlayer.Character:FindFirstChildOfClass("Humanoid"), Humanoid, true)
 					end
 				until not Enabled
+				Main:TargetHud(NearestPlayer.Name, TargetImage, NearestPlayer.Character:FindFirstChildOfClass("Humanoid"), Humanoid, false)
 			end
 		end
 	})
