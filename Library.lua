@@ -4,11 +4,20 @@ local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
 local PlayerGui = game:GetService("Players").LocalPlayer.PlayerGui
 local CoreGui = game:GetService("CoreGui")
+local Library = {
+	CurrentVersion = 1.8,
+	Settings = {
+		LibraryKeybind = "RightShift",
+		LibraryColor = Color3.fromRGB(255, 255, 255),
+		MobileSupport = false,
+		Uninjected = false,
+	}
+}
 
---ConfigSystem
 local MainFolder, ConfigFolder, LogsFolder = "Eternal", "Eternal/configs", "Eternal/logs"
 local AutoSave = false
-local Settings = { ToggleButton = { MiniToggle = {}, Sliders = {}, Dropdown = {} } }
+local SaveDelay
+local Settings = {ToggleButton = {MiniToggle = {}, Sliders = {}, Dropdown = {}}}
 
 local function LoadSettings(path)
 	return isfile(path) and HttpService:JSONDecode(readfile(path)) or nil
@@ -23,24 +32,17 @@ if isfolder(MainFolder) and isfolder(ConfigFolder) and isfolder(LogsFolder) then
 	local LoadedSettings = LoadSettings(FileMain)
 	if LoadedSettings then Settings = LoadedSettings end
 	AutoSave = true
-
+	SaveDelay = 3
 	spawn(function()
 		while AutoSave do
-			wait(3)
+			wait(SaveDelay)
 			SaveSettings(FileMain, Settings)
+			if Library.Settings.Uninjected then
+				SaveDelay = 860000
+			end
 		end
 	end)
 end
-
---Library
-local Library = {
-	CurrentVersion = 1.8,
-	Settings = {
-		LibraryKeybind = "RightShift",
-		LibraryColor = Color3.fromRGB(255, 255, 255),
-		MobileSupport = false,
-	}
-}
 
 function MakeDraggable(object)
 	local dragging, dragInput, dragStart, startPos
@@ -83,13 +85,23 @@ function Library:CreateMain()
 	local ScreenGui = Instance.new("ScreenGui")
 	ScreenGui.Name = "Eternal_" .. Library.CurrentVersion
 	ScreenGui.ResetOnSpawn = false
-	if RunService:IsStudio() or game.PlaceId == 11630038968 then
+	if RunService:IsStudio() then
 		warn("CoreGui Denied")
 		ScreenGui.Parent = PlayerGui
 	else
 		ScreenGui.Parent = CoreGui
 	end
-
+	
+	spawn(function()
+		repeat
+			wait()
+			if Library.Settings.Uninjected then
+				wait(5)
+				ScreenGui:Destroy()
+			end
+		until not game
+	end)
+	
 	local MainFrame = Instance.new("Frame")
 	MainFrame.Parent = ScreenGui
 	MainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -342,7 +354,7 @@ function Library:CreateMain()
 		HealthFront.Size = UDim2.new(targethumanoid.Health /targethumanoid.MaxHealth, 0, 1, 0)
 		return TargetHuds
 	end	
-	
+
 	function Main:CreateTab(name, customsettings)
 		local Tabs = {}
 
@@ -456,7 +468,58 @@ function Library:CreateMain()
 		local UIListLayout_4 = Instance.new("UIListLayout")
 		UIListLayout_4.Parent = ClientList
 		UIListLayout_4.SortOrder = Enum.SortOrder.LayoutOrder
+		
+		local Uninjects = Instance.new("TextButton")
+		Uninjects.Parent = ClientList
+		Uninjects.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		Uninjects.BackgroundTransparency = 1.000
+		Uninjects.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		Uninjects.BorderSizePixel = 0
+		Uninjects.Size = UDim2.new(1, 0, 0, 23)
+		Uninjects.AutoButtonColor = false
+		Uninjects.Font = Enum.Font.SourceSans
+		Uninjects.Text = ""
+		Uninjects.TextColor3 = Color3.fromRGB(0, 0, 0)
+		Uninjects.TextSize = 14.000
 
+		local UninjectsName = Instance.new("TextLabel")
+		UninjectsName.Parent = Uninjects
+		UninjectsName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		UninjectsName.BackgroundTransparency = 1.000
+		UninjectsName.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		UninjectsName.BorderSizePixel = 0
+		UninjectsName.Position = UDim2.new(0.200000003, 0, 0.158999994, 0)
+		UninjectsName.Size = UDim2.new(0, 80, 0, 15)
+		UninjectsName.Font = Enum.Font.SourceSans
+		UninjectsName.Text = "Uninject"
+		UninjectsName.TextColor3 = Color3.fromRGB(255, 255, 255)
+		UninjectsName.TextSize = 13.000
+		UninjectsName.TextXAlignment = Enum.TextXAlignment.Left
+
+		local UninjectEnabled = false
+		local UninjectStatus = Instance.new("Frame")
+		UninjectStatus.Parent = Uninjects
+		UninjectStatus.BackgroundColor3 = Color3.fromRGB(175, 0, 0)
+		UninjectStatus.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		UninjectStatus.BorderSizePixel = 0
+		UninjectStatus.Position = UDim2.new(0.075000003, 0, 0.254000008, 0)
+		UninjectStatus.Size = UDim2.new(0, 10, 0, 10)
+
+		local UICorner_4 = Instance.new("UICorner")
+		UICorner_4.CornerRadius = UDim.new(0, 3)
+		UICorner_4.Parent = UninjectStatus
+
+		Uninjects.MouseButton1Click:Connect(function()
+			UninjectEnabled = not UninjectEnabled
+			if UninjectEnabled then
+				Library.Settings.MobileSupport = true
+				UninjectStatus.BackgroundColor3 = Color3.fromRGB(0, 175, 0)
+			else
+				Library.Settings.MobileSupport = false
+				UninjectStatus.BackgroundColor3 = Color3.fromRGB(175, 0, 0)
+			end
+		end)
+		
 		local MobileSupport = Instance.new("TextButton")
 		MobileSupport.Parent = ClientList
 		MobileSupport.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -486,7 +549,6 @@ function Library:CreateMain()
 
 		local MobileSupportEnabled = false
 		local MobileSupportStatus = Instance.new("Frame")
-		MobileSupportStatus.Name = "MobileSupportStatus"
 		MobileSupportStatus.Parent = MobileSupport
 		MobileSupportStatus.BackgroundColor3 = Color3.fromRGB(175, 0, 0)
 		MobileSupportStatus.BorderColor3 = Color3.fromRGB(0, 0, 0)
@@ -843,6 +905,21 @@ function Library:CreateMain()
 					end
 				until not ToggleButton.AutoDisable
 			end)
+			
+			spawn(function()
+				repeat
+					wait()
+					if Library.Settings.Uninjected then
+						wait(3)
+						ToggleButton.Enabled = false
+						ToggleButtonClicked()
+
+						if ToggleButton.Callback then
+							ToggleButton.Callback(ToggleButton.Enabled)
+						end
+					end
+				until not game
+			end)
 
 			function ToggleButton:CreateMiniToggle(MiniToggle)
 				MiniToggle = {
@@ -924,6 +1001,22 @@ function Library:CreateMain()
 						MiniToggle.Callback(MiniToggle.Enabled)
 					end
 				end
+				
+				spawn(function()
+					repeat
+						wait()
+						if Library.Settings.Uninjected then
+							wait(3)
+							MiniToggle.Enabled = false
+							MiniToggleClick()
+
+							if MiniToggle.Callback then
+								MiniToggle.Callback(MiniToggle.Enabled)
+							end	
+						end
+					until not game
+				end)
+				
 				return MiniToggle
 			end
 
@@ -1044,9 +1137,9 @@ function Library:CreateMain()
 				else
 					Dropdown.Default = Settings.ToggleButton.Dropdown[Dropdown.Name].Default
 				end
-				
+
 				local Selected
-				
+
 				local DropdownHolder = Instance.new("TextButton")
 				DropdownHolder.Name = "DropdownHolder"
 				DropdownHolder.Parent = SettingsList
