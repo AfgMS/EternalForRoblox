@@ -74,13 +74,22 @@ function MakeDraggable(object)
 	end)
 end
 
+function Spoof(length)
+	local Letter = {}
+	for i = 1, length do
+		local RandomLetter = string.char(math.random(97, 122))
+		table.insert(Letter, RandomLetter)
+	end
+	return table.concat(Letter)
+end
+
 function Library:CreateMain()
 	local Main = {}
 
 	local ScreenGui = Instance.new("ScreenGui")
-	ScreenGui.Name = "Delta"
+	ScreenGui.Name = Spoof(math.random(8, 12))
 	if RunService:IsStudio() then
-		warn("CoreGui Denied")
+		warn("Unable to use CoreGui")
 		ScreenGui.ResetOnSpawn = false
 		ScreenGui.Parent = PlayerGui
 	else
