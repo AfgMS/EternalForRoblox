@@ -6,7 +6,7 @@ local PlayerGui = game:GetService("Players").LocalPlayer.PlayerGui
 local CoreGui = game:GetService("CoreGui")
 local MainFolder, ConfigFolder, LogsFolder = "Eternal", "Eternal/configs", "Eternal/logs"
 local AutoSave = false
-local Settings = { ToggleButton = { MiniToggle = {}, Sliders = {}, Dropdown = {} } }
+local Settings = {ToggleButton = {MiniToggle = {}, Sliders = {}, Dropdown = {}}}
 
 local function LoadSettings(path)
 	return isfile(path) and HttpService:JSONDecode(readfile(path)) or nil
@@ -79,9 +79,9 @@ function Library:CreateMain()
 
 	local ScreenGui = Instance.new("ScreenGui")
 	ScreenGui.Name = "Eternal_" .. Library.CurrentVersion
-	ScreenGui.ResetOnSpawn = false
-	if RunService:IsStudio() or game.PlaceId == 11630038968 then
+	if RunService:IsStudio() then
 		warn("CoreGui Denied")
+		ScreenGui.ResetOnSpawn = false
 		ScreenGui.Parent = PlayerGui
 	else
 		ScreenGui.Parent = CoreGui
@@ -127,6 +127,16 @@ function Library:CreateMain()
 	TrashCans.Size = UDim2.new(0, 80, 0, 80)
 	TrashCans.Image = "rbxassetid://8463436236"
 	TrashCans.Visible = false
+	spawn(function()
+		while true do
+			wait()
+			if Library.Settings.MobileSupport then
+				TrashCans.Visible = true
+			else
+				TrashCans.Visible = false
+			end
+		end
+	end)
 
 	local UICorner_7 = Instance.new("UICorner")
 	UICorner_7.CornerRadius = UDim.new(0, 4)
@@ -238,13 +248,17 @@ function Library:CreateMain()
 
 	OpenGui.MouseButton1Click:Connect(function()
 		MainFrame.Visible = not MainFrame.Visible
-		TrashCans.Visible = not TrashCans.Visible
+		if Library.Settings.MobileSupport then
+			TrashCans.Visible = MainFrame.Visible
+		end
 	end)
 
 	UserInputService.InputBegan:Connect(function(Input, isTyping)
 		if Input.KeyCode == Enum.KeyCode[Library.Settings.LibraryKeybind] and not isTyping then
 			MainFrame.Visible = not MainFrame.Visible
-			TrashCans.Visible = not TrashCans.Visible
+			if Library.Settings.MobileSupport then
+				TrashCans.Visible = MainFrame.Visible
+			end
 		end
 	end)
 
@@ -339,7 +353,7 @@ function Library:CreateMain()
 		HealthFront.Size = UDim2.new(targethumanoid.Health /targethumanoid.MaxHealth, 0, 1, 0)
 		return TargetHuds
 	end	
-	
+
 	function Main:CreateTab(name, customsettings)
 		local Tabs = {}
 
@@ -1041,9 +1055,9 @@ function Library:CreateMain()
 				else
 					Dropdown.Default = Settings.ToggleButton.Dropdown[Dropdown.Name].Default
 				end
-				
+
 				local Selected
-				
+
 				local DropdownHolder = Instance.new("TextButton")
 				DropdownHolder.Name = "DropdownHolder"
 				DropdownHolder.Parent = SettingsList
