@@ -139,7 +139,7 @@ spawn(function()
 		end
 	})
 end)
-
+--[[
 spawn(function()
 	local Enabled = false
 	local AutoSword = Tabs.Combat:CreateToggle({
@@ -388,7 +388,6 @@ spawn(function()
 	})
 end)
 
---[[
 spawn(function()
 	local HumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 	local Enabled, Diagonal, Expand = false, false, nil
@@ -446,7 +445,7 @@ spawn(function()
 		end
 	})
 end)
---]]
+
 spawn(function()
 	local Enabled, NewSpeed, Mode = true, nil, nil
 	local OldGravity = game.Workspace.Gravity
@@ -579,3 +578,4 @@ spawn(function()
 		end
 	})
 end)
+--]]
