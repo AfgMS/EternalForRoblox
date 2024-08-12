@@ -79,8 +79,9 @@ function Library:CreateMain()
 	
 	local ProtectGui = protectgui or (syn and syn.protect_gui) or (function() end);
 	local ScreenGui = Instance.new("ScreenGui")
-	ProtectGui(ScreenGui);
-
+	ProtectGui(ScreenGui)
+	ScreenGui.Parent = CoreGui
+	
 	local MainFrame = Instance.new("Frame")
 	MainFrame.Parent = ScreenGui
 	MainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
