@@ -520,20 +520,6 @@ spawn(function()
 end)
 
 spawn(function()
-	local OldHipHeight = Humanoid.HipHeight
-	local Steps = Tabs.Movement:CreateToggle({
-		Name = "Steps",
-		Callback = function(callback)
-			if callback then
-				Humanoid.HipHeight = 3
-			else
-				Humanoid.HipHeight = OldHipHeight
-			end
-		end
-	})
-end)
-
-spawn(function()
 	local function Hightlight(player)
 		if player ~= LocalPlayer and IsAlive(player) then
 			if not player.Character:FindFirstChildOfClass("Highlight") then
@@ -589,41 +575,6 @@ spawn(function()
 					end
 				until not Enabled
 				Main:TargetHud(NearestPlayer.Name, TargetImage, NearestPlayer.Character:FindFirstChildOfClass("Humanoid"), Humanoid, false)
-			end
-		end
-	})
-end)
-
-spawn(function()
-	local Blurz, Size, Enabled = nil, nil, false
-	local Blur = Tabs.Render:CreateToggle({
-		Name = "Blur",
-		Callback = function(callback)
-			Enabled = callback
-			if callback then
-				if not Lighting:FindFirstChildWhichIsA("BlurEffect") then
-					Blurz = Instance.new("BlurEffect")
-					Blurz.Parent = Lighting
-				end
-				repeat
-					wait()
-					Blurz.Size = Size
-				until not Enabled
-			else
-				if Blurz then
-					Blurz:Destroy()
-				end
-			end
-		end
-	})
-	local CustomSize = Blur:CreateSlider({
-		Name = "Size",
-		Min = 0,
-		Max = 100,
-		Default = 28,
-		Callback = function(callback)
-			if callback then
-				Size = callback
 			end
 		end
 	})
