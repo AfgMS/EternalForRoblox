@@ -78,8 +78,7 @@ function Library:CreateMain()
 	local Main = {}
 
 	local ScreenGui = Instance.new("ScreenGui")
-	ScreenGui.Parent = PlayerGui
-	--[[
+	ScreenGui.Name = "Delta"
 	if RunService:IsStudio() then
 		warn("CoreGui Denied")
 		ScreenGui.ResetOnSpawn = false
@@ -87,7 +86,6 @@ function Library:CreateMain()
 	else
 		ScreenGui.Parent = CoreGui
 	end
-	--])
 
 	local MainFrame = Instance.new("Frame")
 	MainFrame.Parent = ScreenGui
