@@ -78,7 +78,6 @@ function Library:CreateMain()
 	local Main = {}
 
 	local ScreenGui = Instance.new("ScreenGui")
-	ScreenGui.Name = "Eternal_" .. Library.CurrentVersion
 	if RunService:IsStudio() then
 		warn("CoreGui Denied")
 		ScreenGui.ResetOnSpawn = false
