@@ -36,7 +36,7 @@ local Library = {
 		LibraryKeybind = "RightShift",
 		LibraryColor = Color3.fromRGB(255, 255, 255),
 		MobileSupport = false,
-		ShowWatermark = false,
+		ShowWatermark = true,
 	}
 }
 
@@ -537,11 +537,11 @@ function Library:CreateMain()
 			Watermark.MouseButton1Click:Connect(function()
 				WatermarkEnabled = not WatermarkEnabled
 				if WatermarkEnabled then
-					Library.Settings.ShowWatermark = true
-					WatermarkStatus.BackgroundColor3 = Color3.fromRGB(0, 175, 0)
-				else
-				Library.Settings.ShowWatermark = false
+					Library.Settings.ShowWatermark = false
 					WatermarkStatus.BackgroundColor3 = Color3.fromRGB(175, 0, 0)
+				else
+				Library.Settings.ShowWatermark = true
+					WatermarkStatus.BackgroundColor3 = Color3.fromRGB(0, 175, 0)
 				end
 			end)
 			
