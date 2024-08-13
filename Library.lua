@@ -36,6 +36,7 @@ local Library = {
 		LibraryKeybind = "RightShift",
 		LibraryColor = Color3.fromRGB(255, 255, 255),
 		MobileSupport = false,
+		ShowWatermark = false,
 	}
 }
 
@@ -170,7 +171,18 @@ function Library:CreateMain()
 		LogoFrame.BorderSizePixel = 0
 		LogoFrame.Position = UDim2.new(0.00932994019, 0, 0.0187969916, 0)
 		LogoFrame.Size = UDim2.new(0, 155, 0, 22)
-
+		LogoFrame.Visible = false
+		spawn(function()
+			while true do
+				wait()
+				if Library.Settings.ShowWatermark then
+					LogoFrame.Visible = true
+				else
+					LogoFrame.Visible = false
+				end
+			end
+		end)
+		
 		local TopFrame = Instance.new("Frame")
 		TopFrame.Parent = LogoFrame
 		TopFrame.BackgroundColor3 = Library.Settings.LibraryColor
@@ -211,6 +223,7 @@ function Library:CreateMain()
 		OpenGui.TextScaled = true
 		OpenGui.TextSize = 14.000
 		OpenGui.TextWrapped = true
+		OpenGui.AutoButtonColor = false
 
 		local UICorner_5 = Instance.new("UICorner")
 		UICorner_5.CornerRadius = UDim.new(0, 4)
@@ -369,7 +382,6 @@ function Library:CreateMain()
 			local Tabs = {}
 
 			local TabHolder = Instance.new("Frame")
-			TabHolder.Name = name
 			TabHolder.Parent = MainFrame
 			TabHolder.BackgroundColor3 = Color3.fromRGB(23, 23, 23)
 			TabHolder.BorderColor3 = Color3.fromRGB(0, 0, 0)
@@ -478,7 +490,58 @@ function Library:CreateMain()
 			local UIListLayout_4 = Instance.new("UIListLayout")
 			UIListLayout_4.Parent = ClientList
 			UIListLayout_4.SortOrder = Enum.SortOrder.LayoutOrder
+			
+			local Watermark = Instance.new("TextButton")
+			Watermark.Parent = ClientList
+			Watermark.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			Watermark.BackgroundTransparency = 1.000
+			Watermark.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			Watermark.BorderSizePixel = 0
+			Watermark.Size = UDim2.new(1, 0, 0, 23)
+			Watermark.AutoButtonColor = false
+			Watermark.Font = Enum.Font.SourceSans
+			Watermark.Text = ""
+			Watermark.TextColor3 = Color3.fromRGB(0, 0, 0)
+			Watermark.TextSize = 14.000
 
+			local WatermarkName = Instance.new("TextLabel")
+			WatermarkName.Parent = Watermark
+			WatermarkName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			WatermarkName.BackgroundTransparency = 1.000
+			WatermarkName.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			WatermarkName.BorderSizePixel = 0
+			WatermarkName.Position = UDim2.new(0.200000003, 0, 0.158999994, 0)
+			WatermarkName.Size = UDim2.new(0, 80, 0, 15)
+			WatermarkName.Font = Enum.Font.SourceSans
+			WatermarkName.Text = "Watermark"
+			WatermarkName.TextColor3 = Color3.fromRGB(255, 255, 255)
+			WatermarkName.TextSize = 13.000
+			WatermarkName.TextXAlignment = Enum.TextXAlignment.Left
+
+			local WatermarkEnabled = false
+			local WatermarkStatus = Instance.new("Frame")
+			WatermarkStatus.Parent = Watermark
+			WatermarkStatus.BackgroundColor3 = Color3.fromRGB(175, 0, 0)
+			WatermarkStatus.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			WatermarkStatus.BorderSizePixel = 0
+			WatermarkStatus.Position = UDim2.new(0.075000003, 0, 0.254000008, 0)
+			WatermarkStatus.Size = UDim2.new(0, 10, 0, 10)
+
+			local UICorner_4444 = Instance.new("UICorner")
+			UICorner_4444.CornerRadius = UDim.new(0, 3)
+			UICorner_4444.Parent = WatermarkStatus
+
+			Watermark.MouseButton1Click:Connect(function()
+				WatermarkEnabled = not WatermarkEnabled
+				if WatermarkEnabled then
+					Library.Settings.ShowWatermark = true
+					WatermarkStatus.BackgroundColor3 = Color3.fromRGB(0, 175, 0)
+				else
+				Library.Settings.ShowWatermark = false
+					WatermarkStatus.BackgroundColor3 = Color3.fromRGB(175, 0, 0)
+				end
+			end)
+			
 			local MobileSupport = Instance.new("TextButton")
 			MobileSupport.Parent = ClientList
 			MobileSupport.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -508,7 +571,6 @@ function Library:CreateMain()
 
 			local MobileSupportEnabled = false
 			local MobileSupportStatus = Instance.new("Frame")
-			MobileSupportStatus.Name = "MobileSupportStatus"
 			MobileSupportStatus.Parent = MobileSupport
 			MobileSupportStatus.BackgroundColor3 = Color3.fromRGB(175, 0, 0)
 			MobileSupportStatus.BorderColor3 = Color3.fromRGB(0, 0, 0)
