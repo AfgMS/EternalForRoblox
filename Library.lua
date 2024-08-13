@@ -88,14 +88,19 @@ function Library:CreateMain()
 		local Main = {}
 
 		local ScreenGui = Instance.new("ScreenGui")
-		ScreenGui.Name = Spoof(math.random(8, 12))
-		if RunService:IsStudio() or game.PlaceId == 11630038968 then
-			warn("CoreGui Disabled")
-			ScreenGui.ResetOnSpawn = false
-			ScreenGui.Parent = PlayerGui
-		else
-			ScreenGui.Parent = CoreGui
+		if not pcall(function() return syn.protect_gui end) then
+			syn = {}
+			syn.protect_gui = function(gui)
+				if RunService:IsStudio() then
+					warn("CoreGui Disabled")
+					gui.ResetOnSpawn = false
+					gui.Parent = PlayerGui
+				else
+					gui.Parent = CoreGui
+				end
+			end
 		end
+		syn.protect_gui(ScreenGui)
 
 		local MainFrame = Instance.new("Frame")
 		MainFrame.Parent = ScreenGui
