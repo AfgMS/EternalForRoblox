@@ -89,6 +89,7 @@ function Library:CreateMain()
 
 	local ScreenGui = Instance.new("ScreenGui")
 	ScreenGui.Name = Spoof(math.random(18, 20))
+	if RunService:IsStudio() then
 		warn("CoreGui Denied")
 		ScreenGui.ResetOnSpawn = false
 		ScreenGui.Parent = PlayerGui
