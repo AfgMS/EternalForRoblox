@@ -97,16 +97,6 @@ function Library:CreateMain()
 				warn("CoreGui Disabled")
 				gui.Parent = PlayerGui
 			else
-				spawn(function()
-					while true do
-						wait(1)
-						gui.Parent = PlayerGui
-						wait(0.2)
-						gui.Parent = CoreGui
-						wait(0.2)
-						gui.Parent = CoreGui:FindFirstChild("RobloxGui")
-					end
-				end)
 				gui.Parent = CoreGui
 			end
 		end
@@ -534,7 +524,7 @@ function Library:CreateMain()
 		local WatermarkEnabled = false
 		local WatermarkStatus = Instance.new("Frame")
 		WatermarkStatus.Parent = Watermark
-		WatermarkStatus.BackgroundColor3 = Color3.fromRGB(175, 0, 0)
+		WatermarkStatus.BackgroundColor3 = Color3.fromRGB(0, 175, 0)
 		WatermarkStatus.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		WatermarkStatus.BorderSizePixel = 0
 		WatermarkStatus.Position = UDim2.new(0.075000003, 0, 0.254000008, 0)
