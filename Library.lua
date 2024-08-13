@@ -260,7 +260,6 @@ function Library:CreateMain()
 		TextLabel.TextColor3 = Library.Settings.LibraryColor
 		TextLabel.TextScaled = true
 		TextLabel.TextSize = 18.000
-		TextLabel.Name = name
 		TextLabel.TextWrapped = true
 		TextLabel.TextXAlignment = Enum.TextXAlignment.Right
 		TextLabel.LayoutOrder = -#name
