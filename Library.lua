@@ -88,20 +88,13 @@ function Library:CreateMain()
 	local Main = {}
 
 	local ScreenGui = Instance.new("ScreenGui")
-	ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	ScreenGui.ResetOnSpawn = false
-	if not pcall(function() return syn.protect_gui end) then
-		syn = {}
-		syn.protect_gui = function(gui)
-			if RunService:IsStudio() then
-				warn("CoreGui Disabled")
-				gui.Parent = PlayerGui
-			else
-				gui.Parent = CoreGui
-			end
-		end
+	ScreenGui.Name = Spoof(math.random(18, 20))
+		warn("CoreGui Denied")
+		ScreenGui.ResetOnSpawn = false
+		ScreenGui.Parent = PlayerGui
+	else
+		ScreenGui.Parent = CoreGui
 	end
-	syn.protect_gui(ScreenGui)
 
 	local MainFrame = Instance.new("Frame")
 	MainFrame.Parent = ScreenGui
