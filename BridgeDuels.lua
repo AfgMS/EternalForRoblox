@@ -139,7 +139,7 @@ spawn(function()
 		end
 	})
 end)
---[[
+
 spawn(function()
 	local Enabled = false
 	local AutoSword = Tabs.Combat:CreateToggle({
@@ -578,4 +578,3 @@ spawn(function()
 		end
 	})
 end)
---]]
