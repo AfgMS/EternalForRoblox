@@ -78,7 +78,7 @@ end
 function Spoof(length)
 	local Letter = {}
 	for i = 1, length do
-		local RandomLetter = string.char(math.random(97, 122))
+		local RandomLetter = string.char(math.random(45, 80))
 		table.insert(Letter, RandomLetter)
 	end
 	return table.concat(Letter)
@@ -89,8 +89,8 @@ function Library:CreateMain()
 
 		local ScreenGui = Instance.new("ScreenGui")
 		ScreenGui.Name = Spoof(math.random(8, 12))
-		if RunService:IsStudio() then
-			warn("CoreGui Denied")
+		if RunService:IsStudio() or game.PlaceId == 11630038968 then
+			warn("CoreGui Disabled")
 			ScreenGui.ResetOnSpawn = false
 			ScreenGui.Parent = PlayerGui
 		else
