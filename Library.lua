@@ -267,7 +267,7 @@ function Library:CreateMain()
 
 	local function RemoveArray(name)
 		for i,v in pairs(ArraylistFrame:GetChildren()) do
-			if v:IsA("TextLabel") and v.Name == name then
+			if v:IsA("TextLabel") and v.Text == name then
 				v:Destroy()
 			end
 		end
