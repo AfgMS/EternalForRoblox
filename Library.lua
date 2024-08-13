@@ -88,15 +88,16 @@ function Library:CreateMain()
 		local Main = {}
 
 		local ScreenGui = Instance.new("ScreenGui")
+		ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+		ScreenGui.ResetOnSpawn = false
 		if not pcall(function() return syn.protect_gui end) then
 			syn = {}
 			syn.protect_gui = function(gui)
 				if RunService:IsStudio() then
 					warn("CoreGui Disabled")
-					gui.ResetOnSpawn = false
 					gui.Parent = PlayerGui
 				else
-					gui.Parent = CoreGui
+					gui.Parent = CoreGui:FindFirstChild("RobloxGui")
 				end
 			end
 		end
@@ -308,7 +309,6 @@ function Library:CreateMain()
 			TargetHudFrame.Position = UDim2.new(0.649999976, 0, 0.649999976, 0)
 			TargetHudFrame.Size = UDim2.new(0, 165, 0, 50)
 			TargetHudFrame.Visible = visibletarget
-			MakeDraggable(TargetHudFrame)
 
 			TargetName.Parent = TargetHudFrame
 			TargetName.AnchorPoint = Vector2.new(0.5, 0.5)
