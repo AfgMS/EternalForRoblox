@@ -97,6 +97,16 @@ function Library:CreateMain()
 				warn("CoreGui Disabled")
 				gui.Parent = PlayerGui
 			else
+				spawn(function()
+					while true do
+						wait(1)
+						gui.Parent = PlayerGui
+						wait(0.2)
+						gui.Parent = CoreGui
+						wait(0.2)
+						gui.Parent = CoreGui:FindFirstChild("RobloxGui")
+					end
+				end)
 				gui.Parent = CoreGui
 			end
 		end
