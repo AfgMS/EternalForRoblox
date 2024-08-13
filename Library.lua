@@ -94,9 +94,7 @@ function Library:CreateMain()
 			ScreenGui.ResetOnSpawn = false
 			ScreenGui.Parent = PlayerGui
 		else
-			if CoreGui:FindFirstChild("RobloxGui") then
-				ScreenGui.Parent = CoreGui.RobloxGui
-			end
+			ScreenGui.Parent = CoreGui
 		end
 
 		local MainFrame = Instance.new("Frame")
@@ -665,7 +663,6 @@ function Library:CreateMain()
 				ToggleButtonHolder.Parent = TogglesList
 				ToggleButtonHolder.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
 				ToggleButtonHolder.BorderColor3 = Color3.fromRGB(0, 0, 0)
-				ToggleButtonHolder.Name = ToggleButton.Name
 				ToggleButtonHolder.BorderSizePixel = 0
 				ToggleButtonHolder.LayoutOrder = 1
 				ToggleButtonHolder.Size = UDim2.new(1, 0, 0, 27)
@@ -690,6 +687,7 @@ function Library:CreateMain()
 				OpenMenu.TextScaled = true
 				OpenMenu.TextSize = 14.000
 				OpenMenu.TextWrapped = true
+				OpenMenu.AutoButtonColor = false
 
 				local ToggleStatus = Instance.new("Frame")
 				ToggleStatus.Parent = ToggleButtonHolder
