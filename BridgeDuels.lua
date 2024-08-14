@@ -1,11 +1,11 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Library.lua"))()
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-local CurrentCamera = game:GetService("Workspace").CurrentCamera
-
+local CurrentCamera = game.Workspace.CurrentCamera
 local Main = Library:CreateMain()
 local Tabs = {
 	Combat = Main:CreateTab("Combat", false),
@@ -15,96 +15,184 @@ local Tabs = {
 	Exploit = Main:CreateTab("Exploit", false),
 	Misc = Main:CreateTab("Misc", true)
 }
-
-local function IsAlive(v)
-	return v and v.Character and v.Character:FindFirstChildOfClass("Humanoid") and v.Character:FindFirstChildOfClass("Humanoid").Health > 0
+--[[ --Features
+local ToggleButtons = {
+	Combat = {
+		AimAssist = {}, Yes
+		AutoClicker = {}, Yes
+		AutoSword = {}, Yes
+		Criticals = {}, Yes
+		KillSults = {}, Yes
+		KillAura = {}, Yes
+		Velocity = {}, No (for now)
+	},
+	Movement = {
+		Fly = {}, Yes
+		HighJump = {},
+		LongJump = {},
+		Scaffold = {},
+		Speed = {},
+		Sprint = {},
+		TargetStrafe = {}
+	},
+	Player = {
+		ChestStealer = {},
+		NoFall = {},
+	},
+	Render = {
+		Blur = {},
+		Chams = {},
+		ESP = {},
+		FullBright = {},
+		HUD = {},
+		TargetHUD = {},
+		TimeChanger = {},
+	},
+	Exploit = {
+		AntiVoid = {},
+		Bypass = {},
+		Disabler = {},
+		AutoHeal = {},
+		NoRotate = {}
+	},
+	Misc = {
+		Timer = {},
+	}
+}
+--]]
+function IsAlive(entity)
+	return entity and entity.Character and entity.Character:FindFirstChildOfClass("Humanoid") and entity.Character:FindFirstChildOfClass("Humanoid").Health > 0
 end
 
-local function GetNearestPlayer(MaxDist)
+function GetPlayer(MaxDist, Mode)
 	local Nearest, MinDist
 
-	for i,v in pairs(Players:GetPlayers()) do
+	for i, v in pairs(Players:s()) do
 		if v ~= LocalPlayer and IsAlive(v) then
 			local Distance = (v.Character:FindFirstChild("HumanoidRootPart").Position - LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position).Magnitude
-			if Distance <= MaxDist and (not MinDist or Distance < MinDist) then
-				MinDist = Distance
-				Nearest = v
+			if Mode == "Distance" then
+				if Distance <= MaxDist and (not MinDist or Distance < MinDist) then
+					MinDist = Distance
+					Nearest = v
+				end
+			elseif Mode == "Health" then
+				local Humanoid = v.Character:FindFirstChild("Humanoid")
+				if Humanoid then
+					local Health = Humanoid.Health
+					if Distance <= MaxDist and (not MinDist or Health < MinDist) then
+						MinDist = Health
+						Nearest = v
+					end
+				end
 			end
 		end
 	end
 	return Nearest
 end
 
-local function GetTool(matchname)
-	local Item = nil
-	for i, v in pairs(LocalPlayer.Character:GetChildren()) do
-		if v:IsA("Tool") and string.match(v.Name, matchname) then
-			Item = v
+function GetTools(name)
+	local TooResults
+	for _,tool in pairs(LocalPlayer.Backpack:GetChildren()) do
+		if tool:IsA("Tool") and tool.Name:match(name) then
+			TooResults = tool
 		end
 	end
-	return Item
+	return TooResults
+end
+
+function CheckTools(name)
+	local TooResults
+	for _,tool in pairs(LocalPlayer.Character:GetChildren()) do
+		if tool:IsA("Tool") and tool.Name:match(name) then
+			TooResults = tool
+		end
+	end
+	return TooResults
+end
+
+function BowFire(pos, power)
+	local Bow = LocalPlayer.Character:FindFirstChildWhichIsA("Tool")
+	if Bow.Name:match("Bow") then
+		Bow:WaitForChild("__comm__"):WaitForChild("RF"):FindFirstChild("Fire"):InvokeServer({
+			[1] = pos,
+			[2] = power
+		})
+	end
+end
+
+function PlaceFire(pos)
+	ReplicatedStorage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("PlaceBlock"):InvokeServer({
+		[1] = pos
+	})
 end
 
 spawn(function()
-	local Enabled, Range, Delays, Object, Direction, Hold = false, nil, 0, nil, nil, false
+	local Enabled, Hold, HoldType, Distance, Aim = false, false, nil, nil, nil
+	local Direction = Vector3.zero
 	local AimAssist = Tabs.Combat:CreateToggle({
 		Name = "AimAssist",
 		Callback = function(callback)
 			Enabled = callback
 			if callback then
 				repeat
-					task.wait(Delays)
-					local NearestPlayer = GetNearestPlayer(Range)
-					if NearestPlayer then
-						if Object == "Head" then
-							Direction = (NearestPlayer.Character:WaitForChild("Head").Position - CurrentCamera.CFrame.Position).unit
-						elseif Object == "HumRootPart" then
-							Direction = (NearestPlayer.Character:WaitForChild("HumanoidRootPart").Position - CurrentCamera.CFrame.Position).unit
-						elseif Object == "LowerTorso" then
-							Direction = (NearestPlayer.Character:WaitForChild("LowerTorso").Position - CurrentCamera.CFrame.Position).unit
-						end
-						local SetLookAt = CFrame.new(CurrentCamera.CFrame.Position, CurrentCamera.CFrame.Position + Direction)
-						if Hold then
-							if UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
-								CurrentCamera.CFrame = SetLookAt
+					wait(0.01)
+					local Player = GetPlayer(Distance, "Distance")
+					if Aim == "Head" then
+						Direction = (Player.Character:FindFirstChild("Head").Position - CurrentCamera.CFrame.Position).unit
+					elseif Aim == "Torso" then
+						Direction = (Player.Character:FindFirstChild("HumanoidRootPart").Position - CurrentCamera.CFrame.Position).unit
+					elseif Aim == "Leg" then
+						Direction = (Player.Character:FindFirstChild("LowerTorso").Position - CurrentCamera.CFrame.Position).unit
+					end
+					local NewCFrame = CFrame.new(CurrentCamera.CFrame.Position, CurrentCamera.CFrame.Position + Direction)
+					if Hold then
+						if Player then
+							if UserInputService:IsMouseButtonPressed(Enum.UserInputType[HoldType]) then
+								CurrentCamera.CFrame = NewCFrame
 							end
 						else
-							CurrentCamera.CFrame = SetLookAt
+							CurrentCamera.CFrame = NewCFrame
 						end
 					end
 				until not Enabled
 			end
 		end
 	})
-	local CustomObject = AimAssist:CreateDropdown({
-		Name = "AimPart",
-		List = {"Head", "HumRootPart", "LowerTorso"},
-		Default = "HumRootPart",
+	local CustomDirection = AimAssist:CreateDropdown({
+		Name = "Directions",
+		List = {"Head", "Torso", "Leg"},
+		Default = "Torso",
 		Callback = function(callback)
 			if callback then
-				Object = callback
+				Aim = callback
 			end
 		end
 	})
-	local HoldToAim = AimAssist:CreateMiniToggle({
+	local CustomHoldType = AimAssist:CreateDropdown({
+		Name = "Type",
+		List = {"MouseButton1", "MouseButton2"},
+		Default = "MouseButton1",
+		Callback = function(callback)
+			if callback then
+				HoldType = callback
+			end
+		end
+	})
+	local HoldMode = AimAssist:CreateMiniToggle({
 		Name = "Hold",
 		Enabled = true,
 		Callback = function(callback)
-			if callback then
-				Hold = true
-			else
-				Hold = false
-			end
+			Hold = callback
 		end
 	})
-	local CustomRange = AimAssist:CreateSlider({
-		Name = "Range",
+	local CustomDistance = AimAssist:CreateSlider({
+		Name = "Distances",
 		Min = 0,
 		Max = 100,
-		Default = 28,
+		Default = 20,
 		Callback = function(callback)
 			if callback then
-				Range = callback
+				Distance = callback
 			end
 		end
 	})
@@ -118,10 +206,12 @@ spawn(function()
 			Enabled = callback
 			if callback then
 				repeat
-					task.wait(1 / CPS)
+					wait(1 / CPS)
 					local Tool = LocalPlayer.Character:FindFirstChildWhichIsA("Tool")
-					if Tool and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
-						Tool:Activate()
+					if UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
+						if Tool then
+							Tool:Activate()
+						end
 					end
 				until not Enabled
 			end
@@ -131,7 +221,7 @@ spawn(function()
 		Name = "CPS",
 		Min = 0,
 		Max = 100,
-		Default = 10,
+		Default = 12,
 		Callback = function(callback)
 			if callback then
 				CPS = callback
@@ -141,92 +231,144 @@ spawn(function()
 end)
 
 spawn(function()
-	local Enabled = false
+	local Enabled, Distance, Sword = false, nil, nil
 	local AutoSword = Tabs.Combat:CreateToggle({
 		Name = "AutoSword",
 		Callback = function(callback)
 			Enabled = callback
 			if callback then
 				repeat
-					task.wait()
-					if IsAlive(LocalPlayer) then
-						local NearestPlayer = GetNearestPlayer(30)
-						if NearestPlayer then
-							for i, v in pairs(LocalPlayer.Backpack:GetChildren()) do
-								if v:IsA("Tool") and v.Name:match("Sword") then
-									Humanoid:EquipTool(v)
-								end
-							end
+					wait()
+					local Player = GetPlayer(Distance, "Distance")
+					Sword = GetTools("Sword")
+					if Players then
+						if Sword then
+							Humanoid:EquipTool(Sword)
 						end
 					end
 				until not Enabled
+				Humanoid:UnequipTools(Sword)
+			end
+		end
+	})
+	local CustomDistance = AutoSword:CreateSlider({
+		Name = "Distance",
+		Min = 0,
+		Max = 100,
+		Default = 20,
+		Callback = function(callback)
+			if callback then
+				Distance = callback
 			end
 		end
 	})
 end)
 
-local KillAuraCrit = false
+local HitCrit = false
 spawn(function()
 	local Criticals = Tabs.Combat:CreateToggle({
 		Name = "Criticals",
-		Enabled = true,
 		Callback = function(callback)
 			if callback then
-				KillAuraCrit = true
+				HitCrit = true
 			else
-				KillAuraCrit = false
+				HitCrit = false
 			end
 		end
 	})
 end)
 
 spawn(function()
-	local Enabled, Range, Swing, Mode, BlockAnim, SwingAnim = false, nil, false, nil, nil, nil
+	local function KillRandom(plr)
+		local Messages = {
+			"Ez " .. plr.Name,
+			"Im the best!, is that right " .. plr.Name .. "?",
+			"Train harder unless you wanna be this noob called " .. plr.Name
+		}
+		return Messages[math.random(1, #Messages)]
+	end
+
+	local function DiedRandom(plr)
+		local Messages = {
+			"Lag! Real! ",
+			"Oops, " .. plr.Name .. ", You Cheater!"
+		}
+		return Messages[math.random(1, #Messages)]
+	end
+
+	local function SendMessages(msg)
+		local args = {
+			[1] = msg,
+			[2] = "All"
+		}
+		game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest"):FireServer(unpack(args))
+	end
+
+	local Enabled = false
+	local KillSults = Tabs.Combat:CreateToggle({
+		Name = "KillSults",
+		Callback = function(callback)
+			Enabled = callback
+			if callback then
+				game:GetService("ReplicatedStorage").Packages.Knit.Services.CombatService.RE.OnKill.OnClientEvent:Connect(function(killer, killed, ...)
+					if Enabled then
+						if  killer.Name == LocalPlayer.Name and killed.Name ~= LocalPlayer.Name then
+							local message = KillRandom(killed)
+							SendMessages(message)
+						elseif killer.Name ~= LocalPlayer.Name and killed.Name == LocalPlayer.Name then
+							local message = DiedRandom(killer)
+							SendMessages(message)
+						end
+					end
+				end)
+			end
+		end
+	})
+end)
+
+local PlayerModes = nil
+spawn(function()
+	local Enabled, Distance, BlockingMode = false, nil, nil
+	local BlockAnim, SwingAnim
 	local KillAura = Tabs.Combat:CreateToggle({
 		Name = "KillAura",
 		Callback = function(callback)
 			Enabled = callback
 			if callback then
 				repeat
-					task.wait()
+					wait()
 					if IsAlive(LocalPlayer) then
-						local NearestPlayer = GetNearestPlayer(Range)
-						if NearestPlayer then
-							local Sword = GetTool("Sword")
+						local Player = GetPlayer(Distance, PlayerModes)
+						if Player then
+							local Sword = CheckTools("Sword")
 							if Sword then
 								BlockAnim = Sword:WaitForChild("Animations").BlockHit
 								SwingAnim = Sword:WaitForChild("Animations").Swing
-								if Swing then
-									Humanoid:LoadAnimation(SwingAnim):Play()
-								end
-								if Mode == "Fake" then
+								if BlockingMode == "Fake" then
 									Humanoid:LoadAnimation(BlockAnim):Play()
 									local args = {
 										[1] = false,
 										[2] = Sword.Name
 									}
-
 									game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
-								elseif Mode == "Remote" then
+								elseif	BlockingMode == "Remote" then
 									Humanoid:LoadAnimation(BlockAnim):Stop()
 									local args = {
 										[1] = true,
 										[2] = Sword.Name
 									}
-
 									game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
-								elseif Mode == "Legit" then
+								elseif BlockingMode == "SemiLegit" then
 									Humanoid:LoadAnimation(BlockAnim):Play()
 									local args = {
 										[1] = true,
 										[2] = Sword.Name
 									}
-
 									game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
 								end
 								local args = {
-									[1] = NearestPlayer.Character,
-									[2] = KillAuraCrit,
+									[1] = Player.Character,
+									[2] = HitCrit,
 									[3] = Sword.Name
 								}
 								game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("AttackPlayerWithSword"):InvokeServer(unpack(args))
@@ -237,46 +379,66 @@ spawn(function()
 			end
 		end
 	})
-	local CustomRange = KillAura:CreateSlider({
-		Name = "Range",
-		Min = 0,
-		Max = 30,
-		Default = 30,
+	local CustomPlayerModes = KillAura:CreateDropdown({
+		Name = "PlayerMode",
+		List = {"Distance", "Health"},
+		Default = "Distance",
 		Callback = function(callback)
 			if callback then
-				Range = callback
+				PlayerModes = callback
 			end
 		end
 	})
-	local CustomSwing = KillAura:CreateMiniToggle({
-		Name = "Swing",
-		Enabled = true,
-		Callback = function(callback)
-			if callback then
-				Swing = true
-			else
-				Swing = false
-			end
-		end
-	})
-	local CustomMode = KillAura:CreateDropdown({
-		Name = "AutoBlock",
-		List = {"Fake", "Remote", "Legit"},
+	local CustomBlockingMode = KillAura:CreateDropdown({
+		Name = "BlockingMode",
+		List = {"Fake", "Remote", "SemiLegit"},
 		Default = "Fake",
 		Callback = function(callback)
 			if callback then
-				Mode = callback
+				BlockingMode = callback
+			end
+		end
+	})
+	local CustomDistance = KillAura:CreateSlider({
+		Name = "Distance",
+		Min = 0,
+		Max = 20,
+		Default = 20,
+		Callback = function(callback)
+			if callback then
+				Distance = callback
 			end
 		end
 	})
 end)
 
+--[[
 spawn(function()
-	local Enabled, YPos = false, 0
-	local YRoot =  LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position.Y
+	local Enabled = false
+	local HumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+	local Velocity = Tabs.Combat:CreateToggle({
+		Name = "Velocity",
+		Callback = function(callback)
+			Enabled = callback
+			if callback then
+				ReplicatedStorage.Packages.Knit.Services.CombatService.RE.KnockBackApplied.OnClientEvent:Connect(function()
+					if Enabled then
+						HumanoidRootPart.Anchored = true
+						wait(1)
+						HumanoidRootPart.Anchored = false
+					end
+				end)
+			end
+		end
+	})
+end)
+--]]
+
+spawn(function()
+	local Enabled, Speed, YPos = false, nil, 0
+	local HumanoidRootPartY = LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position.Y
 	local OldGravity = game.Workspace.Gravity
-	local Speed = nil
-	local OldSpeed = Humanoid.WalkSpeed
+
 	UserInputService.JumpRequest:Connect(function()
 		YPos = YPos + 6
 	end)
@@ -286,24 +448,24 @@ spawn(function()
 			YPos = YPos - 6
 		end
 	end)
+
 	local Fly = Tabs.Movement:CreateToggle({
 		Name = "Fly",
 		Callback = function(callback)
 			Enabled = callback
 			if callback then
-				YRoot =  LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position.Y
 				YPos = 0
+				HumanoidRootPartY = LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position.Y
 				repeat
 					task.wait()
-					local velo = LocalPlayer.Character.Humanoid.MoveDirection * Speed
-					LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Velocity = Vector3.new(velo.X, LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Velocity.Y, velo.Z)
-					LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position.X, YRoot + YPos, LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position.Z) * LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame.Rotation
+					local Motion = LocalPlayer.Character.Humanoid.MoveDirection * Speed
+					LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Velocity = Vector3.new(Motion.X, LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Velocity.Y, Motion.Z)
+					LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position.X, HumanoidRootPartY + YPos, LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position.Z) * LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame.Rotation
 					game.Workspace.Gravity = 0
 				until not Enabled
-				YRoot =  LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position.Y
 				YPos = 0
-				Humanoid.WalkSpeed = OldSpeed
 				game.Workspace.Gravity = OldGravity
+				HumanoidRootPartY =  LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position.Y
 				LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame = LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame
 			end
 		end
@@ -311,7 +473,7 @@ spawn(function()
 	local CustomSpeed = Fly:CreateSlider({
 		Name = "Speed",
 		Min = 0,
-		Max = 100,
+		Max = 38,
 		Default = 28,
 		Callback = function(callback)
 			if callback then
@@ -519,20 +681,6 @@ spawn(function()
 end)
 
 spawn(function()
-	local OldHipHeight = Humanoid.HipHeight
-	local Steps = Tabs.Movement:CreateToggle({
-		Name = "Steps",
-		Callback = function(callback)
-			if callback then
-				Humanoid.HipHeight = 3
-			else
-				Humanoid.HipHeight = OldHipHeight
-			end
-		end
-	})
-end)
-
-spawn(function()
 	local function Hightlight(player)
 		if player ~= LocalPlayer and IsAlive(player) then
 			if not player.Character:FindFirstChildOfClass("Highlight") then
@@ -581,7 +729,7 @@ spawn(function()
 			if callback then
 				repeat
 					wait()
-					NearestPlayer = GetNearestPlayer(30)
+					NearestPlayer = GetPlayer(20, PlayerModes)
 					if NearestPlayer then
 						TargetImage = Players:GetUserThumbnailAsync(NearestPlayer.UserId, Enum.ThumbnailType.AvatarBust, Enum.ThumbnailSize.Size48x48)
 						Main:TargetHud(NearestPlayer.Name, TargetImage, NearestPlayer.Character:FindFirstChildOfClass("Humanoid"), Humanoid, true)
@@ -627,3 +775,28 @@ spawn(function()
 		end
 	})
 end)
+
+spawn(function()
+	local NoRotate = Tabs.Exploit:CreateToggle({
+		Name = "NoRotate",
+		Callback = function(callback)
+			if callback then
+				Humanoid.AutoRotate = false
+			else
+				Humanoid.AutoRotate = true
+			end
+		end
+	})
+end)
+
+--[[
+game:GetService("ReplicatedStorage").__comm__.RP.gamemode:FireServer()
+game:GetService("ReplicatedStorage").Remotes.Jumpscare:FireServer()
+game:GetService("ReplicatedStorage").Packages.Knit.Services.CombatService.RE.OnKill:FireServer()
+game:GetService("ReplicatedStorage").Packages.Knit.Services.VoidService.RE.OnFell:FireServer()
+game:GetService("ReplicatedStorage").Packages.Knit.Services.ModerationService.RF.Ban:InvokeServer()
+game:GetService("ReplicatedStorage").Packages.Knit.Services.ModerationService.RF.Unban:InvokeServer()
+game:GetService("ReplicatedStorage").Packages.Knit.Services.NetworkService.RF.SendReport:InvokeServer()
+game:GetService("ReplicatedStorage").Packages.Knit.Services.GuildService.RF.KickPlayer:InvokeServer()
+game:GetService("ReplicatedStorage").Packages.Knit.Services.CombatService.RE.KnockBackApplied:FireServer()
+--]]
