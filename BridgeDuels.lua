@@ -485,6 +485,7 @@ spawn(function()
 	})
 end)
 
+--[[
 spawn(function()
 	local Enabled, Boost = false, nil
 	local HumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
@@ -523,6 +524,7 @@ spawn(function()
 		end
 	})
 end)
+--]]
 
 spawn(function()
 	local Boost = nil
