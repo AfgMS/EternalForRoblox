@@ -904,7 +904,10 @@ function Library:CreateMain()
 			if ToggleButton.Enabled then
 				ToggleButton.Enabled = true
 				ToggleButtonClicked()
-
+			elseif not ToggleButton.Enabled then
+				ToggleButton.Enabled = false
+				ToggleButtonClicked()
+				
 				if ToggleButton.Callback then
 					ToggleButton.Callback(ToggleButton.Enabled)
 				end
@@ -998,6 +1001,9 @@ function Library:CreateMain()
 
 				if MiniToggle.Enabled then
 					MiniToggle.Enabled = true
+					MiniToggleClick()
+				elseif not MiniToggle.Enabled then
+					MiniToggle.Enabled = false
 					MiniToggleClick()
 
 					if MiniToggle.Callback then
