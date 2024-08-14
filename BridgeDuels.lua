@@ -487,7 +487,6 @@ end)
 
 spawn(function()
 	local Enabled, Boost = false, nil
-	local NewBodyVelocity = nil
 	local HumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 	local HighJump = Tabs.Movement:CreateToggle({
 		Name = "HighJump",
@@ -505,8 +504,9 @@ spawn(function()
 				NewBodyVelocity.MaxForce = Vector3.new(0, math.huge, 0)
 				NewBodyVelocity.Parent = HumanoidRootPart
 			else
-				if NewBodyVelocity then
-					NewBodyVelocity:Destroy()
+				local OldBodyVelocity = LocalPlayer.Character:FindFirstChildWhichIsA("BodyVelocity")
+				if OldBodyVelocity then
+					OldBodyVelocity:Destroy()
 				end
 			end
 		end
