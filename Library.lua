@@ -78,7 +78,7 @@ end
 function Spoof(length)
 	local Letter = {}
 	for i = 1, length do
-		local RandomLetter = string.char(math.random(45, 80))
+		local RandomLetter = string.char(math.random(25, 125))
 		table.insert(Letter, RandomLetter)
 	end
 	return table.concat(Letter)
@@ -88,7 +88,7 @@ function Library:CreateMain()
 	local Main = {}
 
 	local ScreenGui = Instance.new("ScreenGui")
-	ScreenGui.Name = Spoof(math.random(18, 20))
+	ScreenGui.Name = Spoof(math.random(8, 16))
 	if RunService:IsStudio() then
 		warn("CoreGui Denied")
 		ScreenGui.ResetOnSpawn = false
@@ -904,10 +904,7 @@ function Library:CreateMain()
 			if ToggleButton.Enabled then
 				ToggleButton.Enabled = true
 				ToggleButtonClicked()
-			elseif not ToggleButton.Enabled then
-				ToggleButton.Enabled = false
-				ToggleButtonClicked()
-				
+
 				if ToggleButton.Callback then
 					ToggleButton.Callback(ToggleButton.Enabled)
 				end
@@ -1001,9 +998,6 @@ function Library:CreateMain()
 
 				if MiniToggle.Enabled then
 					MiniToggle.Enabled = true
-					MiniToggleClick()
-				elseif not MiniToggle.Enabled then
-					MiniToggle.Enabled = false
 					MiniToggleClick()
 
 					if MiniToggle.Callback then
