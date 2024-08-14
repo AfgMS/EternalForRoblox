@@ -67,7 +67,7 @@ end
 function GetPlayer(MaxDist, Mode)
 	local Nearest, MinDist
 
-	for i, v in pairs(Players:s()) do
+	for i, v in pairs(Players:GetChildren()) do
 		if v ~= LocalPlayer and IsAlive(v) then
 			local Distance = (v.Character:FindFirstChild("HumanoidRootPart").Position - LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position).Magnitude
 			if Mode == "Distance" then
