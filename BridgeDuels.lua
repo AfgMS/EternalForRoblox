@@ -782,6 +782,50 @@ spawn(function()
 	})
 end)
 
+spawn(function()
+	local Enabled, Distance, PlayerModes = false, nil, nil
+	local BowAura = Tabs.Exploit:CreateToggle({
+		Name = "BowAura",
+		Callback = function(callback)
+			Enabled = callback
+			if callback then
+				repeat
+					wait()
+					local Player = GetPlayer(Distance, PlayerModes)
+					if Player then
+						local Bow = CheckTools("Bow")
+						if Bow then
+							local args = {
+								[1] = Player.Character:FindFirstChild("HumanoidRootPart").Position,
+								[2] = 2.9958127420395613
+							}
+							Bow:WaitForChild("__comm__"):WaitForChild("RF"):FindFirstChild("Fire"):InvokeServer(unpack(args))
+						end
+					end
+				until not Enabled
+			end
+		end
+	})
+	local CustomDistance = BowAura:CreateSlider({
+		Name = "Distance",
+		Callback = function(callback)
+			if callback then
+				Distance = callback
+			end
+		end
+	})
+	local CustomPlayerModes = BowAura:CreateDropdown({
+		Name = "PlayerMode",
+		List = {"Distance", "Health"},
+		Default = "Distance",
+		Callback = function(callback)
+			if callback then
+				PlayerModes = callback
+			end
+		end
+	})
+end)
+
 -- game:GetService("ReplicatedStorage").__comm__.RP.gamemode:FireServer()
 -- game:GetService("ReplicatedStorage").Remotes.Jumpscare:FireServer()
 -- game:GetService("ReplicatedStorage").Packages.Knit.Services.CombatService.RE.OnKill:FireServer()
