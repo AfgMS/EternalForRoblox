@@ -326,9 +326,10 @@ spawn(function()
 	})
 end)
 
-local PlayerModes = nil
+local KillAuraDistance = nil
+local KillAuraPlayerModes = nil
 spawn(function()
-	local Enabled, Distance, BlockingMode = false, nil, nil
+	local Enabled, BlockingMode = false, nil
 	local BlockAnim, SwingAnim
 	local KillAura = Tabs.Combat:CreateToggle({
 		Name = "KillAura",
@@ -338,7 +339,7 @@ spawn(function()
 				repeat
 					wait()
 					if IsAlive(LocalPlayer) then
-						local Player = GetPlayer(Distance, PlayerModes)
+						local Player = GetPlayer(KillAuraDistance, KillAuraPlayerModes)
 						if Player then
 							local Sword = CheckTools("Sword")
 							if Sword then
@@ -379,13 +380,13 @@ spawn(function()
 			end
 		end
 	})
-	local CustomPlayerModes = KillAura:CreateDropdown({
+	local CustomKillAuraPlayerModes = KillAura:CreateDropdown({
 		Name = "PlayerMode",
 		List = {"Distance", "Health"},
 		Default = "Distance",
 		Callback = function(callback)
 			if callback then
-				PlayerModes = callback
+				KillAuraPlayerModes = callback
 			end
 		end
 	})
@@ -406,12 +407,13 @@ spawn(function()
 		Default = 20,
 		Callback = function(callback)
 			if callback then
-				Distance = callback
+				KillAuraDistance = callback
 			end
 		end
 	})
 end)
 
+--Velocity
 --[[
 spawn(function()
 	local Enabled = false
@@ -485,6 +487,7 @@ end)
 
 spawn(function()
 	local Enabled, Boost = false, nil
+	local NewBodyVelocity = nil
 	local HumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 	local HighJump = Tabs.Movement:CreateToggle({
 		Name = "HighJump",
@@ -492,19 +495,18 @@ spawn(function()
 		Callback = function(callback)
 			Enabled = callback
 			if callback then
-				local OldBodyVelo = LocalPlayer.Character:FindFirstChildWhichIsA("BodyVelocity")
-				if OldBodyVelo then
-					OldBodyVelo:Destroy()
+				local OldBodyVelocity = LocalPlayer.Character:FindFirstChildWhichIsA("BodyVelocity")
+				if OldBodyVelocity then
+					OldBodyVelocity:Destroy()
 				end
-				local BodyVelo = Instance.new("BodyVelocity")
-				BodyVelo.Velocity = Vector3.new(0, Boost, 0)
-				BodyVelo.P = Boost
-				BodyVelo.MaxForce = Vector3.new(0, math.huge, 0)
-				BodyVelo.Parent = HumanoidRootPart
+				local NewBodyVelocity = Instance.new("BodyVelocity")
+				NewBodyVelocity.Velocity = Vector3.new(0, Boost, 0)
+				NewBodyVelocity.P = Boost
+				NewBodyVelocity.MaxForce = Vector3.new(0, math.huge, 0)
+				NewBodyVelocity.Parent = HumanoidRootPart
 			else
-				local BodyVelo = HumanoidRootPart:FindFirstChildOfClass("BodyVelocity")
-				if BodyVelo then
-					BodyVelo:Destroy()
+				if NewBodyVelocity then
+					NewBodyVelocity:Destroy()
 				end
 			end
 		end
@@ -512,7 +514,7 @@ spawn(function()
 	local CustomBoost = HighJump:CreateSlider({
 		Name = "Boost",
 		Min = 0,
-		Max = 1000,
+		Max = 220,
 		Default = 140,
 		Callback = function(callback)
 			if callback then
@@ -523,7 +525,7 @@ spawn(function()
 end)
 
 spawn(function()
-	local Boost = 75
+	local Boost = nil
 	local HumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 	local LongJump = Tabs.Movement:CreateToggle({
 		Name = "LongJump",
@@ -532,9 +534,11 @@ spawn(function()
 		Callback = function(enabled)
 			if enabled then
 				if HumanoidRootPart then
-					Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-					local velo = HumanoidRootPart.CFrame.LookVector * Boost
-					HumanoidRootPart.Velocity = Vector3.new(velo.X, HumanoidRootPart.Velocity.Y, velo.Z)
+					spawn(function()
+						Humanoid.Jump = true
+					end)
+					local Motion = HumanoidRootPart.CFrame.LookVector * Boost
+					HumanoidRootPart.Velocity = Vector3.new(Motion.X, HumanoidRootPart.Velocity.Y, Motion.Z)
 				end
 			end
 		end
@@ -542,8 +546,8 @@ spawn(function()
 	local CustomBoostL = LongJump:CreateSlider({
 		Name = "Boost",
 		Min = 50,
-		Max = 120,
-		Default = 75,
+		Max = 100,
+		Default = 65,
 		Callback = function(value)
 			Boost = value
 		end
@@ -729,7 +733,7 @@ spawn(function()
 			if callback then
 				repeat
 					wait()
-					NearestPlayer = GetPlayer(20, PlayerModes)
+					NearestPlayer = GetPlayer(KillAuraDistance, KillAuraPlayerModes)
 					if NearestPlayer then
 						TargetImage = Players:GetUserThumbnailAsync(NearestPlayer.UserId, Enum.ThumbnailType.AvatarBust, Enum.ThumbnailSize.Size48x48)
 						Main:TargetHud(NearestPlayer.Name, TargetImage, NearestPlayer.Character:FindFirstChildOfClass("Humanoid"), Humanoid, true)
@@ -776,27 +780,12 @@ spawn(function()
 	})
 end)
 
-spawn(function()
-	local NoRotate = Tabs.Exploit:CreateToggle({
-		Name = "NoRotate",
-		Callback = function(callback)
-			if callback then
-				Humanoid.AutoRotate = false
-			else
-				Humanoid.AutoRotate = true
-			end
-		end
-	})
-end)
-
---[[
-game:GetService("ReplicatedStorage").__comm__.RP.gamemode:FireServer()
-game:GetService("ReplicatedStorage").Remotes.Jumpscare:FireServer()
-game:GetService("ReplicatedStorage").Packages.Knit.Services.CombatService.RE.OnKill:FireServer()
-game:GetService("ReplicatedStorage").Packages.Knit.Services.VoidService.RE.OnFell:FireServer()
-game:GetService("ReplicatedStorage").Packages.Knit.Services.ModerationService.RF.Ban:InvokeServer()
-game:GetService("ReplicatedStorage").Packages.Knit.Services.ModerationService.RF.Unban:InvokeServer()
-game:GetService("ReplicatedStorage").Packages.Knit.Services.NetworkService.RF.SendReport:InvokeServer()
-game:GetService("ReplicatedStorage").Packages.Knit.Services.GuildService.RF.KickPlayer:InvokeServer()
-game:GetService("ReplicatedStorage").Packages.Knit.Services.CombatService.RE.KnockBackApplied:FireServer()
---]]
+-- game:GetService("ReplicatedStorage").__comm__.RP.gamemode:FireServer()
+-- game:GetService("ReplicatedStorage").Remotes.Jumpscare:FireServer()
+-- game:GetService("ReplicatedStorage").Packages.Knit.Services.CombatService.RE.OnKill:FireServer()
+-- game:GetService("ReplicatedStorage").Packages.Knit.Services.VoidService.RE.OnFell:FireServer()
+-- game:GetService("ReplicatedStorage").Packages.Knit.Services.ModerationService.RF.Ban:InvokeServer()
+-- game:GetService("ReplicatedStorage").Packages.Knit.Services.ModerationService.RF.Unban:InvokeServer()
+-- game:GetService("ReplicatedStorage").Packages.Knit.Services.NetworkService.RF.SendReport:InvokeServer()
+-- game:GetService("ReplicatedStorage").Packages.Knit.Services.GuildService.RF.KickPlayer:InvokeServer()
+-- game:GetService("ReplicatedStorage").Packages.Knit.Services.CombatService.RE.KnockBackApplied:FireServer()
