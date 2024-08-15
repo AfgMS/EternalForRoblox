@@ -15,51 +15,7 @@ local Tabs = {
 	Exploit = Main:CreateTab("Exploit", false),
 	Misc = Main:CreateTab("Misc", true)
 }
---[[ --Features
-local ToggleButtons = {
-	Combat = {
-		AimAssist = {}, Yes
-		AutoClicker = {}, Yes
-		AutoSword = {}, Yes
-		Criticals = {}, Yes
-		KillSults = {}, Yes
-		KillAura = {}, Yes
-		Velocity = {}, No (for now)
-	},
-	Movement = {
-		Fly = {}, Yes
-		HighJump = {},
-		LongJump = {},
-		Scaffold = {},
-		Speed = {},
-		Sprint = {},
-		TargetStrafe = {}
-	},
-	Player = {
-		ChestStealer = {},
-		NoFall = {},
-	},
-	Render = {
-		Blur = {},
-		Chams = {},
-		ESP = {},
-		FullBright = {},
-		HUD = {},
-		TargetHUD = {},
-		TimeChanger = {},
-	},
-	Exploit = {
-		AntiVoid = {},
-		Bypass = {},
-		Disabler = {},
-		AutoHeal = {},
-		NoRotate = {}
-	},
-	Misc = {
-		Timer = {},
-	}
-}
---]]
+
 function IsAlive(entity)
 	return entity and entity.Character and entity.Character:FindFirstChildOfClass("Humanoid") and entity.Character:FindFirstChildOfClass("Humanoid").Health > 0
 end
@@ -485,7 +441,6 @@ spawn(function()
 	})
 end)
 
---[[
 spawn(function()
 	local Enabled, Boost = false, nil
 	local HumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
@@ -505,7 +460,8 @@ spawn(function()
 				NewBodyVelocity.MaxForce = Vector3.new(0, math.huge, 0)
 				NewBodyVelocity.Parent = HumanoidRootPart
 			else
-				local OldBodyVelocity = LocalPlayer.Character:FindFirstChildWhichIsA("BodyVelocity")
+				wait(0.3)
+				local OldBodyVelocity = HumanoidRootPart:FindFirstChildWhichIsA("BodyVelocity")
 				if OldBodyVelocity then
 					OldBodyVelocity:Destroy()
 				end
@@ -524,7 +480,6 @@ spawn(function()
 		end
 	})
 end)
---]]
 
 spawn(function()
 	local Boost = nil
@@ -687,6 +642,41 @@ spawn(function()
 end)
 
 spawn(function()
+	local Blurz, Size, Enabled = nil, nil, false
+	local Blur = Tabs.Render:CreateToggle({
+		Name = "Blur",
+		Callback = function(callback)
+			Enabled = callback
+			if callback then
+				if not Lighting:FindFirstChildWhichIsA("BlurEffect") then
+					Blurz = Instance.new("BlurEffect")
+					Blurz.Parent = Lighting
+				end
+				repeat
+					wait()
+					Blurz.Size = Size
+				until not Enabled
+			else
+				if Blurz then
+					Blurz:Destroy()
+				end
+			end
+		end
+	})
+	local CustomSize = Blur:CreateSlider({
+		Name = "Size",
+		Min = 0,
+		Max = 100,
+		Default = 28,
+		Callback = function(callback)
+			if callback then
+				Size = callback
+			end
+		end
+	})
+end)
+
+spawn(function()
 	local function Hightlight(player)
 		if player ~= LocalPlayer and IsAlive(player) then
 			if not player.Character:FindFirstChildOfClass("Highlight") then
@@ -742,41 +732,6 @@ spawn(function()
 					end
 				until not Enabled
 				Main:TargetHud(NearestPlayer.Name, TargetImage, NearestPlayer.Character:FindFirstChildOfClass("Humanoid"), Humanoid, false)
-			end
-		end
-	})
-end)
-
-spawn(function()
-	local Blurz, Size, Enabled = nil, nil, false
-	local Blur = Tabs.Render:CreateToggle({
-		Name = "Blur",
-		Callback = function(callback)
-			Enabled = callback
-			if callback then
-				if not Lighting:FindFirstChildWhichIsA("BlurEffect") then
-					Blurz = Instance.new("BlurEffect")
-					Blurz.Parent = Lighting
-				end
-				repeat
-					wait()
-					Blurz.Size = Size
-				until not Enabled
-			else
-				if Blurz then
-					Blurz:Destroy()
-				end
-			end
-		end
-	})
-	local CustomSize = Blur:CreateSlider({
-		Name = "Size",
-		Min = 0,
-		Max = 100,
-		Default = 28,
-		Callback = function(callback)
-			if callback then
-				Size = callback
 			end
 		end
 	})
