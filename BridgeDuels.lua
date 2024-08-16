@@ -16,6 +16,19 @@ local Tabs = {
 	Misc = Main:CreateTab("Misc", true)
 }
 
+--[[ Not Used
+game:GetService("ReplicatedStorage").__comm__.RP.gamemode:FireServer()
+game:GetService("ReplicatedStorage").Remotes.Jumpscare:FireServer()
+game:GetService("ReplicatedStorage").Packages.Knit.Services.CombatService.RE.OnKill:FireServer()
+game:GetService("ReplicatedStorage").Packages.Knit.Services.VoidService.RE.OnFell:FireServer()
+game:GetService("ReplicatedStorage").Packages.Knit.Services.ModerationService.RF.Ban:InvokeServer()
+game:GetService("ReplicatedStorage").Packages.Knit.Services.ModerationService.RF.Unban:InvokeServer()
+game:GetService("ReplicatedStorage").Packages.Knit.Services.NetworkService.RF.SendReport:InvokeServer()
+game:GetService("ReplicatedStorage").Packages.Knit.Services.GuildService.RF.KickPlayer:InvokeServer()
+game:GetService("ReplicatedStorage").Packages.Knit.Services.CombatService.RE.KnockBackApplied:FireServer()
+--]]
+
+
 function IsAlive(entity)
 	return entity and entity.Character and entity.Character:FindFirstChildOfClass("Humanoid") and entity.Character:FindFirstChildOfClass("Humanoid").Health > 0
 end
@@ -780,13 +793,3 @@ spawn(function()
 		end
 	})
 end)
-
--- game:GetService("ReplicatedStorage").__comm__.RP.gamemode:FireServer()
--- game:GetService("ReplicatedStorage").Remotes.Jumpscare:FireServer()
--- game:GetService("ReplicatedStorage").Packages.Knit.Services.CombatService.RE.OnKill:FireServer()
--- game:GetService("ReplicatedStorage").Packages.Knit.Services.VoidService.RE.OnFell:FireServer()
--- game:GetService("ReplicatedStorage").Packages.Knit.Services.ModerationService.RF.Ban:InvokeServer()
--- game:GetService("ReplicatedStorage").Packages.Knit.Services.ModerationService.RF.Unban:InvokeServer()
--- game:GetService("ReplicatedStorage").Packages.Knit.Services.NetworkService.RF.SendReport:InvokeServer()
--- game:GetService("ReplicatedStorage").Packages.Knit.Services.GuildService.RF.KickPlayer:InvokeServer()
--- game:GetService("ReplicatedStorage").Packages.Knit.Services.CombatService.RE.KnockBackApplied:FireServer()
