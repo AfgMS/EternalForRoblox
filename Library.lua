@@ -89,14 +89,8 @@ function Library:CreateMain()
 
 	local ScreenGui = Instance.new("ScreenGui")
 	ScreenGui.Name = Spoof(math.random(18, 20))
-	if RunService:IsStudio() then
-		warn("CoreGui Denied")
-		ScreenGui.ResetOnSpawn = false
-		ScreenGui.Parent = PlayerGui
-	else
-		ScreenGui.Parent = CoreGui
-	end
-
+	ScreenGui.Parent = PlayerGui:FindFirstChild("MainGui")
+	
 	local MainFrame = Instance.new("Frame")
 	MainFrame.Parent = ScreenGui
 	MainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
