@@ -78,7 +78,7 @@ end
 function Spoof(length)
 	local Letter = {}
 	for i = 1, length do
-		local RandomLetter = string.char(math.random(25, 125))
+		local RandomLetter = string.char(math.random(45, 80))
 		table.insert(Letter, RandomLetter)
 	end
 	return table.concat(Letter)
@@ -88,7 +88,7 @@ function Library:CreateMain()
 	local Main = {}
 
 	local ScreenGui = Instance.new("ScreenGui")
-	ScreenGui.Name = Spoof(math.random(8, 16))
+	ScreenGui.Name = Spoof(math.random(18, 20))
 	if RunService:IsStudio() then
 		warn("CoreGui Denied")
 		ScreenGui.ResetOnSpawn = false
@@ -227,6 +227,7 @@ function Library:CreateMain()
 	UICorner_5.CornerRadius = UDim.new(0, 4)
 	UICorner_5.Parent = OpenGui
 
+	local ArrayTable = {} --thanks to Xethrantic
 	local ArraylistFrame = Instance.new("Frame")
 	ArraylistFrame.Parent = HudsFrame
 	ArraylistFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -239,7 +240,7 @@ function Library:CreateMain()
 	local UIListLayout_5 = Instance.new("UIListLayout")
 	UIListLayout_5.Parent = ArraylistFrame
 	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	UIListLayout_5.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	UIListLayout_5.HorizontalAlignment = Enum.HorizontalAlignment.Right
 
 	local function AddArray(name)
 		local TextLabel = Instance.new("TextLabel")
@@ -248,7 +249,6 @@ function Library:CreateMain()
 		TextLabel.BackgroundTransparency = 1.000
 		TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		TextLabel.BorderSizePixel = 0
-		TextLabel.Size = UDim2.new(1, 0, 0, 18)
 		TextLabel.Font = Enum.Font.SourceSans
 		TextLabel.Text = name
 		TextLabel.TextColor3 = Library.Settings.LibraryColor
@@ -256,13 +256,30 @@ function Library:CreateMain()
 		TextLabel.TextSize = 18.000
 		TextLabel.TextWrapped = true
 		TextLabel.TextXAlignment = Enum.TextXAlignment.Right
-		TextLabel.LayoutOrder = -#name
+		
+		local size = UDim2.new(0.01, game.TextService:GetTextSize(name , 18, Enum.Font.SourceSans, Vector2.new(0,0)).X, 0.033,0)
+		if name == "" then
+			size = UDim2.fromScale(0,0)
+		end
+		
+		TextLabel.Size = size
+		table.insert(ArrayTable,TextLabel)
+		table.sort(ArrayTable,function(a,b) return game.TextService:GetTextSize(a.Text .. "  ", 18, Enum.Font.SourceSans, Vector2.new(0,0)).X > game.TextService:GetTextSize(b.Text .. "  ", 18, Enum.Font.SourceSans,Vector2.new(0,0)).X end)
+		for i,v in ipairs(ArrayTable) do
+			v.LayoutOrder = i
+		end
 	end
 
 	local function RemoveArray(name)
-		for i,v in pairs(ArraylistFrame:GetChildren()) do
-			if v:IsA("TextLabel") and v.Text == name then
+		table.sort(ArrayTable,function(a,b) return game.TextService:GetTextSize(a.Text.."  ",18,Enum.Font.SourceSans,Vector2.new(0,0)).X > game.TextService:GetTextSize(b.Text.."  ",18,Enum.Font.SourceSans,Vector2.new(0,0)).X end)
+		local c = 0
+		for i,v in ipairs(ArrayTable) do
+			c += 1
+			if (v.Text == name) then
 				v:Destroy()
+				table.remove(ArrayTable,c)
+			else
+				v.LayoutOrder = i
 			end
 		end
 	end
@@ -904,7 +921,10 @@ function Library:CreateMain()
 			if ToggleButton.Enabled then
 				ToggleButton.Enabled = true
 				ToggleButtonClicked()
-
+			elseif not ToggleButton.Enabled then
+				ToggleButton.Enabled = false
+				ToggleButtonClicked()
+				
 				if ToggleButton.Callback then
 					ToggleButton.Callback(ToggleButton.Enabled)
 				end
@@ -998,6 +1018,9 @@ function Library:CreateMain()
 
 				if MiniToggle.Enabled then
 					MiniToggle.Enabled = true
+					MiniToggleClick()
+				elseif not MiniToggle.Enabled then
+					MiniToggle.Enabled = false
 					MiniToggleClick()
 
 					if MiniToggle.Callback then
