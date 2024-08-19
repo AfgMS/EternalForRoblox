@@ -251,7 +251,7 @@ function Library:CreateMain()
 		TextLabel.TextWrapped = true
 		TextLabel.TextXAlignment = Enum.TextXAlignment.Right
 
-		local size = UDim2.new(0.01, game.TextService:GetTextSize(name , 18, Enum.Font.SourceSans, Vector2.new(0,0)).X, 0.025,0)
+		local size = UDim2.new(0.01, game.TextService:GetTextSize(name , 18, Enum.Font.SourceSans, Vector2.new(0,0)).X, 0.022,0)
 		if name == "" then
 			size = UDim2.fromScale(0,0)
 		end
@@ -525,7 +525,7 @@ function Library:CreateMain()
 		WatermarkName.TextSize = 13.000
 		WatermarkName.TextXAlignment = Enum.TextXAlignment.Left
 
-		local WatermarkEnabled = LibrarySettings.Watermark
+		local WatermarkEnabled = LibrarySettings.Watermark or true
 		local WatermarkStatus = Instance.new("Frame")
 		WatermarkStatus.Parent = Watermark
 		WatermarkStatus.BackgroundColor3 = Color3.fromRGB(0, 175, 0)
@@ -578,7 +578,7 @@ function Library:CreateMain()
 		MobileSupportName.TextSize = 13.000
 		MobileSupportName.TextXAlignment = Enum.TextXAlignment.Left
 
-		local MobileSupportEnabled = LibrarySettings.MobileSupport
+		local MobileSupportEnabled = LibrarySettings.MobileSupport or false
 		local MobileSupportStatus = Instance.new("Frame")
 		MobileSupportStatus.Parent = MobileSupport
 		MobileSupportStatus.BackgroundColor3 = Color3.fromRGB(175, 0, 0)
