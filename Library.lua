@@ -5,7 +5,8 @@ local HttpService = game:GetService("HttpService")
 local PlayerGui = game:GetService("Players").LocalPlayer.PlayerGui
 local CoreGui = game:GetService("CoreGui")
 local MainFolder, ConfigFolder, LogsFolder = "Eternal", "Eternal/configs", "Eternal/logs"
-local Settings = {ToggleButton = {MiniToggle = {}, Sliders = {}, Dropdown = {}}}
+local MainSettings = {ToggleButton = {MiniToggle = {}, Sliders = {}, Dropdown = {}}}
+local LibrarySettings = {Keybinds = nil, Watermark = nil, MobileSupport = nil}
 local AutoSave = false
 
 local function LoadSettings(path)
@@ -17,15 +18,23 @@ local function SaveSettings(path, settings)
 end
 
 if isfolder(MainFolder) and isfolder(ConfigFolder) and isfolder(LogsFolder) then
-	local FileMain = ConfigFolder .. "/" .. game.PlaceId .. ".lua"
-	local LoadedSettings = LoadSettings(FileMain)
-	if LoadedSettings then Settings = LoadedSettings end
+	local GameData = ConfigFolder .. "/" .. game.PlaceId .. ".lua"
+	local LibraryData = MainFolder .. "/" .. "library.lua"
+	local GameConfig = LoadSettings(GameData)
+	local LibraryConfig = LoadSettings(LibraryData)
+	if GameConfig then 
+		MainSettings = GameConfig 
+	end
+	if LibraryConfig then
+		LibrarySettings = LibraryConfig
+	end
 	AutoSave = true
 
 	spawn(function()
 		while AutoSave do
 			wait(3)
-			SaveSettings(FileMain, Settings)
+			SaveSettings(GameData, MainSettings)
+			SaveSettings(LibraryData, LibrarySettings)
 		end
 	end)
 end
@@ -33,10 +42,10 @@ end
 local Library = {
 	CurrentVersion = 1.8,
 	Settings = {
-		LibraryKeybind = "RightShift",
+		LibraryKeybind = LibrarySettings.Keybinds or "RightShift",
 		LibraryColor = Color3.fromRGB(255, 255, 255),
-		MobileSupport = false,
-		ShowWatermark = true,
+		MobileSupport = LibrarySettings.MobileSupport or false,
+		ShowWatermark = LibrarySettings.Watermark or true, 
 	}
 }
 
@@ -75,22 +84,13 @@ function MakeDraggable(object)
 	end)
 end
 
-function Spoof(length)
-	local Letter = {}
-	for i = 1, length do
-		local RandomLetter = string.char(math.random(45, 80))
-		table.insert(Letter, RandomLetter)
-	end
-	return table.concat(Letter)
-end
-
 function Library:CreateMain()
 	local Main = {}
 
 	local ScreenGui = Instance.new("ScreenGui")
-	ScreenGui.Name = Spoof(math.random(18, 20))
+	ScreenGui.Name = "Eternal_" .. Library.CurrentVersion
 	ScreenGui.Parent = PlayerGui:FindFirstChild("MainGui")
-	
+
 	local MainFrame = Instance.new("Frame")
 	MainFrame.Parent = ScreenGui
 	MainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -250,12 +250,12 @@ function Library:CreateMain()
 		TextLabel.TextSize = 18.000
 		TextLabel.TextWrapped = true
 		TextLabel.TextXAlignment = Enum.TextXAlignment.Right
-		
-		local size = UDim2.new(0.01, game.TextService:GetTextSize(name , 18, Enum.Font.SourceSans, Vector2.new(0,0)).X, 0.033,0)
+
+		local size = UDim2.new(0.01, game.TextService:GetTextSize(name , 18, Enum.Font.SourceSans, Vector2.new(0,0)).X, 0.025,0)
 		if name == "" then
 			size = UDim2.fromScale(0,0)
 		end
-		
+
 		TextLabel.Size = size
 		table.insert(ArrayTable,TextLabel)
 		table.sort(ArrayTable,function(a,b) return game.TextService:GetTextSize(a.Text .. "  ", 18, Enum.Font.SourceSans, Vector2.new(0,0)).X > game.TextService:GetTextSize(b.Text .. "  ", 18, Enum.Font.SourceSans,Vector2.new(0,0)).X end)
@@ -525,7 +525,7 @@ function Library:CreateMain()
 		WatermarkName.TextSize = 13.000
 		WatermarkName.TextXAlignment = Enum.TextXAlignment.Left
 
-		local WatermarkEnabled = false
+		local WatermarkEnabled = LibrarySettings.Watermark
 		local WatermarkStatus = Instance.new("Frame")
 		WatermarkStatus.Parent = Watermark
 		WatermarkStatus.BackgroundColor3 = Color3.fromRGB(0, 175, 0)
@@ -542,8 +542,10 @@ function Library:CreateMain()
 			WatermarkEnabled = not WatermarkEnabled
 			if WatermarkEnabled then
 				Library.Settings.ShowWatermark = false
+				Library.Settings.ShowWatermark = WatermarkEnabled
 				WatermarkStatus.BackgroundColor3 = Color3.fromRGB(175, 0, 0)
 			else
+				Library.Settings.ShowWatermark = WatermarkEnabled
 				Library.Settings.ShowWatermark = true
 				WatermarkStatus.BackgroundColor3 = Color3.fromRGB(0, 175, 0)
 			end
@@ -576,7 +578,7 @@ function Library:CreateMain()
 		MobileSupportName.TextSize = 13.000
 		MobileSupportName.TextXAlignment = Enum.TextXAlignment.Left
 
-		local MobileSupportEnabled = false
+		local MobileSupportEnabled = LibrarySettings.MobileSupport
 		local MobileSupportStatus = Instance.new("Frame")
 		MobileSupportStatus.Parent = MobileSupport
 		MobileSupportStatus.BackgroundColor3 = Color3.fromRGB(175, 0, 0)
@@ -593,9 +595,11 @@ function Library:CreateMain()
 			MobileSupportEnabled = not MobileSupportEnabled
 			if MobileSupportEnabled then
 				Library.Settings.MobileSupport = true
+				Library.Settings.MobileSupport = MobileSupportEnabled
 				MobileSupportStatus.BackgroundColor3 = Color3.fromRGB(0, 175, 0)
 			else
 				Library.Settings.MobileSupport = false
+				Library.Settings.MobileSupport = MobileSupportEnabled
 				MobileSupportStatus.BackgroundColor3 = Color3.fromRGB(175, 0, 0)
 			end
 		end)
@@ -620,7 +624,7 @@ function Library:CreateMain()
 					KeybindChanger.Text = Input.KeyCode.Name
 					KeybindChanger.PlaceholderText = Input.KeyCode.Name
 					KeybindChanger:ReleaseFocus() 
-				end       
+				end
 			end
 		end)
 
@@ -658,14 +662,14 @@ function Library:CreateMain()
 				Keybind = ToggleButton.Keybind or "Insert",
 				Callback = ToggleButton.Callback or function() end
 			}
-			if not Settings.ToggleButton[ToggleButton.Name] then
-				Settings.ToggleButton[ToggleButton.Name] = {
+			if not MainSettings.ToggleButton[ToggleButton.Name] then
+				MainSettings.ToggleButton[ToggleButton.Name] = {
 					Enabled = ToggleButton.Enabled,
 					Keybind = ToggleButton.Keybind,
 				}
 			else
-				ToggleButton.Enabled = Settings.ToggleButton[ToggleButton.Name].Enabled
-				ToggleButton.Keybind = Settings.ToggleButton[ToggleButton.Name].Keybind
+				ToggleButton.Enabled = MainSettings.ToggleButton[ToggleButton.Name].Enabled
+				ToggleButton.Keybind = MainSettings.ToggleButton[ToggleButton.Name].Keybind
 			end
 
 			local ToggleButtonHolder = Instance.new("TextButton")
@@ -756,7 +760,7 @@ function Library:CreateMain()
 						KeyBinds.Text = Input.KeyCode.Name
 						KeyBinds.PlaceholderText = Input.KeyCode.Name
 						KeyBinds:ReleaseFocus() 
-						Settings.ToggleButton[ToggleButton.Name].Keybind = ToggleButton.Keybind
+						MainSettings.ToggleButton[ToggleButton.Name].Keybind = ToggleButton.Keybind
 					end       
 				end
 			end)
@@ -782,11 +786,11 @@ function Library:CreateMain()
 				if ToggleButton.Enabled then
 					ToggleStatus.BackgroundColor3 = Color3.fromRGB(0, 175, 0)
 					AddArray(ToggleButton.Name)
-					Settings.ToggleButton[ToggleButton.Name].Enabled = ToggleButton.Enabled
+					MainSettings.ToggleButton[ToggleButton.Name].Enabled = ToggleButton.Enabled
 				else
 					ToggleStatus.BackgroundColor3 = Color3.fromRGB(175, 0, 0)
 					RemoveArray(ToggleButton.Name)
-					Settings.ToggleButton[ToggleButton.Name].Enabled = ToggleButton.Enabled
+					MainSettings.ToggleButton[ToggleButton.Name].Enabled = ToggleButton.Enabled
 				end
 			end
 
@@ -818,12 +822,12 @@ function Library:CreateMain()
 						MobileButtons.BackgroundColor3 = Color3.fromRGB(0, 175, 0)
 						ToggleStatus.BackgroundColor3 = Color3.fromRGB(0, 175, 0)
 						AddArray(ToggleButton.Name)
-						Settings.ToggleButton[ToggleButton.Name].Enabled = ToggleButton.Enabled
+						MainSettings.ToggleButton[ToggleButton.Name].Enabled = ToggleButton.Enabled
 					else
 						ToggleStatus.BackgroundColor3 = Color3.fromRGB(175, 0, 0)
 						MobileButtons.BackgroundColor3 = Color3.fromRGB(175, 0, 0)
 						RemoveArray(ToggleButton.Name)
-						Settings.ToggleButton[ToggleButton.Name].Enabled = ToggleButton.Enabled
+						MainSettings.ToggleButton[ToggleButton.Name].Enabled = ToggleButton.Enabled
 					end
 				end
 
@@ -918,7 +922,7 @@ function Library:CreateMain()
 			elseif not ToggleButton.Enabled then
 				ToggleButton.Enabled = false
 				ToggleButtonClicked()
-				
+
 				if ToggleButton.Callback then
 					ToggleButton.Callback(ToggleButton.Enabled)
 				end
@@ -944,12 +948,12 @@ function Library:CreateMain()
 					Enabled = MiniToggle.Enabled or false,
 					Callback = MiniToggle.Callback or function() end
 				}
-				if not Settings.ToggleButton.MiniToggle[MiniToggle.Name] then
-					Settings.ToggleButton.MiniToggle[MiniToggle.Name] = {
+				if not MainSettings.ToggleButton.MiniToggle[MiniToggle.Name] then
+					MainSettings.ToggleButton.MiniToggle[MiniToggle.Name] = {
 						Enabled = MiniToggle.Enabled
 					}
 				else
-					MiniToggle.Enabled = Settings.ToggleButton.MiniToggle[MiniToggle.Name].Enabled
+					MiniToggle.Enabled = MainSettings.ToggleButton.MiniToggle[MiniToggle.Name].Enabled
 				end
 
 				local MiniToggleHolder = Instance.new("TextButton")
@@ -994,10 +998,10 @@ function Library:CreateMain()
 				local function MiniToggleClick()
 					if MiniToggle.Enabled then
 						MiniToggleHolderStatus.BackgroundColor3 = Color3.fromRGB(0, 175, 0)
-						Settings.ToggleButton.MiniToggle[MiniToggle.Name].Enabled = MiniToggle.Enabled
+						MainSettings.ToggleButton.MiniToggle[MiniToggle.Name].Enabled = MiniToggle.Enabled
 					else
 						MiniToggleHolderStatus.BackgroundColor3 = Color3.fromRGB(175, 0, 0)
-						Settings.ToggleButton.MiniToggle[MiniToggle.Name].Enabled = MiniToggle.Enabled
+						MainSettings.ToggleButton.MiniToggle[MiniToggle.Name].Enabled = MiniToggle.Enabled
 					end
 				end
 
@@ -1032,12 +1036,12 @@ function Library:CreateMain()
 					Default = Slider.Default,
 					Callback = Slider.Callback or function() end
 				}
-				if not Settings.ToggleButton.Sliders[Slider.Name] then
-					Settings.ToggleButton.Sliders[Slider.Name] = {
+				if not MainSettings.ToggleButton.Sliders[Slider.Name] then
+					MainSettings.ToggleButton.Sliders[Slider.Name] = {
 						Default = Slider.Default
 					}
 				else
-					Slider.Default = Settings.ToggleButton.Sliders[Slider.Name].Default
+					Slider.Default = MainSettings.ToggleButton.Sliders[Slider.Name].Default
 				end
 
 				local Value
@@ -1099,7 +1103,7 @@ function Library:CreateMain()
 					SliderHolderFront.Size = UDim2.fromScale(Value, 1)
 					SliderHolderName.Text = Slider.Name .. ": " .. SliderValue
 					Slider.Callback(SliderValue)
-					Settings.ToggleButton.Sliders[Slider.Name].Default = SliderValue
+					MainSettings.ToggleButton.Sliders[Slider.Name].Default = SliderValue
 				end
 
 				SliderHolderTriggerer.MouseButton1Down:Connect(function()
@@ -1134,12 +1138,12 @@ function Library:CreateMain()
 					Default = Dropdown.Default,
 					Callback = Dropdown.Callback or function() end
 				}
-				if not Settings.ToggleButton.Dropdown[Dropdown.Name] then
-					Settings.ToggleButton.Dropdown[Dropdown.Name] = {
+				if not MainSettings.ToggleButton.Dropdown[Dropdown.Name] then
+					MainSettings.ToggleButton.Dropdown[Dropdown.Name] = {
 						Default = Dropdown.Default
 					}
 				else
-					Dropdown.Default = Settings.ToggleButton.Dropdown[Dropdown.Name].Default
+					Dropdown.Default = MainSettings.ToggleButton.Dropdown[Dropdown.Name].Default
 				end
 
 				local Selected
@@ -1191,7 +1195,7 @@ function Library:CreateMain()
 					Selected = Dropdown.List[CurrentDropdown]
 					Dropdown.Callback(Dropdown.List[CurrentDropdown])
 					CurrentDropdown = CurrentDropdown % #Dropdown.List + 1
-					Settings.ToggleButton.Dropdown[Dropdown.Name].Default = Selected
+					MainSettings.ToggleButton.Dropdown[Dropdown.Name].Default = Selected
 				end)
 
 				if Dropdown.Default then
