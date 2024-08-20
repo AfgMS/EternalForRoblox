@@ -31,12 +31,11 @@ if isfolder(MainFolder) and isfolder(ConfigFolder) and isfolder(LogsFolder) then
 end
 
 local Library = {
-	CurrentVersion = 1.9,
+	CurrentVersion = 2.1,
 	Settings = {
 		LibraryKeybind = "RightShift",
-		LibraryColor = Color3.fromRGB(255, 255, 255),
+		LibraryColor = Color3.fromRGB(170, 255, 0),
 		MobileSupport = false,
-		ShowWatermark = true,
 	}
 }
 
@@ -80,8 +79,14 @@ function Library:CreateMain()
 
 	local ScreenGui = Instance.new("ScreenGui")
 	ScreenGui.Name = "Eternal_" .. Library.CurrentVersion
-	ScreenGui.Parent = PlayerGui:FindFirstChild("MainGui")
-	
+	if RunService:IsStudio() then
+		ScreenGui.Parent = PlayerGui
+	elseif game.PlaceId == 11630038968 then
+		ScreenGui.Parent = PlayerGui:FindFirstChild("MainGui")
+	else
+		ScreenGui.Parent = CoreGui
+	end
+
 	local MainFrame = Instance.new("Frame")
 	MainFrame.Parent = ScreenGui
 	MainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -154,17 +159,6 @@ function Library:CreateMain()
 	LogoFrame.BorderSizePixel = 0
 	LogoFrame.Position = UDim2.new(0.00932994019, 0, 0.0187969916, 0)
 	LogoFrame.Size = UDim2.new(0, 155, 0, 22)
-	LogoFrame.Visible = false
-	spawn(function()
-		while true do
-			wait()
-			if Library.Settings.ShowWatermark then
-				LogoFrame.Visible = true
-			else
-				LogoFrame.Visible = false
-			end
-		end
-	end)
 
 	local TopFrame = Instance.new("Frame")
 	TopFrame.Parent = LogoFrame
@@ -189,7 +183,7 @@ function Library:CreateMain()
 	LogoText.TextXAlignment = Enum.TextXAlignment.Left
 
 	local NewSize = game:GetService("TextService"):GetTextSize(LogoText.Text, LogoText.TextSize, LogoText.Font, Vector2.new(math.huge, math.huge))
-	LogoFrame.Size = UDim2.new(0, NewSize.X + 12, 0, 21)
+	LogoFrame.Size = UDim2.new(0, NewSize.X + 12, 0, 22)
 
 	local OpenGui = Instance.new("TextButton")
 	OpenGui.Parent = ScreenGui
@@ -212,7 +206,7 @@ function Library:CreateMain()
 	UICorner_5.CornerRadius = UDim.new(0, 4)
 	UICorner_5.Parent = OpenGui
 
-	local ArrayTable = {} --thanks to Xethrantic
+	local ArrayTable = {}
 	local ArraylistFrame = Instance.new("Frame")
 	ArraylistFrame.Parent = HudsFrame
 	ArraylistFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -241,12 +235,12 @@ function Library:CreateMain()
 		TextLabel.TextSize = 18.000
 		TextLabel.TextWrapped = true
 		TextLabel.TextXAlignment = Enum.TextXAlignment.Right
-		
-		local size = UDim2.new(0.01, game.TextService:GetTextSize(name , 18, Enum.Font.SourceSans, Vector2.new(0,0)).X, 0.033,0)
+
+		local size = UDim2.new(0.01, game.TextService:GetTextSize(name , 18, Enum.Font.SourceSans, Vector2.new(0,0)).X, 0.03,0)
 		if name == "" then
 			size = UDim2.fromScale(0,0)
 		end
-		
+
 		TextLabel.Size = size
 		table.insert(ArrayTable,TextLabel)
 		table.sort(ArrayTable,function(a,b) return game.TextService:GetTextSize(a.Text .. "  ", 18, Enum.Font.SourceSans, Vector2.new(0,0)).X > game.TextService:GetTextSize(b.Text .. "  ", 18, Enum.Font.SourceSans,Vector2.new(0,0)).X end)
@@ -489,56 +483,6 @@ function Library:CreateMain()
 		UIListLayout_4.Parent = ClientList
 		UIListLayout_4.SortOrder = Enum.SortOrder.LayoutOrder
 
-		local Watermark = Instance.new("TextButton")
-		Watermark.Parent = ClientList
-		Watermark.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		Watermark.BackgroundTransparency = 1.000
-		Watermark.BorderColor3 = Color3.fromRGB(0, 0, 0)
-		Watermark.BorderSizePixel = 0
-		Watermark.Size = UDim2.new(1, 0, 0, 23)
-		Watermark.AutoButtonColor = false
-		Watermark.Font = Enum.Font.SourceSans
-		Watermark.Text = ""
-		Watermark.TextColor3 = Color3.fromRGB(0, 0, 0)
-		Watermark.TextSize = 14.000
-
-		local WatermarkName = Instance.new("TextLabel")
-		WatermarkName.Parent = Watermark
-		WatermarkName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		WatermarkName.BackgroundTransparency = 1.000
-		WatermarkName.BorderColor3 = Color3.fromRGB(0, 0, 0)
-		WatermarkName.BorderSizePixel = 0
-		WatermarkName.Position = UDim2.new(0.200000003, 0, 0.158999994, 0)
-		WatermarkName.Size = UDim2.new(0, 80, 0, 15)
-		WatermarkName.Font = Enum.Font.SourceSans
-		WatermarkName.Text = "Watermark"
-		WatermarkName.TextColor3 = Color3.fromRGB(255, 255, 255)
-		WatermarkName.TextSize = 13.000
-		WatermarkName.TextXAlignment = Enum.TextXAlignment.Left
-
-		local WatermarkEnabled = false
-		local WatermarkStatus = Instance.new("Frame")
-		WatermarkStatus.Parent = Watermark
-		WatermarkStatus.BackgroundColor3 = Color3.fromRGB(0, 175, 0)
-		WatermarkStatus.BorderColor3 = Color3.fromRGB(0, 0, 0)
-		WatermarkStatus.BorderSizePixel = 0
-		WatermarkStatus.Position = UDim2.new(0.075000003, 0, 0.254000008, 0)
-		WatermarkStatus.Size = UDim2.new(0, 10, 0, 10)
-
-		local UICorner_4444 = Instance.new("UICorner")
-		UICorner_4444.CornerRadius = UDim.new(0, 3)
-		UICorner_4444.Parent = WatermarkStatus
-
-		Watermark.MouseButton1Click:Connect(function()
-			WatermarkEnabled = not WatermarkEnabled
-			if WatermarkEnabled then
-				Library.Settings.ShowWatermark = false
-				WatermarkStatus.BackgroundColor3 = Color3.fromRGB(175, 0, 0)
-			else
-				Library.Settings.ShowWatermark = true
-				WatermarkStatus.BackgroundColor3 = Color3.fromRGB(0, 175, 0)
-			end
-		end)
 
 		local MobileSupport = Instance.new("TextButton")
 		MobileSupport.Parent = ClientList
@@ -909,7 +853,7 @@ function Library:CreateMain()
 			elseif not ToggleButton.Enabled then
 				ToggleButton.Enabled = false
 				ToggleButtonClicked()
-				
+
 				if ToggleButton.Callback then
 					ToggleButton.Callback(ToggleButton.Enabled)
 				end
