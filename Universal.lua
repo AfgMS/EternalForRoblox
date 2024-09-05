@@ -7,7 +7,7 @@ local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
-local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+--local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
 local CurrentCamera = game.Workspace.CurrentCamera
 --[[
 local Rayparams = RaycastParams.new()
@@ -48,7 +48,7 @@ function GetNearestEntity(MaxDist, EntityModes, EntityGetModes, EntitySort, Enti
 				
 				if Distance ~= nil then
 					if EntityGetModes == "Distance" then
-						local HumanoidE = entities:FindFirstChild("Humanoid")
+						local Humanoid = entities:FindFirstChild("Humanoid")
 						if EntitySort == "Nearest" then
 							if Distance <= MaxDist and (not MinDist or Distance < MinDist) then
 								MinDist = Distance
@@ -60,13 +60,13 @@ function GetNearestEntity(MaxDist, EntityModes, EntityGetModes, EntitySort, Enti
 								Entity = entities
 							end
 						elseif EntitySort == "Health" then
-							if HumanoidE and Distance <= MaxDist and (not MinDist or HumanoidE.Health < MinDist) then
-								MinDist = HumanoidE.Health
+							if Humanoid and Distance <= MaxDist and (not MinDist or Humanoid.Health < MinDist) then
+								MinDist = Humanoid.Health
 								Entity = entities
 							end
 						elseif EntitySort == "Threat" then
-							if HumanoidE and Distance <= MaxDist and (not MinDist or HumanoidE.Health > MinDist) then
-								MinDist = HumanoidE.Health
+							if Humanoid and Distance <= MaxDist and (not MinDist or Humanoid.Health > MinDist) then
+								MinDist = Humanoid.Health
 								Entity = entities
 							end
 						end
@@ -188,7 +188,7 @@ spawn(function()
 end)
 
 spawn(function()
-	local Enabled, CPS = false, nil
+	local Enabled, CPS, Hold = false, nil, false
 	local AutoClicker = Tabs.Combat:CreateToggle({
 		Name = "AutoClicker",
 		Callback = function(callback)
@@ -197,8 +197,12 @@ spawn(function()
 				repeat
 					wait(1 / CPS)
 					local Tool = LocalPlayer.Character:FindFirstChildWhichIsA("Tool")
-					if UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
-						if Tool then
+					if Tool then
+						if Hold then
+							if UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
+								Tool:Activate()
+							end
+						else
 							Tool:Activate()
 						end
 					end
@@ -217,275 +221,11 @@ spawn(function()
 			end
 		end
 	})
-end)
-
-spawn(function()
-	local Enabled, Speed, YPos = false, nil, 0
-	local HumanoidRootPartY = LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position.Y
-	local OldGravity = game.Workspace.Gravity
-
-	UserInputService.JumpRequest:Connect(function()
-		YPos = YPos + 6
-	end)
-	UserInputService.InputBegan:Connect(function(Input, IsTyping)
-		if IsTyping then return end
-		if Input.KeyCode == Enum.KeyCode.LeftShift then
-			YPos = YPos - 6
-		end
-	end)
-
-	local Fly = Tabs.Movement:CreateToggle({
-		Name = "Fly",
-		Callback = function(callback)
-			Enabled = callback
-			if callback then
-				YPos = 0
-				HumanoidRootPartY = LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position.Y
-				repeat
-					task.wait()
-					local Motion = LocalPlayer.Character.Humanoid.MoveDirection * Speed
-					LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Velocity = Vector3.new(Motion.X, LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Velocity.Y, Motion.Z)
-					LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position.X, HumanoidRootPartY + YPos, LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position.Z) * LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame.Rotation
-					game.Workspace.Gravity = 0
-				until not Enabled
-				YPos = 0
-				game.Workspace.Gravity = OldGravity
-				HumanoidRootPartY =  LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position.Y
-				LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame = LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame
-			end
-		end
-	})
-	local CustomSpeed = Fly:CreateSlider({
-		Name = "Speed",
-		Min = 0,
-		Max = 30,
-		Default = 28,
+	local HoldModes = AutoClicker:CreateMiniToggle({
+		Name = "Hold",
 		Callback = function(callback)
 			if callback then
-				Speed = callback
-			end
-		end
-	})
-end)
-
-spawn(function()
-	local Enabled, Boost = false, nil
-	local HumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-	local HighJump = Tabs.Movement:CreateToggle({
-		Name = "HighJump",
-		AutoDisable = true,
-		Callback = function(callback)
-			Enabled = callback
-			if callback then
-				local OldBodyVelocity = LocalPlayer.Character:FindFirstChildWhichIsA("BodyVelocity")
-				if OldBodyVelocity then
-					OldBodyVelocity:Destroy()
-				end
-				local NewBodyVelocity = Instance.new("BodyVelocity")
-				NewBodyVelocity.Velocity = Vector3.new(0, Boost, 0)
-				NewBodyVelocity.P = Boost
-				NewBodyVelocity.MaxForce = Vector3.new(0, math.huge, 0)
-				NewBodyVelocity.Parent = HumanoidRootPart
-			else
-				wait(0.3)
-				local OldBodyVelocity = HumanoidRootPart:FindFirstChildWhichIsA("BodyVelocity")
-				if OldBodyVelocity then
-					OldBodyVelocity:Destroy()
-				end
-			end
-		end
-	})
-	local CustomBoost = HighJump:CreateSlider({
-		Name = "Boost",
-		Min = 0,
-		Max = 220,
-		Default = 75,
-		Callback = function(callback)
-			if callback then
-				Boost = callback
-			end
-		end
-	})
-end)
-
-spawn(function()
-	local Boost = nil
-	local OldGravity = game.Workspace.Gravity
-	local HumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-	local LongJump = Tabs.Movement:CreateToggle({
-		Name = "LongJump",
-		AutoDisable = true,
-		Callback = function(callback)
-			if callback then
-				game.Workspace.Gravity = 20
-				spawn(function()
-					if callback then
-						Humanoid.Jump = true
-					end
-				end)
-				wait(0.28)
-				if HumanoidRootPart then
-					local Motion = HumanoidRootPart.CFrame.LookVector * Boost
-					HumanoidRootPart.Velocity = Vector3.new(Motion.X, HumanoidRootPart.Velocity.Y, Motion.Z)
-				end
-			else
-				wait(1.15)
-				game.Workspace.Gravity = OldGravity
-				HumanoidRootPart.Velocity = Vector3.new(HumanoidRootPart.Velocity.X, HumanoidRootPart.Velocity.Y, HumanoidRootPart.Velocity.Z)
-			end
-		end
-	})
-	local CustomBoost = LongJump:CreateSlider({
-		Name = "Boost",
-		Min = 0,
-		Max = 115,
-		Default = 185,
-		Callback = function(callback)
-			if callback then
-				Boost = callback
-			end
-		end
-	})
-end)
-
-spawn(function()
-	local HumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-	local OldGravity = game.Workspace.Gravity
-	local Enabled, AutoJump, Gravity, Speeds = false, true, false, nil
-	local Speed = Tabs.Movement:CreateToggle({
-		Name = "Speed",
-		Callback = function(callback)
-			Enabled = callback
-			if callback then
-				repeat
-					wait()
-					if HumanoidRootPart then
-						local Motion = LocalPlayer.Character.Humanoid.MoveDirection * Speeds
-						HumanoidRootPart.Velocity = Vector3.new(Motion.X, HumanoidRootPart.Velocity.Y, Motion.Z)
-						if AutoJump then
-							Humanoid.Jump = true
-						end
-						if Gravity then
-							game.Workspace.Gravity = 82
-						else
-							game.Workspace.Gravity = OldGravity
-						end
-					end
-				until not Enabled
-				game.Workspace.Gravity = OldGravity
-				HumanoidRootPart.Velocity = Vector3.new(HumanoidRootPart.Velocity.X, HumanoidRootPart.Velocity.Y, HumanoidRootPart.Velocity.Z)
-			end
-		end
-	})
-	local CustomSpeed = Speed:CreateSlider({
-		Name = "Speed",
-		Min = 0,
-		Max = 30,
-		Default = 30,
-		Callback = function(callback)
-			if callback then
-				Speeds = callback
-			end
-		end
-	})
-	local AutoJumpMode = Speed:CreateMiniToggle({
-		Name = "AutoJump",
-		Enabled = true,
-		Callback = function(callback)
-			if callback then
-				AutoJump = true
-			else
-				AutoJump = false
-			end
-		end
-	})
-	local GravityMode = Speed:CreateMiniToggle({
-		Name = "Gravity",
-		Callback = function(callback)
-			if callback then
-				Gravity = true
-			else
-				Gravity = false
-			end
-		end
-	})
-end)
-
-spawn(function()
-	local BlurEffect, Size, Enabled = nil, nil, false
-	local Blur = Tabs.Render:CreateToggle({
-		Name = "Blur",
-		Callback = function(callback)
-			Enabled = callback
-			if callback then
-				if not Lighting:FindFirstChildWhichIsA("BlurEffect") then
-					BlurEffect = Instance.new("BlurEffect")
-					BlurEffect.Parent = Lighting
-				end
-				repeat
-					wait()
-					BlurEffect.Size = Size
-				until not Enabled
-			else
-				if BlurEffect then
-					BlurEffect:Destroy()
-				end
-			end
-		end
-	})
-	local CustomSize = Blur:CreateSlider({
-		Name = "Size",
-		Min = 0,
-		Max = 100,
-		Default = 28,
-		Callback = function(callback)
-			if callback then
-				Size = callback
-			end
-		end
-	})
-end)
-
-spawn(function()
-	local function Hightlight(player)
-		if player ~= LocalPlayer and IsAlive(player) then
-			local highlight = player.Character:FindFirstChildOfClass("Highlight")
-			if not highlight or highlight.Name ~= "Chams" then
-				highlight = Instance.new("Highlight")
-				highlight.Name = "Chams"
-				highlight.Parent = player.Character
-				highlight.FillTransparency = 1
-				highlight.OutlineTransparency = 0.45
-			end
-		end
-	end
-
-	local function RemoveHighlight(player)
-		if player ~= LocalPlayer and IsAlive(player) then
-			local highlight = player.Character:FindFirstChildOfClass("Highlight")
-			if highlight and highlight.Name == "Chams" then
-				highlight:Destroy()
-			end
-		end
-	end
-
-	local Enabled = false
-	local Chams = Tabs.Render:CreateToggle({
-		Name = "Chams",
-		Callback = function(callback)
-			Enabled = callback
-			if callback then
-				repeat
-					wait()
-					Players.PlayerAdded:Connect(Hightlight)
-					Players.PlayerRemoving:Connect(RemoveHighlight)
-					for i,v in pairs(Players:GetPlayers()) do
-						Hightlight(v)
-					end
-				until not Enabled
-				for i,v in pairs(Players:GetPlayers()) do
-					RemoveHighlight(v)
-				end
+				Hold = callback
 			end
 		end
 	})
