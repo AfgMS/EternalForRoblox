@@ -1,4 +1,5 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AfgMS/EternalForRoblox/main/Library.lua"))()
+local TweenService = game:GetService("TweenService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 local Lighting = game:GetService("Lighting")
@@ -6,6 +7,10 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
 local CurrentCamera = game.Workspace.CurrentCamera
+local Viewmodel = CurrentCamera:FindFirstChildWhichIsA("Model")
+if not shared.OriginalC0 then
+	shared.OriginalC0 = Viewmodel:FindFirstChildWhichIsA("Model"):WaitForChild("Handle"):WaitForChild("MainPart").C0
+end
 local Main = Library:CreateMain()
 local Tabs = {
 	Combat = Main:CreateTab("Combat", false),
@@ -15,19 +20,6 @@ local Tabs = {
 	Exploit = Main:CreateTab("Exploit", false),
 	Misc = Main:CreateTab("Misc", true)
 }
-
---[[ Not Used
-game:GetService("ReplicatedStorage").__comm__.RP.gamemode:FireServer()
-game:GetService("ReplicatedStorage").Remotes.Jumpscare:FireServer()
-game:GetService("ReplicatedStorage").Packages.Knit.Services.CombatService.RE.OnKill:FireServer()
-game:GetService("ReplicatedStorage").Packages.Knit.Services.VoidService.RE.OnFell:FireServer()
-game:GetService("ReplicatedStorage").Packages.Knit.Services.ModerationService.RF.Ban:InvokeServer()
-game:GetService("ReplicatedStorage").Packages.Knit.Services.ModerationService.RF.Unban:InvokeServer()
-game:GetService("ReplicatedStorage").Packages.Knit.Services.NetworkService.RF.SendReport:InvokeServer()
-game:GetService("ReplicatedStorage").Packages.Knit.Services.GuildService.RF.KickPlayer:InvokeServer()
-game:GetService("ReplicatedStorage").Packages.Knit.Services.CombatService.RE.KnockBackApplied:FireServer()
---]]
-
 
 function IsAlive(entity)
 	return entity and entity.Character and entity.Character:FindFirstChildOfClass("Humanoid") and entity.Character:FindFirstChildOfClass("Humanoid").Health > 0
@@ -79,20 +71,35 @@ function CheckTools(name)
 	return TooResults
 end
 
-function BowFire(pos, power)
-	local Bow = LocalPlayer.Character:FindFirstChildWhichIsA("Tool")
-	if Bow.Name:match("Bow") then
-		Bow:WaitForChild("__comm__"):WaitForChild("RF"):FindFirstChild("Fire"):InvokeServer({
-			[1] = pos,
-			[2] = power
-		})
+local function GetToolsViewmodel()
+	local ToolsMain = nil
+	if Viewmodel and Viewmodel.Name:match("View") then
+		for _,tools in pairs(Viewmodel:GetChildren()) do
+			if tools:IsA("Model") then
+				for _,handle in pairs(tools:GetChildren()) do
+					if handle.Name:match("Handle") then
+						for _,mainpart in pairs(handle:GetChildren()) do
+							if mainpart.Name:match("Main") then
+								ToolsMain = mainpart
+							end
+						end
+					end
+				end
+			end
+		end
 	end
+	return ToolsMain
 end
 
-function PlaceFire(pos)
-	ReplicatedStorage:WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("PlaceBlock"):InvokeServer({
-		[1] = pos
-	})
+function PlayItemView(anim)
+	local Item = GetToolsViewmodel()
+	if Item then
+		local Tween = TweenService:Create(Item, TweenInfo.new(anim.Time), {C0 = shared.OriginalC0 * anim.CFrame})
+		if Tween then
+			Tween:Play()
+			Tween.Completed:Wait()
+		end
+	end
 end
 
 spawn(function()
@@ -113,14 +120,14 @@ spawn(function()
 					elseif Aim == "Leg" then
 						Direction = (Player.Character:FindFirstChild("LowerTorso").Position - CurrentCamera.CFrame.Position).unit
 					end
+					if Player then
 					local NewCFrame = CFrame.new(CurrentCamera.CFrame.Position, CurrentCamera.CFrame.Position + Direction)
-					if Hold then
-						if Player then
+						if Hold then
 							if UserInputService:IsMouseButtonPressed(Enum.UserInputType[HoldType]) then
 								CurrentCamera.CFrame = NewCFrame
+							else
+								CurrentCamera.CFrame = NewCFrame
 							end
-						else
-							CurrentCamera.CFrame = NewCFrame
 						end
 					end
 				until not Enabled
@@ -151,7 +158,11 @@ spawn(function()
 		Name = "Hold",
 		Enabled = true,
 		Callback = function(callback)
-			Hold = callback
+			if callback then
+				Hold = true
+			else
+				Hold = false
+			end
 		end
 	})
 	local CustomDistance = AimAssist:CreateSlider({
@@ -190,7 +201,7 @@ spawn(function()
 		Name = "CPS",
 		Min = 0,
 		Max = 100,
-		Default = 12,
+		Default = 50,
 		Callback = function(callback)
 			if callback then
 				CPS = callback
@@ -211,8 +222,10 @@ spawn(function()
 					local Player = GetPlayer(Distance, "Distance")
 					Sword = GetTools("Sword")
 					if Players then
-						if Sword then
-							Humanoid:EquipTool(Sword)
+						if Sword ~= nil then
+							if LocalPlayer.Character:WaitForChild(Sword.Name) then
+								Humanoid:EquipTool(Sword)
+							end
 						end
 					end
 				until not Enabled
@@ -237,6 +250,7 @@ local HitCrit = false
 spawn(function()
 	local Criticals = Tabs.Combat:CreateToggle({
 		Name = "Criticals",
+		Enabled = true,
 		Callback = function(callback)
 			if callback then
 				HitCrit = true
@@ -250,9 +264,9 @@ end)
 spawn(function()
 	local function KillRandom(plr)
 		local Messages = {
-			"Ez " .. plr.Name,
-			"Im the best!, is that right " .. plr.Name .. "?",
-			"Train harder unless you wanna be this noob called " .. plr.Name
+			"Soo bad, just use Eternal " .. plr.Name .. "!",
+			"Get Eternal Now! " .. plr.Name,
+			"LOL " .. plr.Name
 		}
 		return Messages[math.random(1, #Messages)]
 	end
@@ -260,7 +274,7 @@ spawn(function()
 	local function DiedRandom(plr)
 		local Messages = {
 			"Lag! Real! ",
-			"Oops, " .. plr.Name .. ", You Cheater!"
+			"Oops, " .. plr.Name .. ", Reported!"
 		}
 		return Messages[math.random(1, #Messages)]
 	end
@@ -279,7 +293,7 @@ spawn(function()
 		Callback = function(callback)
 			Enabled = callback
 			if callback then
-				game:GetService("ReplicatedStorage").Packages.Knit.Services.CombatService.RE.OnKill.OnClientEvent:Connect(function(killer, killed, ...)
+				game:GetService("ReplicatedStorage").Modules.Knit.Services.CombatService.RE.OnKill.OnClientEvent:Connect(function(killer, killed, ...)
 					if Enabled then
 						if  killer.Name == LocalPlayer.Name and killed.Name ~= LocalPlayer.Name then
 							local message = KillRandom(killed)
@@ -297,9 +311,14 @@ end)
 
 local KillAuraDistance = nil
 local KillAuraPlayerModes = nil
+local KillAuraAnimation = nil
 spawn(function()
+	local BillboardGui = Instance.new("BillboardGui")
+	local ImageLabel = Instance.new("ImageLabel")
+	local Viewmodel = GetToolsViewmodel()
 	local Enabled, BlockingMode = false, nil
-	local BlockAnim, SwingAnim
+	local BlockAnim, SwingAnim, AnimSword
+	local Sword
 	local KillAura = Tabs.Combat:CreateToggle({
 		Name = "KillAura",
 		Callback = function(callback)
@@ -310,42 +329,83 @@ spawn(function()
 					if IsAlive(LocalPlayer) then
 						local Player = GetPlayer(KillAuraDistance, KillAuraPlayerModes)
 						if Player then
-							local Sword = CheckTools("Sword")
+							Sword = CheckTools("Sword")
 							if Sword then
-								BlockAnim = Sword:WaitForChild("Animations").BlockHit
-								SwingAnim = Sword:WaitForChild("Animations").Swing
 								if BlockingMode == "Fake" then
-									Humanoid:LoadAnimation(BlockAnim):Play()
 									local args = {
 										[1] = false,
 										[2] = Sword.Name
 									}
-									game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
+									game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
 								elseif	BlockingMode == "Remote" then
-									Humanoid:LoadAnimation(BlockAnim):Stop()
 									local args = {
 										[1] = true,
 										[2] = Sword.Name
 									}
-									game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
-								elseif BlockingMode == "SemiLegit" then
-									Humanoid:LoadAnimation(BlockAnim):Play()
-									local args = {
-										[1] = true,
-										[2] = Sword.Name
-									}
-									game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
+									game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
 								end
+								spawn(function()
+									if Enabled then
+										if KillAuraAnimation ~= nil then
+											for i,v in pairs(KillAuraAnimation) do
+												PlayItemView(v)
+											end
+										else
+											Sword:Activate()
+										end
+									end
+								end)
+								spawn(function()
+									if Enabled and BillboardGui and ImageLabel then
+										BillboardGui.Active = true
+										BillboardGui.AlwaysOnTop = true
+										BillboardGui.MaxDistance = math.huge
+										BillboardGui.Size = UDim2.new(18, 0, 18, 0)
+										BillboardGui.StudsOffsetWorldSpace = Vector3.new(0, 5, 0)
+										BillboardGui.Parent = Player.Character:FindFirstChild("HumanoidRootPart")
+
+										ImageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+										ImageLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+										ImageLabel.BackgroundTransparency = 1.000
+										ImageLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+										ImageLabel.BorderSizePixel = 0
+										ImageLabel.Parent = BillboardGui
+										ImageLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+										ImageLabel.Size = UDim2.new(0.215, 0, 0.245, 0)
+										ImageLabel.Image = "http://www.roblox.com/asset/?id=17329562110" 
+									else
+										BillboardGui.Active = false
+									end
+								end)
 								local args = {
 									[1] = Player.Character,
 									[2] = HitCrit,
 									[3] = Sword.Name
 								}
-								game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("AttackPlayerWithSword"):InvokeServer(unpack(args))
+								game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("AttackPlayerWithSword"):InvokeServer(unpack(args))
 							end
+						else
+							if KillAuraAnimation ~= nil then
+								Viewmodel.C0 = shared.OriginalC0
+							end
+							BillboardGui.Active = false
+							local args = {
+								[1] = false,
+								[2] = Sword.Name
+							}
+							game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
 						end
 					end
 				until not Enabled
+				BillboardGui.Active = false
+				if KillAuraAnimation ~= nil then
+					Viewmodel.C0 = shared.OriginalC0
+				end
+				local args = {
+					[1] = false,
+					[2] = Sword.Name
+				}
+				game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
 			end
 		end
 	})
@@ -382,21 +442,171 @@ spawn(function()
 	})
 end)
 
---Velocity
+--[[ OldKillAura
+local KillAuraDistance = nil
+local KillAuraPlayerModes = nil
+local KillAuraAnimation = nil
+spawn(function()
+	local BillboardGui = Instance.new("BillboardGui")
+	local ImageLabel = Instance.new("ImageLabel")
+	local Viewmodel = GetToolsViewmodel()
+	local Enabled, BlockingMode = false, nil
+	local BlockAnim, SwingAnim, AnimSword
+	local Sword
+	local KillAura = Tabs.Combat:CreateToggle({
+		Name = "KillAura",
+		Callback = function(callback)
+			Enabled = callback
+			if callback then
+				repeat
+					wait()
+					if IsAlive(LocalPlayer) then
+						local Player = GetPlayer(KillAuraDistance, KillAuraPlayerModes)
+						if Player then
+							Sword = CheckTools("Sword")
+							if Sword then
+								--BlockAnim = Sword:WaitForChild("Animations").BlockHit
+								--SwingAnim = Sword:WaitForChild("Animations").Swing
+								if BlockingMode == "Fake" then
+									--Humanoid:LoadAnimation(BlockAnim):Play()
+									local args = {
+										[1] = false,
+										[2] = Sword.Name
+									}
+									game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
+								elseif	BlockingMode == "Remote" then
+									--Humanoid:LoadAnimation(BlockAnim):Stop()
+									local args = {
+										[1] = true,
+										[2] = Sword.Name
+									}
+									game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
+									--[[
+								elseif BlockingMode == "SemiLegit" then
+									Humanoid:LoadAnimation(BlockAnim):Play()
+									local args = {
+										[1] = true,
+										[2] = Sword.Name
+									}
+									game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
+								end
+								spawn(function()
+									if Enabled then
+										if KillAuraAnimation ~= nil then
+											--Humanoid:LoadAnimation(SwingAnim):Play()
+											for i,v in pairs(KillAuraAnimation) do
+												PlayItemView(v)
+											end
+										else
+											Sword:Activate()
+											--Humanoid:LoadAnimation(SwingAnim):Play()
+										end
+									end
+								end)
+								spawn(function()
+									if Enabled and BillboardGui and ImageLabel then
+										BillboardGui.Active = true
+										BillboardGui.AlwaysOnTop = true
+										BillboardGui.MaxDistance = math.huge
+										BillboardGui.Size = UDim2.new(18, 0, 18, 0)
+										BillboardGui.StudsOffsetWorldSpace = Vector3.new(0, 5, 0)
+										BillboardGui.Parent = Player.Character:FindFirstChild("HumanoidRootPart")
+
+										ImageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+										ImageLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+										ImageLabel.BackgroundTransparency = 1.000
+										ImageLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+										ImageLabel.BorderSizePixel = 0
+										ImageLabel.Parent = BillboardGui
+										ImageLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+										ImageLabel.Size = UDim2.new(0.215, 0, 0.245, 0)
+										ImageLabel.Image = "http://www.roblox.com/asset/?id=17329562110" 
+									else
+										BillboardGui.Active = false
+									end
+								end)
+								local args = {
+									[1] = Player.Character,
+									[2] = HitCrit,
+									[3] = Sword.Name
+								}
+								game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("AttackPlayerWithSword"):InvokeServer(unpack(args))
+							end
+						else
+							if KillAuraAnimation ~= nil then
+								Viewmodel.C0 = shared.OriginalC0
+							end
+							BillboardGui.Active = false
+							--Humanoid:LoadAnimation(SwingAnim):Stop()
+							--Humanoid:LoadAnimation(BlockAnim):Stop()
+							local args = {
+								[1] = false,
+								[2] = Sword.Name
+							}
+							game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
+						end
+					end
+				until not Enabled
+				BillboardGui.Active = false
+				--Humanoid:LoadAnimation(SwingAnim):Stop()
+				--Humanoid:LoadAnimation(BlockAnim):Stop()
+				if KillAuraAnimation ~= nil then
+					Viewmodel.C0 = shared.OriginalC0
+				end
+				local args = {
+					[1] = false,
+					[2] = Sword.Name
+				}
+				game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("ToggleBlockSword"):InvokeServer(unpack(args))
+			end
+		end
+	})
+	local CustomKillAuraPlayerModes = KillAura:CreateDropdown({
+		Name = "PlayerMode",
+		List = {"Distance", "Health"},
+		Default = "Distance",
+		Callback = function(callback)
+			if callback then
+				KillAuraPlayerModes = callback
+			end
+		end
+	})
+	local CustomBlockingMode = KillAura:CreateDropdown({
+		Name = "BlockingMode",
+		List = {"Fake", "Remote", "SemiLegit"},
+		Default = "Fake",
+		Callback = function(callback)
+			if callback then
+				BlockingMode = callback
+			end
+		end
+	})
+	local CustomDistance = KillAura:CreateSlider({
+		Name = "Distance",
+		Min = 0,
+		Max = 20,
+		Default = 20,
+		Callback = function(callback)
+			if callback then
+				KillAuraDistance = callback
+			end
+		end
+	})
+end)
+--]]
+
 --[[
 spawn(function()
 	local Enabled = false
 	local HumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 	local Velocity = Tabs.Combat:CreateToggle({
-		Name = "Velocity",
+		Name = "JumpReset",
 		Callback = function(callback)
 			Enabled = callback
 			if callback then
-				ReplicatedStorage.Packages.Knit.Services.CombatService.RE.KnockBackApplied.OnClientEvent:Connect(function()
+				ReplicatedStorage.Modules.Knit.Services.CombatService.RE.KnockBackApplied.OnClientEvent:Connect(function()
 					if Enabled then
-						HumanoidRootPart.Anchored = true
-						wait(1)
-						HumanoidRootPart.Anchored = false
+						Humanoid.Jump = true			
 					end
 				end)
 			end
@@ -444,7 +654,7 @@ spawn(function()
 	local CustomSpeed = Fly:CreateSlider({
 		Name = "Speed",
 		Min = 0,
-		Max = 38,
+		Max = 30,
 		Default = 28,
 		Callback = function(callback)
 			if callback then
@@ -485,7 +695,7 @@ spawn(function()
 		Name = "Boost",
 		Min = 0,
 		Max = 220,
-		Default = 140,
+		Default = 75,
 		Callback = function(callback)
 			if callback then
 				Boost = callback
@@ -496,76 +706,170 @@ end)
 
 spawn(function()
 	local Boost = nil
+	local OldGravity = game.Workspace.Gravity
 	local HumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 	local LongJump = Tabs.Movement:CreateToggle({
 		Name = "LongJump",
 		AutoDisable = true,
-		Enabled = false,
-		Callback = function(enabled)
-			if enabled then
-				if HumanoidRootPart then
-					spawn(function()
+		Callback = function(callback)
+			if callback then
+				game.Workspace.Gravity = 20
+				spawn(function()
+					if callback then
 						Humanoid.Jump = true
-					end)
+					end
+				end)
+				wait(0.28)
+				if HumanoidRootPart then
 					local Motion = HumanoidRootPart.CFrame.LookVector * Boost
 					HumanoidRootPart.Velocity = Vector3.new(Motion.X, HumanoidRootPart.Velocity.Y, Motion.Z)
 				end
+			else
+				wait(1.15)
+				game.Workspace.Gravity = OldGravity
+				HumanoidRootPart.Velocity = Vector3.new(HumanoidRootPart.Velocity.X, HumanoidRootPart.Velocity.Y, HumanoidRootPart.Velocity.Z)
 			end
 		end
 	})
-	local CustomBoostL = LongJump:CreateSlider({
+	local CustomBoost = LongJump:CreateSlider({
 		Name = "Boost",
-		Min = 50,
-		Max = 100,
-		Default = 65,
-		Callback = function(value)
-			Boost = value
+		Min = 0,
+		Max = 105,
+		Default = 145,
+		Callback = function(callback)
+			if callback then
+				Boost = callback
+			end
 		end
 	})
 end)
 
 spawn(function()
 	local HumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-	local Enabled, Diagonal, Expand = false, false, 1
-	local DefaultPos = Vector3.zero
+	local OldGravity = game.Workspace.Gravity
+	local Enabled, AutoJump, Gravity, Speeds = false, true, false, nil
+	local Speed = Tabs.Movement:CreateToggle({
+		Name = "Speed",
+		Callback = function(callback)
+			Enabled = callback
+			if callback then
+				repeat
+					wait()
+					if IsAlive(LocalPlayer) then
+						if HumanoidRootPart then
+							local Motion = LocalPlayer.Character.Humanoid.MoveDirection * Speeds
+							HumanoidRootPart.Velocity = Vector3.new(Motion.X, HumanoidRootPart.Velocity.Y, Motion.Z)
+							if AutoJump then
+								Humanoid.Jump = true
+							end
+							if Gravity then
+								game.Workspace.Gravity = 82
+							else
+								game.Workspace.Gravity = OldGravity
+							end
+						end
+					end
+				until not Enabled
+				game.Workspace.Gravity = OldGravity
+				HumanoidRootPart.Velocity = Vector3.new(HumanoidRootPart.Velocity.X, HumanoidRootPart.Velocity.Y, HumanoidRootPart.Velocity.Z)
+			end
+		end
+	})
+	local AutoJumpMode = Speed:CreateMiniToggle({
+		Name = "AutoJump",
+		Enabled = true,
+		Callback = function(callback)
+			if callback then
+				AutoJump = true
+			else
+				AutoJump = false
+			end
+		end
+	})
+	local GravityMode = Speed:CreateMiniToggle({
+		Name = "Gravity",
+		Callback = function(callback)
+			if callback then
+				Gravity = true
+			else
+				Gravity = false
+			end
+		end
+	})
+	local CustomSpeed = Speed:CreateSlider({
+		Name = "Speed",
+		Min = 0,
+		Max = 30,
+		Default = 30,
+		Callback = function(callback)
+			if callback then
+				Speeds = callback
+			end
+		end
+	})
+end)
 
-	local function GetPlacePos(pos, diagonalmode)
+spawn(function()
+	local Enabled, Diagonal, ToolCheck, Expand = false, false, false, nil
+	local DefaultPos = Vector3.zero
+	local function GetPlace(pos, diagonal)
 		local NewPos = Vector3.new(math.floor((pos.X / 3) + 0.5) * 3, math.floor((pos.Y / 3) + 0.5) * 3, math.floor((pos.Z / 3) + 0.5) * 3)
-		local Offset = (DefaultPos - NewPos)
 		if IsAlive(LocalPlayer) then
-			local HumanoidAngle = math.deg(math.atan2(-Humanoid.MoveDirection.X, -Humanoid.MoveDirection.Z))
-			local DiagonalCheck = (HumanoidAngle >= 130 and HumanoidAngle <= 150) or (HumanoidAngle <= -35 and HumanoidAngle >= -50) or (HumanoidAngle >= 35 and HumanoidAngle <= 50) or (HumanoidAngle <= -130 and HumanoidAngle >= -150)
-			if DiagonalCheck and ((NewPos.X == 0 and NewPos.Z ~= 0) or (NewPos.X ~= 0 and NewPos.Z == 0)) and diagonalmode then
+			local HumanoidDirections = math.deg(math.atan2(-Humanoid.MoveDirection.X, -Humanoid.MoveDirection.Z))
+			local DiagonalAngle = (HumanoidDirections >= 130 and HumanoidDirections <= 150) or (HumanoidDirections <= -35 and HumanoidDirections >= -50) or (HumanoidDirections >= 35 and HumanoidDirections <= 50) or (HumanoidDirections <= -130 and HumanoidDirections >= -150)
+			if DiagonalAngle and ((NewPos.X == 0 and NewPos.Z ~= 0) or (NewPos.X ~= 0 and NewPos.Z == 0)) and diagonal then
 				return DefaultPos
 			end
 		end
 		return NewPos
 	end
-
-	local Scaffold = Tabs.Movement:CreateToggle({
+	
+	local Scaffold = Tabs.Player:CreateToggle({
 		Name = "Scaffold",
 		Callback = function(callback)
 			Enabled = callback
 			if callback then
 				repeat
-					task.wait()
+					wait()
 					if IsAlive(LocalPlayer) then
+						local HumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+						local Block = CheckTools("Blocks")
 						for i = 1, Expand do
-							local PlacePos = GetPlacePos((HumanoidRootPart.Position + (Humanoid.MoveDirection * (i * 3.5))) + Vector3.new(0, -((HumanoidRootPart.Size.Y / 2) + Humanoid.HipHeight + 1.5)), Diagonal)
-							PlacePos = Vector3.new(PlacePos.X, PlacePos.Y, PlacePos.Z)
-							local args = {
-								[1] = PlacePos
-							}
-
-							game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("PlaceBlock"):InvokeServer(unpack(args))
-							if Expand > 1 then
-								task.wait()
-							end
+							local PlacePos = GetPlace(HumanoidRootPart.Position + Humanoid.MoveDirection * (i * 3.5) - Vector3.yAxis * ((HumanoidRootPart.Size.Y / 2) + Humanoid.HipHeight + 1.5), Diagonal)
 							DefaultPos = PlacePos
+							if ToolCheck then
+								if Block then
+									local args = {
+										[1] = PlacePos
+									}
+
+									game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("PlaceBlock"):InvokeServer(unpack(args))
+								end
+							else
+								local args = {
+									[1] = PlacePos
+								}
+
+								game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ToolService"):WaitForChild("RF"):WaitForChild("PlaceBlock"):InvokeServer(unpack(args))
+							end
+							if Expand > 1 then
+								wait()
+							end
 						end
 					end
 				until not Enabled
 				DefaultPos = Vector3.zero
+			end
+		end
+	})
+	local CustomExpand = Scaffold:CreateSlider({
+		Name = "Expand",
+		Min = 0,
+		Max = 3,
+		Default = 1,
+		Callback = function(callback)
+			if callback then
+				Expand = callback
 			end
 		end
 	})
@@ -580,98 +884,100 @@ spawn(function()
 			end
 		end
 	})
+	local ToolCheckMode = Scaffold:CreateMiniToggle({
+		Name = "ToolCheck",
+		Callback = function(callback)
+			if callback then
+				ToolCheck = true
+			else
+				ToolCheck = false
+			end
+		end
+	})
 end)
 
 spawn(function()
-	local Enabled, NewSpeed, Mode = true, nil, nil
-	local OldGravity = game.Workspace.Gravity
-	local OldJumpHeight = Humanoid.JumpHeight
-	local OldWalkspeed = Humanoid.WalkSpeed
-	local HumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-	local Speed = Tabs.Movement:CreateToggle({
-		Name = "Speed",
+	local Enabled = false
+	local AutoHeal = Tabs.Player:CreateToggle({
+		Name = "AutoGapple",
+		Callback = function(callback)
+			if callback then
+				repeat
+					wait()
+					local Apple = CheckTools("Apple")
+					if Apple then
+						local args = {
+							[1] = true
+						}
+
+						game:GetService("Players").LocalPlayer.Character.GoldApple.__comm__.RF.Eat:InvokeServer(unpack(args))
+					end
+				until not Enabled
+				local args = {
+					[1] = false
+				}
+
+				game:GetService("Players").LocalPlayer.Character.GoldApple.__comm__.RF.Eat:InvokeServer(unpack(args))
+			end
+		end
+	})
+end)
+
+spawn(function()
+	local Enabled, Selected = false, nil
+	local Animation = Tabs.Render:CreateToggle({
+		Name = "Animation",
 		Callback = function(callback)
 			Enabled = callback
 			if callback then
 				repeat
-					task.wait()
-					if IsAlive(LocalPlayer) then
-						if Mode == "WalkSpeed" then
-							Humanoid.JumpHeight = OldJumpHeight
-							Humanoid.WalkSpeed = NewSpeed
-						elseif Mode == "Hop" then
-							game.Workspace.Gravity = 82
-							Humanoid.WalkSpeed = OldWalkspeed
-							local velo = LocalPlayer.Character.Humanoid.MoveDirection * NewSpeed
-							HumanoidRootPart.Velocity = Vector3.new(velo.X, HumanoidRootPart.Velocity.Y, velo.Z)
-							spawn(function()
-								while Enabled do
-									wait()
-									Humanoid.Jump = true
-								end
-							end)
-						elseif Mode == "LowHop" then
-							Humanoid.WalkSpeed = OldWalkspeed
-							game.Workspace.Gravity = OldGravity
-							Humanoid.JumpHeight = 0.20
-							local velo = LocalPlayer.Character.Humanoid.MoveDirection * NewSpeed
-							HumanoidRootPart.Velocity = Vector3.new(velo.X, HumanoidRootPart.Velocity.Y, velo.Z)
-							spawn(function()
-								while Enabled do
-									wait()
-									Humanoid.Jump = true
-								end
-							end)
-						end
+					wait()
+					if Selected == "Eternal1" then
+						KillAuraAnimation = {
+							{CFrame = CFrame.new(0, 0, 1.5) * CFrame.Angles(math.rad(-35), math.rad(50), math.rad(110)), Time = 0.15},
+							{CFrame = CFrame.new(0, 0.8, 1.0) * CFrame.Angles(math.rad(-65), math.rad(50), math.rad(110)), Time = 0.15}
+						}
+					elseif Selected == "Eternal2" then
+						KillAuraAnimation = {
+							{CFrame = CFrame.new(-2.5, 0, 3.5) * CFrame.Angles(math.rad(0), math.rad(25), math.rad(60)), Time = 0.1},
+							{CFrame = CFrame.new(-0.5, 0, 1.3) * CFrame.Angles(math.rad(0), math.rad(25), math.rad(60)), Time = 0.1}
+						}
 					end
 				until not Enabled
-				Humanoid.WalkSpeed = OldWalkspeed
-				game.Workspace.Gravity = OldGravity
-				Humanoid.JumpHeight = OldJumpHeight
+				KillAuraAnimation = nil
 			end
 		end
 	})
-	local CustomSpeedMode = Speed:CreateDropdown({
-		Name = "SpeedMode",
-		List = {"WalkSpeed", "Hop", "LowHop"},
-		Default = "Hop",
+	local CustomAnimations = Animation:CreateDropdown({
+		Name = "Animations",
+		List = {"Eternal1", "Eternal2"},
+		Default = "Eternal1",
 		Callback = function(callback)
 			if callback then
-				Mode = callback
-			end
-		end
-	})
-	local CustomSpeed = Speed:CreateSlider({
-		Name = "Speed",
-		Min = 0,
-		Max = 50,
-		Default = 28,
-		Callback = function(callback)
-			if callback then
-				NewSpeed = callback
+				Selected = callback
 			end
 		end
 	})
 end)
 
 spawn(function()
-	local Blurz, Size, Enabled = nil, nil, false
+	local BlurEffect, Size, Enabled = nil, nil, false
 	local Blur = Tabs.Render:CreateToggle({
 		Name = "Blur",
 		Callback = function(callback)
 			Enabled = callback
 			if callback then
 				if not Lighting:FindFirstChildWhichIsA("BlurEffect") then
-					Blurz = Instance.new("BlurEffect")
-					Blurz.Parent = Lighting
+					BlurEffect = Instance.new("BlurEffect")
+					BlurEffect.Parent = Lighting
 				end
 				repeat
 					wait()
-					Blurz.Size = Size
+					BlurEffect.Size = Size
 				until not Enabled
 			else
-				if Blurz then
-					Blurz:Destroy()
+				if BlurEffect then
+					BlurEffect:Destroy()
 				end
 			end
 		end
@@ -692,8 +998,10 @@ end)
 spawn(function()
 	local function Hightlight(player)
 		if player ~= LocalPlayer and IsAlive(player) then
-			if not player.Character:FindFirstChildOfClass("Highlight") then
-				local highlight = Instance.new("Highlight")
+			local highlight = player.Character:FindFirstChildOfClass("Highlight")
+			if not highlight or highlight.Name ~= "Chams" then
+				highlight = Instance.new("Highlight")
+				highlight.Name = "Chams"
 				highlight.Parent = player.Character
 				highlight.FillTransparency = 1
 				highlight.OutlineTransparency = 0.45
@@ -702,8 +1010,11 @@ spawn(function()
 	end
 
 	local function RemoveHighlight(player)
-		if player ~= LocalPlayer and IsAlive(player) and player.Character:FindFirstChildOfClass("Highlight") then
-			player.Character:FindFirstChildOfClass("Highlight"):Destroy()
+		if player ~= LocalPlayer and IsAlive(player) then
+			local highlight = player.Character:FindFirstChildOfClass("Highlight")
+			if highlight and highlight.Name == "Chams" then
+				highlight:Destroy()
+			end
 		end
 	end
 
@@ -714,14 +1025,14 @@ spawn(function()
 			Enabled = callback
 			if callback then
 				repeat
-					task.wait()
+					wait()
 					Players.PlayerAdded:Connect(Hightlight)
 					Players.PlayerRemoving:Connect(RemoveHighlight)
-					for i,v in pairs(Players:GetChildren()) do
+					for i,v in pairs(Players:GetPlayers()) do
 						Hightlight(v)
 					end
 				until not Enabled
-				for i,v in pairs(Players:GetChildren()) do
+				for i,v in pairs(Players:GetPlayers()) do
 					RemoveHighlight(v)
 				end
 			end
@@ -730,7 +1041,77 @@ spawn(function()
 end)
 
 spawn(function()
-	local Enabled, NearestPlayer, TargetImage  = false, nil, nil
+	local Enabled = false
+	local function CreateESP(player)
+		if player ~= LocalPlayer and IsAlive(player) then
+			local BillboardGui = player.Character:FindFirstChild("2DESP")
+			if not BillboardGui then
+				local BillboardGui = Instance.new("BillboardGui")
+				local Frame = Instance.new("Frame")
+				local UICorner = Instance.new("UICorner")
+				local UIStroke = Instance.new("UIStroke")
+
+				BillboardGui.Parent = player.Character
+				BillboardGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+				BillboardGui.Active = true
+				BillboardGui.AlwaysOnTop = true
+				BillboardGui.Name = "2DESP"
+				BillboardGui.LightInfluence = 1.000
+				BillboardGui.Size = UDim2.new(4.5, 0, 5.5, 0)
+
+				Frame.Parent = BillboardGui
+				Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+				Frame.BackgroundTransparency = 1
+				Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+				Frame.BorderSizePixel = 0
+				Frame.Size = UDim2.new(1, 0, 1, 0)
+
+				UICorner.CornerRadius = UDim.new(0.219999999, 0)
+				UICorner.Parent = Frame
+
+				UIStroke.Parent = Frame
+				UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+				UIStroke.LineJoinMode = Enum.LineJoinMode.Bevel
+				UIStroke.Transparency = 0.25
+				UIStroke.Thickness = 0.025
+				UIStroke.Color = Color3.fromRGB(255, 255, 255)
+			end
+		end
+	end
+
+	local function RemoveESP(player)
+		if player ~= LocalPlayer and IsAlive(player) then
+			local BillboardGui = player.Character:FindFirstChild("2DESP")
+			if BillboardGui then
+				BillboardGui:Destroy()
+			end
+		end
+	end
+	
+	local ESP = Tabs.Render:CreateToggle({
+		Name = "ESP",
+		Callback = function(callback)
+			Enabled = callback
+			if callback then
+				repeat
+					wait()
+					Players.PlayerAdded:Connect(CreateESP)
+					Players.PlayerRemoving:Connect(RemoveESP)
+					for _, v in pairs(Players:GetPlayers()) do
+						CreateESP(v)
+					end
+				until not Enabled
+				for _, v in pairs(Players:GetPlayers()) do
+					RemoveESP(v)
+				end
+			end
+		end
+	})
+end)
+
+
+spawn(function()
+	local Enabled, Player, PlayerName, PlayerHumanoid, PlayerImage  = false, nil, nil, nil, nil
 	local TargetHUD = Tabs.Render:CreateToggle({
 		Name = "TargetHUD",
 		Callback = function(callback)
@@ -738,17 +1119,84 @@ spawn(function()
 			if callback then
 				repeat
 					wait()
-					NearestPlayer = GetPlayer(KillAuraDistance, KillAuraPlayerModes)
-					if NearestPlayer then
-						TargetImage = Players:GetUserThumbnailAsync(NearestPlayer.UserId, Enum.ThumbnailType.AvatarBust, Enum.ThumbnailSize.Size48x48)
-						Main:TargetHud(NearestPlayer.Name, TargetImage, NearestPlayer.Character:FindFirstChildOfClass("Humanoid"), Humanoid, true)
+					Player = GetPlayer(KillAuraDistance, KillAuraPlayerModes)
+					if Player and IsAlive(Player) then
+						PlayerName = Player.Name
+						PlayerHumanoid = Player.Character:FindFirstChildOfClass("Humanoid")
+						PlayerImage = Players:GetUserThumbnailAsync(Player.UserId, Enum.ThumbnailType.AvatarBust, Enum.ThumbnailSize.Size48x48)
+						Main:TargetHud(PlayerName, PlayerImage, PlayerHumanoid, Humanoid, Enabled)
 					end
 				until not Enabled
-				Main:TargetHud(NearestPlayer.Name, TargetImage, NearestPlayer.Character:FindFirstChildOfClass("Humanoid"), Humanoid, false)
+				Player, PlayerName, PlayerHumanoid, PlayerImage  = nil, nil, nil, nil
+				Main:TargetHud(PlayerName, PlayerImage, PlayerHumanoid, Humanoid, Enabled)
 			end
 		end
 	})
 end)
+
+--[[
+spawn(function()
+	local ToolsView = GetToolsViewmodel()
+	local Enabled = false
+	local ToolsPosition = {
+		Original = {
+			OriginalX = ToolsView.Position.X,
+			OriginalY = ToolsView.Position.Y,
+			OriginalZ = ToolsView.Position.Z 
+		},
+		Modified = {
+			NewX = ToolsView.Position.X or 0,
+			NewY = ToolsView.Position.Y or 0,
+			NewZ = ToolsView.Position.Z or 0
+		}
+	}
+	local Viewmodel = Tabs.Render:CreateToggle({
+		Name = "Viewmodel",
+		Callback = function(callback)
+			Enabled = callback
+			if callback then
+				repeat
+					wait()
+					local Tool = LocalPlayer.Character:FindFirstChildOfClass("Tool")
+					if Tool and ToolsView then
+						if shared.OriginalC0 then
+							ToolsView.C0 = shared.OriginalC0 * CFrame.new(ToolsPosition.Modified.NewX, ToolsPosition.Modified.NewY, ToolsPosition.Modified.NewZ)
+						end
+					end
+				until not Enabled
+				ToolsView.C0 = shared.OriginalC0
+			end
+		end
+	})
+	local CustomX = Viewmodel:CreateSlider({
+		Name = "X",
+		Min = 0,
+		Max = 100,
+		Default = ToolsPosition.Original.OriginalX,
+		Callback = function(callback)
+			ToolsPosition.Modified.NewX = callback
+		end
+	})
+	local CustomY = Viewmodel:CreateSlider({
+		Name = "Y",
+		Min = 0,
+		Max = 100,
+		Default = ToolsPosition.Original.OriginalY,
+		Callback = function(callback)
+			ToolsPosition.Modified.NewY = callback
+		end
+	})
+	local CustomZ = Viewmodel:CreateSlider({
+		Name = "Z",
+		Min = 0,
+		Max = 100,
+		Default = ToolsPosition.Original.OriginalZ,
+		Callback = function(callback)
+			ToolsPosition.Modified.NewZ = callback
+		end
+	})
+end)
+--]]
 
 spawn(function()
 	local Enabled, Distance, PlayerModes = false, nil, nil
@@ -765,7 +1213,7 @@ spawn(function()
 						if Bow then
 							local args = {
 								[1] = Player.Character:FindFirstChild("HumanoidRootPart").Position,
-								[2] = 2.9958127420395613
+								[2] = 5.9958127420395613
 							}
 							Bow:WaitForChild("__comm__"):WaitForChild("RF"):FindFirstChild("Fire"):InvokeServer(unpack(args))
 						end
@@ -776,6 +1224,9 @@ spawn(function()
 	})
 	local CustomDistance = BowAura:CreateSlider({
 		Name = "Distance",
+		Min = 0,
+		Max = 100,
+		Default = 50,
 		Callback = function(callback)
 			if callback then
 				Distance = callback
