@@ -111,7 +111,7 @@ spawn(function()
 			Enabled = callback
 			if callback then
 				repeat
-					wait(0.01)
+					task.wait()
 					local Player = GetPlayer(Distance, "Distance")
 					if Aim == "Head" then
 						Direction = (Player.Character:FindFirstChild("Head").Position - CurrentCamera.CFrame.Position).unit
@@ -121,7 +121,7 @@ spawn(function()
 						Direction = (Player.Character:FindFirstChild("LowerTorso").Position - CurrentCamera.CFrame.Position).unit
 					end
 					if Player then
-					local NewCFrame = CFrame.new(CurrentCamera.CFrame.Position, CurrentCamera.CFrame.Position + Direction)
+						local NewCFrame = CFrame.new(CurrentCamera.CFrame.Position, CurrentCamera.CFrame.Position + Direction)
 						if Hold then
 							if UserInputService:IsMouseButtonPressed(Enum.UserInputType[HoldType]) then
 								CurrentCamera.CFrame = NewCFrame
@@ -186,7 +186,7 @@ spawn(function()
 			Enabled = callback
 			if callback then
 				repeat
-					wait(1 / CPS)
+					task.wait(1 / CPS)
 					local Tool = LocalPlayer.Character:FindFirstChildWhichIsA("Tool")
 					if UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
 						if Tool then
@@ -218,7 +218,7 @@ spawn(function()
 			Enabled = callback
 			if callback then
 				repeat
-					wait()
+					task.wait()
 					local Player = GetPlayer(Distance, "Distance")
 					Sword = GetTools("Sword")
 					if Players then
@@ -325,7 +325,7 @@ spawn(function()
 			Enabled = callback
 			if callback then
 				repeat
-					wait()
+					task.wait()
 					if IsAlive(LocalPlayer) then
 						local Player = GetPlayer(KillAuraDistance, KillAuraPlayerModes)
 						if Player then
@@ -754,7 +754,7 @@ spawn(function()
 			Enabled = callback
 			if callback then
 				repeat
-					wait()
+					task.wait()
 					if IsAlive(LocalPlayer) then
 						if HumanoidRootPart then
 							local Motion = LocalPlayer.Character.Humanoid.MoveDirection * Speeds
@@ -823,14 +823,14 @@ spawn(function()
 		end
 		return NewPos
 	end
-	
+
 	local Scaffold = Tabs.Player:CreateToggle({
 		Name = "Scaffold",
 		Callback = function(callback)
 			Enabled = callback
 			if callback then
 				repeat
-					wait()
+					task.wait()
 					if IsAlive(LocalPlayer) then
 						local HumanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 						local Block = CheckTools("Blocks")
@@ -903,7 +903,7 @@ spawn(function()
 		Callback = function(callback)
 			if callback then
 				repeat
-					wait()
+					task.wait()
 					local Apple = CheckTools("Apple")
 					if Apple then
 						local args = {
@@ -931,7 +931,7 @@ spawn(function()
 			Enabled = callback
 			if callback then
 				repeat
-					wait()
+					task.wait()
 					if Selected == "Eternal1" then
 						KillAuraAnimation = {
 							{CFrame = CFrame.new(0, 0, 1.5) * CFrame.Angles(math.rad(-35), math.rad(50), math.rad(110)), Time = 0.15},
@@ -972,7 +972,7 @@ spawn(function()
 					BlurEffect.Parent = Lighting
 				end
 				repeat
-					wait()
+					task.wait()
 					BlurEffect.Size = Size
 				until not Enabled
 			else
@@ -1025,7 +1025,7 @@ spawn(function()
 			Enabled = callback
 			if callback then
 				repeat
-					wait()
+					task.wait()
 					Players.PlayerAdded:Connect(Hightlight)
 					Players.PlayerRemoving:Connect(RemoveHighlight)
 					for i,v in pairs(Players:GetPlayers()) do
@@ -1087,14 +1087,14 @@ spawn(function()
 			end
 		end
 	end
-	
+
 	local ESP = Tabs.Render:CreateToggle({
 		Name = "ESP",
 		Callback = function(callback)
 			Enabled = callback
 			if callback then
 				repeat
-					wait()
+					task.wait()
 					Players.PlayerAdded:Connect(CreateESP)
 					Players.PlayerRemoving:Connect(RemoveESP)
 					for _, v in pairs(Players:GetPlayers()) do
@@ -1118,7 +1118,7 @@ spawn(function()
 			Enabled = callback
 			if callback then
 				repeat
-					wait()
+					task.wait()
 					Player = GetPlayer(KillAuraDistance, KillAuraPlayerModes)
 					if Player and IsAlive(Player) then
 						PlayerName = Player.Name
@@ -1206,7 +1206,7 @@ spawn(function()
 			Enabled = callback
 			if callback then
 				repeat
-					wait()
+					task.wait()
 					local Player = GetPlayer(Distance, PlayerModes)
 					if Player then
 						local Bow = CheckTools("Bow")
